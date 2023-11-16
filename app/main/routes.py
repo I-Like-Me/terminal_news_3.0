@@ -5,5 +5,5 @@ from app.main import bp
 @bp.route('/')
 @bp.route('/index')
 def index():
-    content = ''
-    return content
+    content = {'food': 'Pizza'}
+    return render_template('index.html', title='Home', content=content)
