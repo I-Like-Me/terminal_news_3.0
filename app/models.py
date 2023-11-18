@@ -31,35 +31,9 @@ class Character(db.Model):
     temp_hit_points = db.Column(db.Integer)
     total_hit_dice = db.Column(db.String(64))
     cur_hit_dice = db.Column(db.String(64))
-    strength = db.Column(db.Integer)
-    dexterity = db.Column(db.Integer)
-    constitution = db.Column(db.Integer)
-    intelligence = db.Column(db.Integer)
-    wisdom = db.Column(db.Integer)
-    charisma = db.Column(db.Integer)
+    abilities =
     pro_abilities = 
-    acrobatics = db.Column(db.Integer)
-    animal_handling = db.Column(db.Integer)
-    arcana = db.Column(db.Integer)
-    athletics = db.Column(db.Integer)
-    computer_use = db.Column(db.Integer)
-    deception = db.Column(db.Integer)
-    demolitions = db.Column(db.Integer)
-    engineering = db.Column(db.Integer)
-    history = db.Column(db.Integer)
-    insight = db.Column(db.Integer)
-    intimidation = db.Column(db.Integer)
-    investigation = db.Column(db.Integer)
-    medicine = db.Column(db.Integer)
-    nature = db.Column(db.Integer)
-    perception = db.Column(db.Integer)
-    performance = db.Column(db.Integer)
-    persuasion = db.Column(db.Integer)
-    religion = db.Column(db.Integer)
-    sciences = db.Column(db.Integer)
-    sleight_of_hand = db.Column(db.Integer)
-    stealth = db.Column(db.Integer)
-    survival = db.Column(db.Integer)
+    skills =
     pro_skills =
     knows_name =
     real_age = db.Column(db.Integer)
@@ -88,6 +62,44 @@ class Character(db.Model):
     job = 
     play_notes = db.Column(db.String(5000))
     history = db.Column(db.String(5000))
+
+class char_skill_scores:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    acrobatics = db.Column(db.Integer)
+    animal_handling = db.Column(db.Integer)
+    arcana = db.Column(db.Integer)
+    athletics = db.Column(db.Integer)
+    computer_use = db.Column(db.Integer)
+    deception = db.Column(db.Integer)
+    demolitions = db.Column(db.Integer)
+    engineering = db.Column(db.Integer)
+    history = db.Column(db.Integer)
+    insight = db.Column(db.Integer)
+    intimidation = db.Column(db.Integer)
+    investigation = db.Column(db.Integer)
+    medicine = db.Column(db.Integer)
+    nature = db.Column(db.Integer)
+    perception = db.Column(db.Integer)
+    performance = db.Column(db.Integer)
+    persuasion = db.Column(db.Integer)
+    religion = db.Column(db.Integer)
+    sciences = db.Column(db.Integer)
+    sleight_of_hand = db.Column(db.Integer)
+    stealth = db.Column(db.Integer)
+    survival = db.Column(db.Integer)
+    skilled_char =
+
+class char_ability_scores:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    strength = db.Column(db.Integer)
+    dexterity = db.Column(db.Integer)
+    constitution = db.Column(db.Integer)
+    intelligence = db.Column(db.Integer)
+    wisdom = db.Column(db.Integer)
+    charisma = db.Column(db.Integer)
+    able_char =
 
 class cls_5e:
     id = db.Column(db.Integer, primary_key=True)
