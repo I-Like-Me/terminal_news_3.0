@@ -35,6 +35,22 @@ class Character(db.Model):
     pro_abilities = 
     skills =
     pro_skills =
+    personal_info = 
+    weapons =
+    gear =
+    factions = 
+    npc = db.Column(db.Boolean)
+    parties = 
+    admin = db.Column(db.Boolean)
+    backpack = db.Column(db.String(5000))
+    prepd_spells =
+    spellbook =
+    feats =
+    play_notes = db.Column(db.String(5000))
+
+class char_personal_info:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
     knows_name =
     real_age = db.Column(db.Integer)
     knows_r_age =
@@ -49,19 +65,9 @@ class Character(db.Model):
     birth_loc = 
     self_k_b_loc = db.Column(db.Boolean)
     cur_loc = 
-    weapons =
-    gear =
-    factions = 
-    npc = db.Column(db.Boolean)
-    parties = 
-    admin = db.Column(db.Boolean)
-    backpack = db.Column(db.String(5000))
-    prepd_spells =
-    spellbook =
-    feats =
     job = 
-    play_notes = db.Column(db.String(5000))
     history = db.Column(db.String(5000))
+    info_subject =
 
 class char_skill_scores:
     id = db.Column(db.Integer, primary_key=True)
@@ -100,6 +106,13 @@ class char_ability_scores:
     wisdom = db.Column(db.Integer)
     charisma = db.Column(db.Integer)
     able_char =
+
+class party:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    members = 
+    max_members = db.Column(db.Integer)
+    joined_game = 
 
 class cls_5e:
     id = db.Column(db.Integer, primary_key=True)
