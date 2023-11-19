@@ -17,7 +17,6 @@ class Character(db.Model):
     player =
     level = db.Column(db.Integer)
     cls =
-    arch = 
     ladder =
     background =
     proficiency = db.Column(db.Integer)
@@ -117,6 +116,7 @@ class party:
 class cls_5e:
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    arch = 
     features =
     hit_dice_type = 
     hit_pnt_l01 = db.Column(db.Integer)
@@ -126,7 +126,40 @@ class cls_5e:
     armor_pro = 
     skill_pro_num = 
     skill_pro_choice = 
-    
+    classed_char =
+
+class architype:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    l01 = db.Column(db.String(64))
+    l02 = db.Column(db.String(64))
+    l03 = db.Column(db.String(64))
+    l04 = db.Column(db.String(64))
+    l05 = db.Column(db.String(64))
+    l06 = db.Column(db.String(64))
+    l07 = db.Column(db.String(64))
+    l08 = db.Column(db.String(64))
+    l09 = db.Column(db.String(64))
+    l10 = db.Column(db.String(64))
+    l11 = db.Column(db.String(64))
+    l12 = db.Column(db.String(64))
+    l13 = db.Column(db.String(64))
+    l14 = db.Column(db.String(64))
+    l15 = db.Column(db.String(64))
+    l16 = db.Column(db.String(64))
+    l17 = db.Column(db.String(64))
+    l18 = db.Column(db.String(64))
+    l19 = db.Column(db.String(64))
+    l20 = db.Column(db.String(64))
+    arched_char =
+
+class features:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    level_access = db.Column(db.Integer)
+    description = db.Column(db.String(200))
+    feature_holder = 
+
 class damage_type:
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
