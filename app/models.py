@@ -49,13 +49,12 @@ class Character(db.Model):
 
 class char_personal_info:
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=True)
     knows_name =
     real_age = db.Column(db.Integer)
     knows_r_age =
     self_k_r_age = db.Column(db.Boolean)
     fake_age = db.Column(db.Integer)
-    knows_f_age = db.Column(db.Integer)
+    knows_f_age = 
     cur_race =
     knows_c_race = 
     birth_race =
@@ -152,6 +151,36 @@ class architype:
     l19 = db.Column(db.String(64))
     l20 = db.Column(db.String(64))
     arched_char =
+
+class knows_char_cls_arch:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    cls_arch_holder = 
+
+class knows_char_real_age:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    real_aged_char = 
+
+class knows_char_fake_age:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    fake_aged_char = 
+
+class knows_char_name:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    named_char = 
+
+class knows_char_birth_race:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    birth_race_char = 
+
+class knows_char_cur_race:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    cur_race_char = 
 
 class features:
     id = db.Column(db.Integer, primary_key=True)
