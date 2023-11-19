@@ -49,21 +49,27 @@ class Character(db.Model):
 
 class char_personal_info:
     id = db.Column(db.Integer, primary_key=True)
-    knows_name =
+    knows_name = #class knows_char_cur_name:
+    birth_name = db.Column(db.String(64))
+    self_k_b_name = db.Column(db.Boolean)
+    knows_birth_name = #class knows_char_birth_name:
     real_age = db.Column(db.Integer)
-    knows_r_age =
+    knows_r_age = #class knows_char_real_age:
     self_k_r_age = db.Column(db.Boolean)
     fake_age = db.Column(db.Integer)
-    knows_f_age = 
+    knows_f_age = #class knows_char_fake_age:
     cur_race =
-    knows_c_race = 
+    knows_c_race = #class knows_char_cur_race:
     birth_race =
     self_k_b_race = db.Column(db.Boolean)
-    cur_race =
+    knows_b_race = #class knows_char_birth_race:
     birth_loc = 
+    knows_b_loc = #class knows_char_birth_loc:
     self_k_b_loc = db.Column(db.Boolean)
     cur_loc = 
+    knows_c_loc = #class knows_char_cur_loc:
     job = 
+    knows_c_job = #class knows_char_job:
     history = db.Column(db.String(5000))
     info_subject =
 
@@ -167,10 +173,15 @@ class knows_char_fake_age:
     name = db.Column(db.String(64), index=True, unique=True)
     fake_aged_char = 
 
-class knows_char_name:
+class knows_char_cur_name:
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    named_char = 
+    cur_named_char = 
+
+class knows_char_birth_name:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    birth_named_char = 
 
 class knows_char_birth_race:
     id = db.Column(db.Integer, primary_key=True)
@@ -181,6 +192,21 @@ class knows_char_cur_race:
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     cur_race_char = 
+
+class knows_char_birth_loc:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    birth_loc_char = 
+
+class knows_char_cur_loc:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    cur_loc_char = 
+
+class knows_char_job:
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    employed_char = 
 
 class features:
     id = db.Column(db.Integer, primary_key=True)
