@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from logging.handlers import SMTPHandler
 from logging.handlers import RotatingFileHandler
+from .database import engine
 import logging
 import os
 
@@ -21,7 +22,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
-
+    db.metadata.create_all(bind=engine)
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
