@@ -6,12 +6,6 @@ user_char_table = db.Table(
     db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
 )
 
-char_cls_table = db.Table(
-    "char_cls_table",
-    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
-    db.Column("cls_id", db.ForeignKey("cls.id"), primary_key=True),
-)
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -31,21 +25,30 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     player = db.relationship("User", secondary=user_char_table, back_populates="character")
-    cls = db.relationship("Cls_5e", secondary=char_cls_table, back_populates="classed_char")
+    classes = db.relationship(back_populates="classed_character")
     level = db.Column(db.Integer)
     npc = db.Column(db.Boolean)
 
     def __repr__(self):
         return f'<Character {self.name}>'
+
+    def pick_cls(self, cls_pick):
+        self.cls.append(cls_pick)
+
+class Char_cls_table(db.model):
+    "char_cls_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    cls_level = db.Column(db.Integer)
+    cls = db.relationship(back_populates='classed_characters')
+    classed_character = db.relationship(back_populates='classes')
     
 class Cls_5e(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    total_hit_dice = db.Column(db.String(64))
-    cur_hit_dice = db.Column(db.String(64))
-    hit_pnt_l01 = db.Column(db.Integer)
-    max_num_pro_skills = db.Column(db.Integer)
-    classed_char = db.relationship("Character", secondary=char_cls_table, back_populates="cls")
+    cls_level = db.Column(db.Integer)
+    classed_characters = db.relationship(back_populates="cls")
 
     def __repr__(self):
-        return f'<Character {self.name}>'
+        return f'<Cls_5e {self.name}>'
+
