@@ -11,8 +11,8 @@ class CharCls(db.model):
     character_id = db.Column("character_id", db.Integer, db.ForeignKey("character.id")),
     cls_5e_id = db.Column("cls_5e_id",db.Integer , db.ForeignKey("cls_5e.id")),
     cls_level = db.Column(db.Integer)
-    cls = db.relationship("Cls_5e", back_populates='classed_characters')
-    classed_character = db.relationship("Character", back_populates='classes')
+    cls = db.relationship("Cls_5e", back_populates='classed_characters_association')
+    classed_character = db.relationship("Character", back_populates='classes_association')
 
 
 class User(db.Model):
@@ -34,8 +34,8 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     player = db.relationship("User", secondary=user_char_table, back_populates="character")
-    # classes = db.relationship(back_populates="classed_character")
-    classes = db.relationship("CharCls", back_populates="classed_character")
+    classes_association = db.relationship("CharCls", back_populates="classed_character")
+    classes = db.association_proxy("classes_association", "cls")
     level = db.Column(db.Integer)
     npc = db.Column(db.Boolean)
 
@@ -58,7 +58,8 @@ class Cls_5e(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     cls_level = db.Column(db.Integer)
     # classed_characters = db.relationship(back_populates="cls")
-    classed_characters = db.relationship("CharCls", back_populates="cls")
+    classed_characters_association = db.relationship("CharCls", back_populates="cls")
+    classed_characters = db.association_proxy('classed_characters_association', 'classed_character')
     def __repr__(self):
         return f'<Cls_5e {self.name}>'
 
