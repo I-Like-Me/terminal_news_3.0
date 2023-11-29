@@ -10,8 +10,8 @@ user_char_table = db.Table(
 
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    character_id = db.Column("character_id", db.Integer, db.ForeignKey("character.id")),
-    cls_5e_id = db.Column("cls_5e_id",db.Integer , db.ForeignKey("cls_5e.id")),
+    character_id = db.Column("character_id", db.Integer, db.ForeignKey("character.id"))
+    cls_5e_id = db.Column("cls_5e_id",db.Integer , db.ForeignKey("cls_5e.id"))
     cls_level = db.Column(db.Integer)
 
     classed_character = db.relationship("Character", back_populates='cls_association')
