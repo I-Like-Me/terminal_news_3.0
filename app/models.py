@@ -10,17 +10,17 @@ user_char_table = db.Table(
 
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    char_cls = db.Column(db.String(64), index=True, unique=True)
     character_id = db.Column("character_id", db.Integer, db.ForeignKey("character.id"))
     cls_5e_id = db.Column("cls_5e_id",db.Integer , db.ForeignKey("cls_5e.id"))
     cls_level = db.Column(db.Integer)
 
     classed_character = db.relationship("Character", back_populates='cls_association')
     cls = db.relationship("Cls_5e", back_populates='classed_character_association')
-
-    # def lvl_up_cls(self, cls_target):
-    #     for cls
-    #     self.cls_level += 1
    
+    def __repr__(self):
+        return f'<CharCls {self.char_cls}>'
+     
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,8 +50,16 @@ class Character(db.Model):
         return f'<Character {self.name}>'
 
     def pick_cls(self, cls_pick):
-        char_cls_ready = CharCls(classed_character=self, cls=cls_pick, cls_level=1)
+        char_cls_ready = CharCls(classed_character=self, cls=cls_pick, cls_level=1, char_cls=f'{self.name[:3]}{self.id}_{cls_pick.name[:3]}{cls_pick.id}')
         db.session.add(char_cls_ready)
+        db.session.commit()
+
+    def lvl_up_cls(self, cls_target):
+        for cls in self.classes:
+            if cls.name == cls_target:
+                char_cls_entry = CharCls.query.filter_by(char_cls=f'{self.name[:3]}{self.id}_{cls.name[:3]}{cls.id}').first()
+                char_cls_entry.cls_level += 1
+        db.session.add(char_cls_entry)
         db.session.commit()
         
 
