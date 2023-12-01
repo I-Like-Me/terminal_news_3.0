@@ -43,7 +43,7 @@ class Character(db.Model):
     player = db.relationship("User", secondary=user_char_table, back_populates="character")
     cls_association = db.relationship("CharCls", back_populates="classed_character")
     classes = association_proxy("cls_association", "cls")
-    level = db.Column(db.Integer)
+    level = db.Column(db.Integer, default=0)
     npc = db.Column(db.Boolean)
 
     def __repr__(self):
@@ -51,6 +51,7 @@ class Character(db.Model):
 
     def pick_cls(self, cls_pick):
         char_cls_ready = CharCls(classed_character=self, cls=cls_pick, cls_level=1, char_cls=f'{self.name[:3]}{self.id}_{cls_pick.name[:3]}{cls_pick.id}')
+        self.level += 1
         db.session.add(char_cls_ready)
         db.session.commit()
 
@@ -59,8 +60,14 @@ class Character(db.Model):
             if cls.name == cls_target:
                 char_cls_entry = CharCls.query.filter_by(char_cls=f'{self.name[:3]}{self.id}_{cls.name[:3]}{cls.id}').first()
                 char_cls_entry.cls_level += 1
-        db.session.add(char_cls_entry)
+                self.level += 1
         db.session.commit()
+    
+    def get_cls_lvl(self, cls_target):
+        for cls in self.classes:
+            if cls.name == cls_target:
+                char_cls_entry = CharCls.query.filter_by(char_cls=f'{self.name[:3]}{self.id}_{cls.name[:3]}{cls.id}').first()
+                return char_cls_entry.cls_level
         
 
 class Cls_5e(db.Model):
