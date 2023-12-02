@@ -51,6 +51,7 @@ class Character(db.Model):
     cur_hit_points = db.Column(db.Integer)
     temp_hit_points = db.Column(db.Integer)
     skill_numbers = db.relationship("SkillScores", back_populates="skilled_char")
+    ability_numbers = db.relationship("AbilityScores", back_populates="able_char")
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
     cls_association = db.relationship("CharCls", back_populates="classed_character")
@@ -135,3 +136,14 @@ class SkillScores(db.Model):
 
     def __repr__(self):
         return f'<SkillScores {self.char_name}>'
+    
+class AbilityScores(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    char_name = db.Column(db.String(64), index=True, unique=True)
+    strength = db.Column(db.Integer)
+    dexterity = db.Column(db.Integer)
+    constitution = db.Column(db.Integer)
+    intelligence = db.Column(db.Integer)
+    wisdom = db.Column(db.Integer)
+    charisma = db.Column(db.Integer)
+    able_char = db.relationship("Character", back_populates="ability_numbers")

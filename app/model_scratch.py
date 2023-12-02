@@ -3,10 +3,8 @@
 #     ladder =
 #     background =
 #     alignment =
-#     ability_numbers = #class char_ability_scores(db.Model):
 #     pro_abilities = 
 #     pro_skills =
-#     personal_info = #class char_personal_info(db.Model):
 #     weapons = #class weapon(db.Model):
 #     armor = #class armor(db.Model):
 #     gear =
@@ -23,19 +21,6 @@
 #     birth_loc = 
 #     cur_loc = 
 #     job = 
-#     history = db.Column(db.String(5000))
-#     info_subject = #class Character(db.Model):
-
-# class char_ability_scores(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     strength = db.Column(db.Integer)
-#     dexterity = db.Column(db.Integer)
-#     constitution = db.Column(db.Integer)
-#     intelligence = db.Column(db.Integer)
-#     wisdom = db.Column(db.Integer)
-#     charisma = db.Column(db.Integer)
-#     able_char = #class Character(db.Model):
 
 # class party(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
