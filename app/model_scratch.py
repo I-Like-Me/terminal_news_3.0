@@ -1,26 +1,10 @@
 
 # class Character(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     player = #class User(db.Model):
-#     level = db.Column(db.Integer)
-#     npc = db.Column(db.Boolean)
-#     cls = #class cls_5e(db.Model):
-#     knows_cls = #class knows_char_cls_arch(db.Model):
 #     ladder =
 #     background =
-#     proficiency = db.Column(db.Integer)
-#     speed = db.Column(db.Integer)
-#     passive_perc = db.Column(db.Integer)
-#     armor_class = db.Column(db.Integer)
-#     inspiration = db.Column(db.Boolean)
-#     initiative = db.Column(db.Integer)
 #     alignment =
-#     cur_hit_points = db.Column(db.Integer)
-#     temp_hit_points = db.Column(db.Integer)
 #     ability_numbers = #class char_ability_scores(db.Model):
 #     pro_abilities = 
-#     skill_numbers = #class char_skill_scores(db.Model):
 #     pro_skills =
 #     personal_info = #class char_personal_info(db.Model):
 #     weapons = #class weapon(db.Model):
@@ -28,65 +12,19 @@
 #     gear =
 #     factions = 
 #     parties = #class party(db.Model):
-#     admin = db.Column(db.Boolean)
-#     backpack = db.Column(db.String(5000))
 #     prepd_spells =
 #     spellbook =
 #     feats =
-#     play_notes = db.Column(db.String(5000))
+
 
 # class char_personal_info(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     knows_name = #class knows_char_cur_name(db.Model):
-#     birth_name = db.Column(db.String(64))
-#     self_k_b_name = db.Column(db.Boolean)
-#     knows_birth_name = #class knows_char_birth_name(db.Model):
-#     real_age = db.Column(db.Integer)
-#     knows_r_age = #class knows_char_real_age(db.Model):
-#     self_k_r_age = db.Column(db.Boolean)
-#     fake_age = db.Column(db.Integer)
-#     knows_f_age = #class knows_char_fake_age(db.Model):
 #     cur_race =
-#     knows_c_race = #class knows_char_cur_race(db.Model):
 #     birth_race =
-#     self_k_b_race = db.Column(db.Boolean)
-#     knows_b_race = #class knows_char_birth_race(db.Model):
 #     birth_loc = 
-#     knows_b_loc = #class knows_char_birth_loc(db.Model):
-#     self_k_b_loc = db.Column(db.Boolean)
 #     cur_loc = 
-#     knows_c_loc = #class knows_char_cur_loc(db.Model):
 #     job = 
-#     knows_c_job = #class knows_char_job(db.Model):
 #     history = db.Column(db.String(5000))
 #     info_subject = #class Character(db.Model):
-
-# class char_skill_scores(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     acrobatics = db.Column(db.Integer)
-#     animal_handling = db.Column(db.Integer)
-#     arcana = db.Column(db.Integer)
-#     athletics = db.Column(db.Integer)
-#     computer_use = db.Column(db.Integer)
-#     deception = db.Column(db.Integer)
-#     demolitions = db.Column(db.Integer)
-#     engineering = db.Column(db.Integer)
-#     history = db.Column(db.Integer)
-#     insight = db.Column(db.Integer)
-#     intimidation = db.Column(db.Integer)
-#     investigation = db.Column(db.Integer)
-#     medicine = db.Column(db.Integer)
-#     nature = db.Column(db.Integer)
-#     perception = db.Column(db.Integer)
-#     performance = db.Column(db.Integer)
-#     persuasion = db.Column(db.Integer)
-#     religion = db.Column(db.Integer)
-#     sciences = db.Column(db.Integer)
-#     sleight_of_hand = db.Column(db.Integer)
-#     stealth = db.Column(db.Integer)
-#     survival = db.Column(db.Integer)
-#     skilled_char = #class Character(db.Model):
 
 # class char_ability_scores(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)

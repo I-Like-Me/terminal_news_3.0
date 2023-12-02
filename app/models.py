@@ -20,7 +20,7 @@ class CharCls(db.Model):
    
     def __repr__(self):
         return f'<CharCls {self.char_cls}>'
-     
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,6 +28,7 @@ class User(db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     character = db.relationship("Character", secondary=user_char_table, back_populates="player")
+    admin = db.Column(db.Boolean)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -41,8 +42,20 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     player = db.relationship("User", secondary=user_char_table, back_populates="character")
+    proficiency = db.Column(db.Integer)
+    speed = db.Column(db.Integer)
+    passive_perc = db.Column(db.Integer)
+    armor_class = db.Column(db.Integer)
+    inspiration = db.Column(db.Boolean)
+    initiative = db.Column(db.Integer)
+    cur_hit_points = db.Column(db.Integer)
+    temp_hit_points = db.Column(db.Integer)
+    skill_numbers = db.relationship("SkillScores", back_populates="skilled_char")
+    backpack = db.Column(db.String(5000))
+    play_notes = db.Column(db.String(5000))
     cls_association = db.relationship("CharCls", back_populates="classed_character")
     classes = association_proxy("cls_association", "cls")
+    life_info = db.relationship("Info", back_populates="info_holder")
     level = db.Column(db.Integer, default=0)
     npc = db.Column(db.Boolean)
 
@@ -67,8 +80,7 @@ class Character(db.Model):
         for cls in self.classes:
             if cls.name == cls_target:
                 char_cls_entry = CharCls.query.filter_by(char_cls=f'{self.name[:3]}{self.id}_{cls.name[:3]}{cls.id}').first()
-                return char_cls_entry.cls_level
-        
+                return char_cls_entry.cls_level      
 
 class Cls_5e(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -83,3 +95,43 @@ class Cls_5e(db.Model):
         new_cls = Cls_5e(name=cls_name)
         db.session.add(new_cls)
         db.session.commit()
+
+class Info(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    char_name = db.Column(db.String(64), index=True, unique=True)
+    birth_name = db.Column(db.String(64))
+    age = db.Column(db.Integer)
+    real_age  = db.Column(db.Integer)
+    history = db.Column(db.String(5000))
+    hid_history = db.Column(db.String(5000))
+    info_holder = db.relationship("Character", back_populates="life_info")
+
+class SkillScores(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    char_name = db.Column(db.String(64), index=True, unique=True)
+    acrobatics = db.Column(db.Integer)
+    animal_handling = db.Column(db.Integer)
+    arcana = db.Column(db.Integer)
+    athletics = db.Column(db.Integer)
+    computer_use = db.Column(db.Integer)
+    deception = db.Column(db.Integer)
+    demolitions = db.Column(db.Integer)
+    engineering = db.Column(db.Integer)
+    history = db.Column(db.Integer)
+    insight = db.Column(db.Integer)
+    intimidation = db.Column(db.Integer)
+    investigation = db.Column(db.Integer)
+    medicine = db.Column(db.Integer)
+    nature = db.Column(db.Integer)
+    perception = db.Column(db.Integer)
+    performance = db.Column(db.Integer)
+    persuasion = db.Column(db.Integer)
+    religion = db.Column(db.Integer)
+    sciences = db.Column(db.Integer)
+    sleight_of_hand = db.Column(db.Integer)
+    stealth = db.Column(db.Integer)
+    survival = db.Column(db.Integer)
+    skilled_char = db.relationship("Character", back_populates="skill_numbers")
+
+    def __repr__(self):
+        return f'<SkillScores {self.char_name}>'
