@@ -7,6 +7,24 @@ user_char_table = db.Table(
     db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
 )
 
+weap_dice_table = db.Table(
+    "weap_dice_table",
+    db.Column("weapon_id", db.ForeignKey("weapon.id"), primary_key=True),
+    db.Column("dice_id", db.ForeignKey("dice.id"), primary_key=True),
+)
+
+weap_dmg_type_table = db.Table(
+    "weap_dmg_type_table",
+    db.Column("weapon_id", db.ForeignKey("weapon.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+armor_dmg_type_table = db.Table(
+    "armor_dmg_type_table",
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
 
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -20,7 +38,6 @@ class CharCls(db.Model):
    
     def __repr__(self):
         return f'<CharCls {self.char_cls}>'
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,7 +53,6 @@ class User(db.Model):
     def claim_char(self, char_pick):
         if char_pick.npc != True and len(char_pick.player) == 0:
             self.character.append(char_pick)
-
 
 class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -103,8 +119,9 @@ class Info(db.Model):
     birth_name = db.Column(db.String(64))
     age = db.Column(db.Integer)
     real_age  = db.Column(db.Integer)
-    history = db.Column(db.String(5000))
-    hid_history = db.Column(db.String(5000))
+    public_history = db.Column(db.String(5000))
+    learned_history = db.Column(db.String(5000))
+    hidden_history = db.Column(db.String(5000))
     info_holder = db.relationship("Character", back_populates="life_info")
 
 class SkillScores(db.Model):
@@ -147,3 +164,46 @@ class AbilityScores(db.Model):
     wisdom = db.Column(db.Integer)
     charisma = db.Column(db.Integer)
     able_char = db.relationship("Character", back_populates="ability_numbers")
+
+class weapon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    damage_dice = db.relationship("Dice", secondary=weap_dice_table, back_populates="damage_roller")
+    num_of_dice = db.Column(db.Integer)
+    dmg_type = db.relationship("DamageType", secondary=weap_dmg_type_table, back_populates="weap_source")
+    # properties =
+    tech_level = db.Column(db.Integer)
+    ranged = db.Column(db.Boolean)
+    reach = db.Column(db.Integer)
+    normal_range = db.Column(db.Integer)
+    long_range = db.Column(db.Integer)
+    martial = db.Column(db.Boolean)
+    # weap_trained_classes =
+    # wielder = 
+
+class Armor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    armor_size = db.Column(db.String(64))
+    ac = db.Column(db.Integer)
+    # ac_mod_type =
+    ac_mod_max = db.Column(db.Integer)
+    str_req = db.Column(db.Integer)
+    stealth = db.Column(db.String(64))
+    resist_type = db.relationship("DamageType", secondary=armor_dmg_type_table, back_populates="armor_source")
+    # armor_trained_classes = 
+    # wearer = 
+
+class Damagetype(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    weap_source = db.relationship("Weapon", secondary=weap_dmg_type_table, back_populates="dmg_type")
+    armor_source = db.relationship("Armor", secondary=armor_dmg_type_table, back_populates="dmg_type")
+    # race_source
+    # cls_source
+
+class Dice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    value = db.Column(db.Integer)
+    damage_roller = db.relationship("Weapon", secondary=weap_dice_table, back_populates="damage_dice")

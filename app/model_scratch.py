@@ -103,58 +103,13 @@
 #     name = db.Column(db.String(64), index=True, unique=True)
 #     employed_char = #class char_personal_info(db.Model):
 
-# class cls_features(db.Model):
+# class Features(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
 #     name = db.Column(db.String(64), index=True, unique=True)
 #     level_access = db.Column(db.Integer)
 #     description = db.Column(db.String(200))
 #     feature_class = #class cls_5e(db.Model):
-
-# class arch_features(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     level_access = db.Column(db.Integer)
-#     description = db.Column(db.String(200))
 #     feature_arch = #class architype(db.Model):
-
-# class damage_type(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     source = 
-
-# class dice(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     value = db.Column(db.Integer)
-#     roller = 
-
-# class weapon(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     damage = 
-#     num_of_dice = db.Column(db.Integer)
-#     dmg_type = 
-#     properties =
-#     tech_level = db.Column(db.Integer)
-#     ranged = db.Column(db.Boolean)
-#     reach = db.Column(db.Integer)
-#     normal_range = db.Column(db.Integer)
-#     long_range = db.Column(db.Integer)
-#     martial = db.Column(db.Boolean)
-#     weap_trained_classes = #class cls_5e(db.Model):
-#     wielder = #class Character(db.Model):
-
-# class armor(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     armor_size = db.Column(db.String(64))
-#     ac = db.Column(db.Integer)
-#     ac_mod_type =
-#     ac_mod_max = db.Column(db.Integer)
-#     str_req = db.Column(db.Integer)
-#     stealth = db.Column(db.String(64))
-#     armor_trained_classes = #class cls_5e(db.Model):
-#     wearer = #class Character(db.Model):
 
 # class gear(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
