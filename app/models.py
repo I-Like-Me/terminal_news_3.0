@@ -72,7 +72,8 @@ class Character(db.Model):
     play_notes = db.Column(db.String(5000))
     cls_association = db.relationship("CharCls", back_populates="classed_character")
     classes = association_proxy("cls_association", "cls")
-    life_info = db.relationship("Info", back_populates="info_holder")
+    life_info = db.relationship("Lifeinfo", back_populates="life_info_holder")
+    cls_info = db.relationship("Clsinfo", back_populates="cls_info_holder")
     level = db.Column(db.Integer, default=0)
     npc = db.Column(db.Boolean)
 
@@ -104,6 +105,15 @@ class Cls_5e(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     classed_character_association = db.relationship("CharCls", back_populates="cls")
     classed_characters = association_proxy('classed_character_association', 'classed_character')
+    arch_choices =
+    cls_features = 
+    hit_dice_type = 
+    sav_throws = 
+    tool_pro = 
+    weap_pro = 
+    armor_pro = 
+    skill_pro_choice = 
+    max_num_pro_skills = db.Column(db.Integer)
     
     def __repr__(self):
         return f'<Cls_5e {self.name}>'
@@ -113,7 +123,7 @@ class Cls_5e(db.Model):
         db.session.add(new_cls)
         db.session.commit()
 
-class Info(db.Model):
+class Lifeinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_name = db.Column(db.String(64), index=True, unique=True)
     birth_name = db.Column(db.String(64))
@@ -122,7 +132,16 @@ class Info(db.Model):
     public_history = db.Column(db.String(5000))
     learned_history = db.Column(db.String(5000))
     hidden_history = db.Column(db.String(5000))
-    info_holder = db.relationship("Character", back_populates="life_info")
+    life_info_holder = db.relationship("Character", back_populates="life_info")
+
+class Clsinfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    char_name = db.Column(db.String(64), index=True, unique=True)
+    arch = db.Column(db.String(64))
+    arch_choices =
+    total_hit_dice = db.Column(db.String(64))
+    cur_hit_dice = db.Column(db.String(64))
+    cls_info_holder = db.relationship("Character", back_populates="cls_info")
 
 class SkillScores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
