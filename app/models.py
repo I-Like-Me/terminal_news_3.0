@@ -25,6 +25,24 @@ armor_dmg_type_table = db.Table(
     db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
 )
 
+cls_arch_table = db.Table(
+    "cls_arch_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("architype_id", db.ForeignKey("architype.id"), primary_key=True),
+)
+
+cls_feature_table = db.Table(
+    "cls_feature_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("feature_id", db.ForeignKey("feature.id"), primary_key=True),
+)
+
+arch_feature_table = db.Table(
+    "arch_feature_table",
+    db.Column("architype_id", db.ForeignKey("architype.id"), primary_key=True),
+    db.Column("feature_id", db.ForeignKey("feature.id"), primary_key=True),
+)
+
 
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,6 +76,7 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     player = db.relationship("User", secondary=user_char_table, back_populates="character")
+    
     proficiency = db.Column(db.Integer)
     speed = db.Column(db.Integer)
     passive_perc = db.Column(db.Integer)
@@ -66,14 +85,19 @@ class Character(db.Model):
     initiative = db.Column(db.Integer)
     cur_hit_points = db.Column(db.Integer)
     temp_hit_points = db.Column(db.Integer)
+    
     skill_numbers = db.relationship("SkillScores", back_populates="skilled_char")
     ability_numbers = db.relationship("AbilityScores", back_populates="able_char")
+    
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
+    
     cls_association = db.relationship("CharCls", back_populates="classed_character")
     classes = association_proxy("cls_association", "cls")
+    
     life_info = db.relationship("Lifeinfo", back_populates="life_info_holder")
     cls_info = db.relationship("Clsinfo", back_populates="cls_info_holder")
+    
     level = db.Column(db.Integer, default=0)
     npc = db.Column(db.Boolean)
 
@@ -105,13 +129,13 @@ class Cls_5e(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     classed_character_association = db.relationship("CharCls", back_populates="cls")
     classed_characters = association_proxy('classed_character_association', 'classed_character')
-    arch_choices =
-    cls_features = 
+    arch_choices = db.relationship("Architype", secondary=cls_arch_table, back_populates="arched_cls")
+    cls_features = db.relationship("Feature", secondary=cls_feature_table, back_populates="featured_cls")
     hit_dice_type = 
     sav_throws = 
-    tool_pro = 
-    weap_pro = 
-    armor_pro = 
+    tool_pros = 
+    weap_pros = 
+    armor_pros = 
     skill_pro_choice = 
     max_num_pro_skills = db.Column(db.Integer)
     
@@ -122,6 +146,28 @@ class Cls_5e(db.Model):
         new_cls = Cls_5e(name=cls_name)
         db.session.add(new_cls)
         db.session.commit()
+
+class Architype(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    arch_features = db.relationship("Feature", secondary=arch_feature_table, back_populates="featured_arch")
+    arched_cls = db.relationship("Cls_5e", secondary=cls_arch_table, back_populates="arch_choices")
+
+    def __repr__(self):
+        return f'<Architype {self.name}>'
+
+    def new_arch_adder(arch_name):
+        new_arch = Architype(name=arch_name)
+        db.session.add(new_arch)
+        db.session.commit()
+
+class Feature(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    level_access = db.Column(db.Integer)
+    description = db.Column(db.String(200))
+    featured_cls = db.relationship("Cls_5e", secondary=cls_feature_table, back_populates="cls_features")
+    featured_arch = db.relationship("Architype", secondary=arch_feature_table, back_populates="arch_features")
 
 class Lifeinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -134,14 +180,19 @@ class Lifeinfo(db.Model):
     hidden_history = db.Column(db.String(5000))
     life_info_holder = db.relationship("Character", back_populates="life_info")
 
+    def __repr__(self):
+        return f'<Lifeinfo {self.char_name}>'
+
 class Clsinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_name = db.Column(db.String(64), index=True, unique=True)
     arch = db.Column(db.String(64))
-    arch_choices =
     total_hit_dice = db.Column(db.String(64))
     cur_hit_dice = db.Column(db.String(64))
     cls_info_holder = db.relationship("Character", back_populates="cls_info")
+
+    def __repr__(self):
+        return f'<Clsinfo {self.name}>'
 
 class SkillScores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -184,7 +235,10 @@ class AbilityScores(db.Model):
     charisma = db.Column(db.Integer)
     able_char = db.relationship("Character", back_populates="ability_numbers")
 
-class weapon(db.Model):
+    def __repr__(self):
+        return f'<AbilityScores {self.char_name}>'
+
+class Weapon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     damage_dice = db.relationship("Dice", secondary=weap_dice_table, back_populates="damage_roller")
@@ -200,6 +254,9 @@ class weapon(db.Model):
     # weap_trained_classes =
     # wielder = 
 
+    def __repr__(self):
+        return f'<Weapon {self.name}>'
+
 class Armor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -213,6 +270,9 @@ class Armor(db.Model):
     # armor_trained_classes = 
     # wearer = 
 
+    def __repr__(self):
+        return f'<Armor {self.name}>'
+
 class Damagetype(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -221,8 +281,14 @@ class Damagetype(db.Model):
     # race_source
     # cls_source
 
+    def __repr__(self):
+        return f'<Damagetype {self.name}>'
+
 class Dice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     value = db.Column(db.Integer)
     damage_roller = db.relationship("Weapon", secondary=weap_dice_table, back_populates="damage_dice")
+
+    def __repr__(self):
+        return f'<Dice {self.name}>'

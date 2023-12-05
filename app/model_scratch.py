@@ -29,20 +29,6 @@
 #     max_members = db.Column(db.Integer)
 #     joined_game = 
 
-# class architype(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     arch = #arch_features(db.Model):
-#     arched_class = #class cls_5e(db.Model):
-
-# class Features(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     level_access = db.Column(db.Integer)
-#     description = db.Column(db.String(200))
-#     feature_class = #class cls_5e(db.Model):
-#     feature_arch = #class architype(db.Model):
-
 # class gear(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
 #     name = db.Column(db.String(64), index=True, unique=True)
