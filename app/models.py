@@ -43,6 +43,29 @@ arch_feature_table = db.Table(
     db.Column("feature_id", db.ForeignKey("feature.id"), primary_key=True),
 )
 
+cls_hit_dice_table = db.Table(
+    "cls_hit_dice_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("dice_id", db.ForeignKey("dice.id"), primary_key=True),
+)
+
+cls_sav_ability_table = db.Table(
+    "cls_sav_ability_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("ability_id", db.ForeignKey("ability.id"), primary_key=True),
+)
+
+cls_pro_skill_table = db.Table(
+    "cls_pro_skill_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("skill_id", db.ForeignKey("skill.id"), primary_key=True),
+)
+
+cls_pro_tool_table = db.Table(
+    "cls_pro_tool_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("gear_id", db.ForeignKey("gear.id"), primary_key=True),
+)
 
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -131,12 +154,12 @@ class Cls_5e(db.Model):
     classed_characters = association_proxy('classed_character_association', 'classed_character')
     arch_choices = db.relationship("Architype", secondary=cls_arch_table, back_populates="arched_cls")
     cls_features = db.relationship("Feature", secondary=cls_feature_table, back_populates="featured_cls")
-    hit_dice_type = 
-    sav_throws = 
-    tool_pros = 
+    hit_dice_type = db.relationship("Dice", secondary=cls_hit_dice_table, back_populates="cls_hit_dice")
+    sav_throws = db.relationship("Ability", secondary=cls_sav_ability_table, back_populates="cls_sav_throw")
+    tool_pros = db.relationship("Gear", secondary=cls_pro_tool_table, back_populates="tool_trained_cls")
     weap_pros = 
     armor_pros = 
-    skill_pro_choice = 
+    skill_pro_choice = db.relationship("Skill", secondary=cls_pro_skill_table, back_populates="skl_trained_cls")
     max_num_pro_skills = db.Column(db.Integer)
     
     def __repr__(self):
@@ -168,6 +191,25 @@ class Feature(db.Model):
     description = db.Column(db.String(200))
     featured_cls = db.relationship("Cls_5e", secondary=cls_feature_table, back_populates="cls_features")
     featured_arch = db.relationship("Architype", secondary=arch_feature_table, back_populates="arch_features")
+
+    def __repr__(self):
+        return f'<Feature {self.name}>'
+
+class Ability(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    cls_sav_throw = db.relationship("Cls_5e", secondary=cls_sav_ability_table, back_populates="sav_throws")
+
+    def __repr__(self):
+        return f'<Ability {self.name}>'
+
+class Skill(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    skl_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_skill_table, back_populates="skill_pro_choice")
+
+    def __repr__(self):
+        return f'<Skill {self.name}>'
 
 class Lifeinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -273,6 +315,15 @@ class Armor(db.Model):
     def __repr__(self):
         return f'<Armor {self.name}>'
 
+class Gear(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
+    # owner = 
+
+    def __repr__(self):
+        return f'<Gear {self.name}>'
+
 class Damagetype(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -289,6 +340,7 @@ class Dice(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     value = db.Column(db.Integer)
     damage_roller = db.relationship("Weapon", secondary=weap_dice_table, back_populates="damage_dice")
+    cls_hit_dice = db.relationship("Cls_5e", secondary=cls_hit_dice_table, back_populates="hit_dice_type")
 
     def __repr__(self):
         return f'<Dice {self.name}>'

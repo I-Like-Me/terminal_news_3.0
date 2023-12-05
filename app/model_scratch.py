@@ -29,10 +29,6 @@
 #     max_members = db.Column(db.Integer)
 #     joined_game = 
 
-# class gear(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), index=True, unique=True)
-#     gear_trained_classes = #class cls_5e(db.Model):
-#     owner = #class Character(db.Model):
+
 
 
