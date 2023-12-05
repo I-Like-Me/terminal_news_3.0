@@ -67,6 +67,18 @@ cls_pro_tool_table = db.Table(
     db.Column("gear_id", db.ForeignKey("gear.id"), primary_key=True),
 )
 
+cls_pro_weap_table = db.Table(
+    "cls_pro_weap_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("weapon_id", db.ForeignKey("weapon.id"), primary_key=True),
+)
+
+cls_pro_armor_table = db.Table(
+    "cls_pro_armor_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -157,8 +169,8 @@ class Cls_5e(db.Model):
     hit_dice_type = db.relationship("Dice", secondary=cls_hit_dice_table, back_populates="cls_hit_dice")
     sav_throws = db.relationship("Ability", secondary=cls_sav_ability_table, back_populates="cls_sav_throw")
     tool_pros = db.relationship("Gear", secondary=cls_pro_tool_table, back_populates="tool_trained_cls")
-    weap_pros = 
-    armor_pros = 
+    weap_pros = db.relationship("Weapon", secondary=cls_pro_weap_table, back_populates="weap_trained_cls")
+    armor_pros = db.relationship("Armor", secondary=cls_pro_armor_table, back_populates="armor_trained_cls") 
     skill_pro_choice = db.relationship("Skill", secondary=cls_pro_skill_table, back_populates="skl_trained_cls")
     max_num_pro_skills = db.Column(db.Integer)
     
@@ -293,7 +305,7 @@ class Weapon(db.Model):
     normal_range = db.Column(db.Integer)
     long_range = db.Column(db.Integer)
     martial = db.Column(db.Boolean)
-    # weap_trained_classes =
+    weap_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_weap_table, back_populates="weap_pros")
     # wielder = 
 
     def __repr__(self):
@@ -309,7 +321,7 @@ class Armor(db.Model):
     str_req = db.Column(db.Integer)
     stealth = db.Column(db.String(64))
     resist_type = db.relationship("DamageType", secondary=armor_dmg_type_table, back_populates="armor_source")
-    # armor_trained_classes = 
+    armor_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_armor_table, back_populates="armor_pros") 
     # wearer = 
 
     def __repr__(self):
