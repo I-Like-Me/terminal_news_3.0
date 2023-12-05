@@ -79,6 +79,12 @@ cls_pro_armor_table = db.Table(
     db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
 )
 
+weapon_property_table = db.Table(
+    "weapon_property_table",
+    db.Column("weapon_id", db.ForeignKey("weapon.id"), primary_key=True),
+    db.Column("property_id", db.ForeignKey("property.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -185,6 +191,7 @@ class Cls_5e(db.Model):
 class Architype(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
     arch_features = db.relationship("Feature", secondary=arch_feature_table, back_populates="featured_arch")
     arched_cls = db.relationship("Cls_5e", secondary=cls_arch_table, back_populates="arch_choices")
 
@@ -298,7 +305,7 @@ class Weapon(db.Model):
     damage_dice = db.relationship("Dice", secondary=weap_dice_table, back_populates="damage_roller")
     num_of_dice = db.Column(db.Integer)
     dmg_type = db.relationship("DamageType", secondary=weap_dmg_type_table, back_populates="weap_source")
-    # properties =
+    properties = db.relationship("Property", secondary=weapon_property_table, back_populates="weap_prop")
     tech_level = db.Column(db.Integer)
     ranged = db.Column(db.Boolean)
     reach = db.Column(db.Integer)
@@ -310,6 +317,15 @@ class Weapon(db.Model):
 
     def __repr__(self):
         return f'<Weapon {self.name}>'
+
+class Property(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    weap_prop = db.relationship("Weapon", secondary=weapon_property_table, back_populates="properties")
+
+    def __repr__(self):
+        return f'<Property {self.name}>'
 
 class Armor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
