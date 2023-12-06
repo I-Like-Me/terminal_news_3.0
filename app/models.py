@@ -85,6 +85,36 @@ weapon_property_table = db.Table(
     db.Column("property_id", db.ForeignKey("property.id"), primary_key=True),
 )
 
+user_game_table = db.Table(
+    "user_game_table",
+    db.Column("user_id", db.ForeignKey("user.id"), primary_key=True),
+    db.Column("game_id", db.ForeignKey("game.id"), primary_key=True),
+)
+
+char_party_table = db.Table(
+    "char_party_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("party_id", db.ForeignKey("party.id"), primary_key=True),
+)
+
+game_party_table = db.Table(
+    "game_party_table",
+    db.Column("game_id", db.ForeignKey("game.id"), primary_key=True),
+    db.Column("party_id", db.ForeignKey("party.id"), primary_key=True),
+)
+
+game_npc_pool_table = db.Table(
+    "game_npc_pool_table",
+    db.Column("game_id", db.ForeignKey("game.id"), primary_key=True),
+    db.Column("npcpool_id", db.ForeignKey("npcpool.id"), primary_key=True),
+)
+
+char_npc_pool_table = db.Table(
+    "char_npc_pool_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("npcpool_id", db.ForeignKey("npcpool.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -104,7 +134,7 @@ class User(db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     character = db.relationship("Character", secondary=user_char_table, back_populates="player")
-    games = 
+    games = db.relationship("Game", secondary=user_game_table, back_populates="gm")
     admin = db.Column(db.Boolean)
 
     def __repr__(self):
@@ -118,7 +148,7 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     player = db.relationship("User", secondary=user_char_table, back_populates="character")
-    parties = 
+    parties = db.relationship("Party", secondary=char_party_table, back_populates="members")
     proficiency = db.Column(db.Integer)
     speed = db.Column(db.Integer)
     passive_perc = db.Column(db.Integer)
@@ -148,6 +178,7 @@ class Character(db.Model):
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
     npc = db.Column(db.Boolean)
+    npc_group = db.relationship("Npcpool", secondary=char_npc_pool_table, back_populates="picked_npc")
 
     def __repr__(self):
         return f'<Character {self.name}>'
@@ -428,9 +459,9 @@ class Dice(db.Model):
 class Party(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    members = 
+    members = db.relationship("Character", secondary=char_party_table, back_populates="parties")
     max_members = db.Column(db.Integer)
-    joined_game = 
+    joined_game = db.relationship("Game", secondary=game_party_table, back_populates="adventurers")
 
     def __repr__(self):
         return f'<Party {self.name}>'
@@ -438,9 +469,9 @@ class Party(db.Model):
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    adventurers = 
-    gm = 
-    npcs =
+    adventurers = db.relationship("Party", secondary=game_party_table, back_populates="joined_game")
+    gm = db.relationship("User", secondary=user_game_table, back_populates="games")
+    npcs = db.relationship("Npcpool", secondary=game_npc_pool_table, back_populates="game")
 
     def __repr__(self):
         return f'<Game {self.name}>'
@@ -448,7 +479,8 @@ class Game(db.Model):
 class Npcpool(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    picked_npc =
+    picked_npc = db.relationship("Character", secondary=char_npc_pool_table, back_populates="npc_group")
+    game = db.relationship("Game", secondary=game_npc_pool_table, back_populates="npcs")
 
     def __repr__(self):
         return f'<Npcpool {self.name}>'
