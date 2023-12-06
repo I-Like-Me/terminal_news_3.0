@@ -157,6 +157,42 @@ char_weap_table = db.Table(
     db.Column("weapon_id", db.ForeignKey("weapon.id"), primary_key=True),
 )
 
+ability_armor_mod_table = db.Table(
+    "ability_armor_mod_table",
+    db.Column("ability_id", db.ForeignKey("ability.id"), primary_key=True),
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
+)
+
+char_armor_table = db.Table(
+    "char_armor_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
+)
+
+char_gear_table = db.Table(
+    "char_gear_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("gear_id", db.ForeignKey("gear.id"), primary_key=True),
+)
+
+race_feature_table = db.Table(
+    "race_feature_table",
+    db.Column("race_id", db.ForeignKey("race.id"), primary_key=True),
+    db.Column("feature_id", db.ForeignKey("feature.id"), primary_key=True),
+)
+
+life_info_cur_race_table = db.Table(
+    "life_info_cur_race_table",
+    db.Column("lifeinfo_id", db.ForeignKey("lifeinfo.id"), primary_key=True),
+    db.Column("race_id", db.ForeignKey("race.id"), primary_key=True),
+)
+
+life_info_birth_race_table = db.Table(
+    "life_info_birth_race_table",
+    db.Column("lifeinfo_id", db.ForeignKey("lifeinfo.id"), primary_key=True),
+    db.Column("race_id", db.ForeignKey("race.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -212,8 +248,8 @@ class Character(db.Model):
     life_info = db.relationship("Lifeinfo", back_populates="life_info_holder")
     cls_info = db.relationship("Clsinfo", back_populates="cls_info_holder") #convert to many to many
     weapons = db.relationship("Weapon", secondary=char_weap_table, back_populates="wielder")
-    armor = 
-    gear =
+    armor = db.relationship("Armor", secondary=char_armor_table, back_populates="wearer")
+    gear = db.relationship("Gear", secondary=char_gear_table, back_populates="owner")
     prepped_spells =
     feats =
     backpack = db.Column(db.String(5000))
@@ -290,9 +326,9 @@ class Race(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
-    race_features =
-    char_cur_race =
-    char_birth_race =
+    race_features = db.relationship("Feature", secondary=race_feature_table, back_populates="featured_race")
+    char_cur_race = db.relationship("Lifeinfo", secondary=life_info_cur_race_table, back_populates="cur_race")
+    char_birth_race = db.relationship("Lifeinfo", secondary=life_info_birth_race_table, back_populates="birth_race")
 
     def __repr__(self):
         return f'<Race {self.name}>'
@@ -381,6 +417,7 @@ class Feature(db.Model):
     featured_cls = db.relationship("Cls_5e", secondary=cls_feature_table, back_populates="cls_features")
     featured_arch = db.relationship("Architype", secondary=arch_feature_table, back_populates="arch_features")
     featured_ladder = db.relationship("Ladder", secondary=ladder_feature_table, back_populates="ladder_features")
+    featured_race = db.relationship("Race", secondary=race_feature_table, back_populates="race_features")
 
     def __repr__(self):
         return f'<Feature {self.name}>'
@@ -389,6 +426,7 @@ class Ability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     cls_sav_throw = db.relationship("Cls_5e", secondary=cls_sav_ability_table, back_populates="sav_throws")
+    armor_mod = db.relationship("Armor", secondary=ability_armor_mod_table, back_populates="ac_mod_type")
 
     def __repr__(self):
         return f'<Ability {self.name}>'
@@ -418,8 +456,8 @@ class Lifeinfo(db.Model):
     birth_name = db.Column(db.String(64))
     age = db.Column(db.Integer)
     real_age  = db.Column(db.Integer)
-    cur_race =
-    birth_race =
+    cur_race = db.relationship("Race", secondary=life_info_cur_race_table, back_populates="char_cur_race")
+    birth_race = db.relationship("Race", secondary=life_info_birth_race_table, back_populates="char_birth_race")
     cur_loc =  
     birth_loc = 
     public_history = db.Column(db.String(5000))
@@ -518,13 +556,13 @@ class Armor(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     armor_size = db.Column(db.String(64))
     ac = db.Column(db.Integer)
-    ac_mod_type =
+    ac_mod_type = db.relationship("Ability", secondary=ability_armor_mod_table, back_populates="armor_mod")
     ac_mod_max = db.Column(db.Integer)
     str_req = db.Column(db.Integer)
     stealth = db.Column(db.String(64))
     resist_type = db.relationship("DamageType", secondary=armor_dmg_type_table, back_populates="armor_source")
     armor_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_armor_table, back_populates="armor_pros") 
-    wearer = 
+    wearer = db.relationship("Character", secondary=char_armor_table, back_populates="armor")
 
     def __repr__(self):
         return f'<Armor {self.name}>'
@@ -533,7 +571,7 @@ class Gear(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
-    owner = 
+    owner = db.relationship("Character", secondary=char_gear_table, back_populates="gear")
 
     def __repr__(self):
         return f'<Gear {self.name}>'
