@@ -440,6 +440,15 @@ class Game(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     adventurers = 
     gm = 
+    npcs =
 
     def __repr__(self):
         return f'<Game {self.name}>'
+
+class Npcpool(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    picked_npc =
+
+    def __repr__(self):
+        return f'<Npcpool {self.name}>'
