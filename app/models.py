@@ -115,6 +115,48 @@ char_npc_pool_table = db.Table(
     db.Column("npcpool_id", db.ForeignKey("npcpool.id"), primary_key=True),
 )
 
+char_ladder_table = db.Table(
+    "char_ladder_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("ladder_id", db.ForeignKey("ladder.id"), primary_key=True),
+)
+
+ladder_feature_table = db.Table(
+    "ladder_feature_table",
+    db.Column("ladder_id", db.ForeignKey("ladder.id"), primary_key=True),
+    db.Column("feature_id", db.ForeignKey("feature.id"), primary_key=True),
+)
+
+char_background_table = db.Table(
+    "char_background_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("feature_id", db.ForeignKey("background.id"), primary_key=True),
+)
+
+char_alignment_table = db.Table(
+    "char_alignment_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("alignment_id", db.ForeignKey("alignment.id"), primary_key=True),
+)
+
+char_faction_table = db.Table(
+    "char_faction_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("faction_id", db.ForeignKey("faction.id"), primary_key=True),
+)
+
+char_pro_skill_table = db.Table(
+    "char_pro_skill_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("skill_id", db.ForeignKey("skill.id"), primary_key=True),
+)
+
+char_weap_table = db.Table(
+    "char_weap_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("weapon_id", db.ForeignKey("weapon.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -158,22 +200,21 @@ class Character(db.Model):
     cur_hit_points = db.Column(db.Integer)
     temp_hit_points = db.Column(db.Integer)
     level = db.Column(db.Integer, default=0)
-    ladder =
-    background =
-    alignment =
-    factions = 
+    ladder = db.relationship("Ladder", secondary=char_ladder_table, back_populates="char_ladder")
+    background = db.relationship("Background", secondary=char_background_table, back_populates="char_bg")
+    alignment = db.relationship("Alignment", secondary=char_alignment_table, back_populates="aligned_char")
+    factions = db.relationship("Faction", secondary=char_faction_table, back_populates="char_fac")
     ability_numbers = db.relationship("AbilityScores", back_populates="able_char")
-    pro_skills =
+    pro_skills = db.relationship("Skill", secondary=char_pro_skill_table, back_populates="skl_trained_char")
     skill_numbers = db.relationship("SkillScores", back_populates="skilled_char")
     cls_association = db.relationship("CharCls", back_populates="classed_character")
     classes = association_proxy("cls_association", "cls")
     life_info = db.relationship("Lifeinfo", back_populates="life_info_holder")
     cls_info = db.relationship("Clsinfo", back_populates="cls_info_holder") #convert to many to many
-    weapons = 
+    weapons = db.relationship("Weapon", secondary=char_weap_table, back_populates="wielder")
     armor = 
     gear =
-    prepd_spells =
-    spellbook =
+    prepped_spells =
     feats =
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
@@ -217,6 +258,7 @@ class Cls_5e(db.Model):
     armor_pros = db.relationship("Armor", secondary=cls_pro_armor_table, back_populates="armor_trained_cls") 
     skill_pro_choice = db.relationship("Skill", secondary=cls_pro_skill_table, back_populates="skl_trained_cls")
     max_num_pro_skills = db.Column(db.Integer)
+    spellbook =
     
     def __repr__(self):
         return f'<Cls_5e {self.name}>'
@@ -224,6 +266,24 @@ class Cls_5e(db.Model):
     def new_cls_adder(cls_name):
         new_cls = Cls_5e(name=cls_name)
         db.session.add(new_cls)
+        db.session.commit()
+
+class Ladder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    char_ladder = db.relationship("Character", secondary=char_ladder_table, back_populates="ladder")
+    ladder_features = db.relationship("Feature", secondary=ladder_feature_table, back_populates="featured_ladder")
+    ladder_gain_5 = db.Column(db.String(64))
+    ladder_gain_11 = db.Column(db.String(64))
+    ladder_gain_17 = db.Column(db.String(64))
+
+    def __repr__(self):
+        return f'<Ladder {self.name}>'
+
+    def new_ladder_adder(ladder_name):
+        new_ladder = Ladder(name=ladder_name)
+        db.session.add(new_ladder)
         db.session.commit()
 
 class Race(db.Model):
@@ -246,16 +306,58 @@ class Background(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
-    char_bg =
+    char_bg = db.relationship("Character", secondary=char_background_table, back_populates="background")
 
     def __repr__(self):
         return f'<Background {self.name}>'
 
-    def new_race_adder(bg_name):
+    def new_bg_adder(bg_name):
         new_bg = Background(name=bg_name)
         db.session.add(new_bg)
         db.session.commit()
 
+class Alignment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    aligned_char = db.relationship("Character", secondary=char_alignment_table, back_populates="alignment")
+
+    def __repr__(self):
+        return f'<Alignment {self.name}>'
+
+    def new_align_adder(align_name):
+        new_align = Alignment(name=align_name)
+        db.session.add(new_align)
+        db.session.commit()
+
+class Faction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    char_fac = db.relationship("Character", secondary=char_faction_table, back_populates="factions")
+
+    def __repr__(self):
+        return f'<Faction {self.name}>'
+
+    def new_fac_adder(fac_name):
+        new_fac = Faction(name=fac_name)
+        db.session.add(new_fac)
+        db.session.commit()
+
+class Rank(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    # ranked_facs = change faction association table to object with rank as column
+
+    def __repr__(self):
+        return f'<Rank {self.name}>'
+
+    def new_rank_adder(rank_name):
+        new_rank = Rank(name=rank_name)
+        db.session.add(new_rank)
+        db.session.commit()
+        
 class Architype(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -278,7 +380,7 @@ class Feature(db.Model):
     description = db.Column(db.String(200))
     featured_cls = db.relationship("Cls_5e", secondary=cls_feature_table, back_populates="cls_features")
     featured_arch = db.relationship("Architype", secondary=arch_feature_table, back_populates="arch_features")
-    featured_arch =
+    featured_ladder = db.relationship("Ladder", secondary=ladder_feature_table, back_populates="ladder_features")
 
     def __repr__(self):
         return f'<Feature {self.name}>'
@@ -305,6 +407,7 @@ class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     skl_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_skill_table, back_populates="skill_pro_choice")
+    skl_trained_char = db.relationship("Character", secondary=char_pro_skill_table, back_populates="pro_skills")
 
     def __repr__(self):
         return f'<Skill {self.name}>'
@@ -396,7 +499,7 @@ class Weapon(db.Model):
     long_range = db.Column(db.Integer)
     martial = db.Column(db.Boolean)
     weap_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_weap_table, back_populates="weap_pros")
-    wielder = 
+    wielder = db.relationship("Character", secondary=char_weap_table, back_populates="weapon")
 
     def __repr__(self):
         return f'<Weapon {self.name}>'
