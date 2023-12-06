@@ -193,6 +193,18 @@ life_info_birth_race_table = db.Table(
     db.Column("race_id", db.ForeignKey("race.id"), primary_key=True),
 )
 
+life_info_cur_loc_table = db.Table(
+    "life_info_cur_loc_table",
+    db.Column("lifeinfo_id", db.ForeignKey("lifeinfo.id"), primary_key=True),
+    db.Column("location_id", db.ForeignKey("location.id"), primary_key=True),
+)
+
+life_info_birth_loc_table = db.Table(
+    "life_info_birth_loc_table",
+    db.Column("lifeinfo_id", db.ForeignKey("lifeinfo.id"), primary_key=True),
+    db.Column("location_id", db.ForeignKey("location.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -338,6 +350,21 @@ class Race(db.Model):
         db.session.add(new_race)
         db.session.commit()
 
+class Location(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    char_cur_loc = db.relationship("Lifeinfo", secondary=life_info_cur_loc_table, back_populates="cur_loc")
+    char_birth_loc = db.relationship("Lifeinfo", secondary=life_info_birth_loc_table, back_populates="birth_loc")
+
+    def __repr__(self):
+        return f'<Location {self.name}>'
+
+    def new_loc_adder(loc_name):
+        new_loc = Location(name=loc_name)
+        db.session.add(new_loc)
+        db.session.commit()
+
 class Background(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -458,8 +485,8 @@ class Lifeinfo(db.Model):
     real_age  = db.Column(db.Integer)
     cur_race = db.relationship("Race", secondary=life_info_cur_race_table, back_populates="char_cur_race")
     birth_race = db.relationship("Race", secondary=life_info_birth_race_table, back_populates="char_birth_race")
-    cur_loc =  
-    birth_loc = 
+    cur_loc = db.relationship("Location", secondary=life_info_cur_loc_table, back_populates="char_cur_loc")
+    birth_loc = db.relationship("Location", secondary=life_info_birth_loc_table, back_populates="char_birth_loc")
     public_history = db.Column(db.String(5000))
     learned_history = db.Column(db.String(5000))
     hidden_history = db.Column(db.String(5000))
