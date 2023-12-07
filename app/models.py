@@ -19,12 +19,6 @@ weap_dmg_type_table = db.Table(
     db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
 )
 
-armor_dmg_type_table = db.Table(
-    "armor_dmg_type_table",
-    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
-    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
-)
-
 cls_arch_table = db.Table(
     "cls_arch_table",
     db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
@@ -82,6 +76,12 @@ cls_pro_armor_table = db.Table(
 weapon_property_table = db.Table(
     "weapon_property_table",
     db.Column("weapon_id", db.ForeignKey("weapon.id"), primary_key=True),
+    db.Column("property_id", db.ForeignKey("property.id"), primary_key=True),
+)
+
+armor_property_table = db.Table(
+    "armor_property_table",
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
     db.Column("property_id", db.ForeignKey("property.id"), primary_key=True),
 )
 
@@ -205,6 +205,84 @@ life_info_birth_loc_table = db.Table(
     db.Column("location_id", db.ForeignKey("location.id"), primary_key=True),
 )
 
+cls_info_arch_table = db.Table(
+    "cls_info_arch_table",
+    db.Column("clsinfo_id", db.ForeignKey("clsinfo.id"), primary_key=True),
+    db.Column("architype_id", db.ForeignKey("architype.id"), primary_key=True),
+)
+
+race_dmg_resist_table = db.Table(
+    "race_dmg_resist_table",
+    db.Column("race_id", db.ForeignKey("race.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+race_dmg_immune_table = db.Table(
+    "race_dmg_immune_table",
+    db.Column("race_id", db.ForeignKey("race.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+race_dmg_vulner_table = db.Table(
+    "race_dmg_vulner_table",
+    db.Column("race_id", db.ForeignKey("race.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+cls_dmg_resist_table = db.Table(
+    "cls_dmg_resist_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+cls_dmg_immune_table = db.Table(
+    "cls_dmg_immune_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+cls_dmg_vulner_table = db.Table(
+    "cls_dmg_vulner_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+feature_dmg_resist_table = db.Table(
+    "feature_dmg_resist_table",
+    db.Column("feature_id", db.ForeignKey("feature.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+feature_dmg_immune_table = db.Table(
+    "feature_dmg_immune_table",
+    db.Column("feature_id", db.ForeignKey("feature.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+feature_dmg_vulner_table = db.Table(
+    "feature_dmg_vulner_table",
+    db.Column("feature_id", db.ForeignKey("feature.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+armor_dmg_resist_table = db.Table(
+    "armor_dmg_resist_table",
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+armor_dmg_immune_table = db.Table(
+    "armor_dmg_immune_table",
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+armor_dmg_vulner_table = db.Table(
+    "armor_dmg_vulner_table",
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -306,6 +384,9 @@ class Cls_5e(db.Model):
     armor_pros = db.relationship("Armor", secondary=cls_pro_armor_table, back_populates="armor_trained_cls") 
     skill_pro_choice = db.relationship("Skill", secondary=cls_pro_skill_table, back_populates="skl_trained_cls")
     max_num_pro_skills = db.Column(db.Integer)
+    dmg_resist = db.relationship("Damagetype", secondary=cls_dmg_resist_table, back_populates="cls_resist")
+    dmg_immune = db.relationship("Damagetype", secondary=cls_dmg_immune_table, back_populates="cls_immune")
+    dmg_vulner = db.relationship("Damagetype", secondary=cls_dmg_vulner_table, back_populates="cls_vulner")    
     spellbook =
     
     def __repr__(self):
@@ -341,6 +422,9 @@ class Race(db.Model):
     race_features = db.relationship("Feature", secondary=race_feature_table, back_populates="featured_race")
     char_cur_race = db.relationship("Lifeinfo", secondary=life_info_cur_race_table, back_populates="cur_race")
     char_birth_race = db.relationship("Lifeinfo", secondary=life_info_birth_race_table, back_populates="birth_race")
+    dmg_resist = db.relationship("Damagetype", secondary=race_dmg_resist_table, back_populates="race_resist")
+    dmg_immune = db.relationship("Damagetype", secondary=race_dmg_immune_table, back_populates="race_immune")
+    dmg_vulner = db.relationship("Damagetype", secondary=race_dmg_vulner_table, back_populates="race_vulner")
 
     def __repr__(self):
         return f'<Race {self.name}>'
@@ -353,7 +437,7 @@ class Race(db.Model):
 class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(200))
+    description = db.Column(db.String(1000))
     char_cur_loc = db.relationship("Lifeinfo", secondary=life_info_cur_loc_table, back_populates="cur_loc")
     char_birth_loc = db.relationship("Lifeinfo", secondary=life_info_birth_loc_table, back_populates="birth_loc")
 
@@ -427,6 +511,7 @@ class Architype(db.Model):
     description = db.Column(db.String(200))
     arch_features = db.relationship("Feature", secondary=arch_feature_table, back_populates="featured_arch")
     arched_cls = db.relationship("Cls_5e", secondary=cls_arch_table, back_populates="arch_choices")
+    picked_arch = db.relationship("Clsinfo", secondary=cls_info_arch_table, back_populates="archs")
 
     def __repr__(self):
         return f'<Architype {self.name}>'
@@ -445,6 +530,9 @@ class Feature(db.Model):
     featured_arch = db.relationship("Architype", secondary=arch_feature_table, back_populates="arch_features")
     featured_ladder = db.relationship("Ladder", secondary=ladder_feature_table, back_populates="ladder_features")
     featured_race = db.relationship("Race", secondary=race_feature_table, back_populates="race_features")
+    dmg_resist = db.relationship("Damagetype", secondary=feature_dmg_resist_table, back_populates="feature_resist")
+    dmg_immune = db.relationship("Damagetype", secondary=feature_dmg_immune_table, back_populates="feature_immune")
+    dmg_vulner = db.relationship("Damagetype", secondary=feature_dmg_vulner_table, back_populates="feature_vulner")
 
     def __repr__(self):
         return f'<Feature {self.name}>'
@@ -457,16 +545,6 @@ class Ability(db.Model):
 
     def __repr__(self):
         return f'<Ability {self.name}>'
-
-class Location(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(1000))
-    char_cur_loc =  
-    char_birth_loc = 
-
-    def __repr__(self):
-        return f'<Location {self.name}>'
 
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -498,7 +576,7 @@ class Lifeinfo(db.Model):
 class Clsinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_name = db.Column(db.String(64), index=True, unique=True)
-    arch = 
+    archs = db.relationship("Architype", secondary=cls_info_arch_table, back_populates="picked_arch")
     total_hit_dice = db.Column(db.String(64))
     cur_hit_dice = db.Column(db.String(64))
     cls_info_holder = db.relationship("Character", back_populates="cls_info") #convert to many to many
@@ -574,6 +652,7 @@ class Property(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
     weap_prop = db.relationship("Weapon", secondary=weapon_property_table, back_populates="properties")
+    armor_prop = db.relationship("Armor", secondary=armor_property_table, back_populates="properties")
 
     def __repr__(self):
         return f'<Property {self.name}>'
@@ -587,7 +666,13 @@ class Armor(db.Model):
     ac_mod_max = db.Column(db.Integer)
     str_req = db.Column(db.Integer)
     stealth = db.Column(db.String(64))
-    resist_type = db.relationship("DamageType", secondary=armor_dmg_type_table, back_populates="armor_source")
+    dmg_resist = db.relationship("Damagetype", secondary=armor_dmg_resist_table, back_populates="armor_resist")
+    dmg_immune = db.relationship("Damagetype", secondary=armor_dmg_immune_table, back_populates="armor_immune")
+    dmg_vulner = db.relationship("Damagetype", secondary=armor_dmg_vulner_table, back_populates="armor_vulner")
+    emp_shielding = db.Column(db.Boolean, default=False)
+    dmg_reduction = db.Column(db.Boolean, default=False)
+    tech_level = db.Column(db.Integer)
+    properties = db.relationship("Property", secondary=armor_property_table, back_populates="armor_prop")
     armor_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_armor_table, back_populates="armor_pros") 
     wearer = db.relationship("Character", secondary=char_armor_table, back_populates="armor")
 
@@ -607,9 +692,18 @@ class Damagetype(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     weap_source = db.relationship("Weapon", secondary=weap_dmg_type_table, back_populates="dmg_type")
-    armor_source = db.relationship("Armor", secondary=armor_dmg_type_table, back_populates="dmg_type")
-    race_source =
-    cls_source =
+    race_resist = db.relationship("Race", secondary=race_dmg_resist_table, back_populates="dmg_resist")
+    race_immune = db.relationship("Race", secondary=race_dmg_immune_table, back_populates="dmg_immune")
+    race_vulner = db.relationship("Race", secondary=race_dmg_vulner_table, back_populates="dmg_vulner")
+    cls_resist = db.relationship("Cls_5e", secondary=cls_dmg_resist_table, back_populates="dmg_resist")
+    cls_immune = db.relationship("Cls_5e", secondary=cls_dmg_immune_table, back_populates="dmg_immune")
+    cls_vulner = db.relationship("Cls_5e", secondary=cls_dmg_vulner_table, back_populates="dmg_vulner")
+    feature_resist = db.relationship("Feature", secondary=feature_dmg_resist_table, back_populates="dmg_resist")
+    feature_immune = db.relationship("Feature", secondary=feature_dmg_immune_table, back_populates="dmg_immune")
+    feature_vulner = db.relationship("Feature", secondary=feature_dmg_vulner_table, back_populates="dmg_vulner")
+    armor_resist = db.relationship("Armor", secondary=armor_dmg_resist_table, back_populates="dmg_resist")
+    armor_immune = db.relationship("Armor", secondary=armor_dmg_immune_table, back_populates="dmg_immune")
+    armor_vulner = db.relationship("Armor", secondary=armor_dmg_vulner_table, back_populates="dmg_vulner")
 
     def __repr__(self):
         return f'<Damagetype {self.name}>'
@@ -652,3 +746,7 @@ class Npcpool(db.Model):
 
     def __repr__(self):
         return f'<Npcpool {self.name}>'
+    
+class Condition
+
+class Ammo
