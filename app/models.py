@@ -1,5 +1,6 @@
 from app import db
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.dialects.postgresql import JSONB, insert
 
 user_char_table = db.Table(
     "user_char_table",
@@ -395,7 +396,7 @@ class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
     character_id = db.Column("character_id", db.Integer, db.ForeignKey("character.id"))
-    cls_5e_id = db.Column("cls_5e_id",db.Integer, db.ForeignKey("cls_5e.id"))
+    cls_5e_id = db.Column("cls_5e_id", db.Integer, db.ForeignKey("cls_5e.id"))
     cls_level = db.Column(db.Integer)
 
     classed_character = db.relationship("Character", back_populates='cls_association')
@@ -403,6 +404,19 @@ class CharCls(db.Model):
    
     def __repr__(self):
         return f'<CharCls {self.char_cls}>'
+    
+class CharKnow(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    char_char = db.Column(db.String(64), index=True, unique=True)
+    learner_id = db.Column("learner_id", db.Integer, db.ForeignKey("character.id"))
+    subject_id = db.Column("subject_id", db.Integer, db.ForeignKey("character.id"))
+    topics = db.Column(JSONB)
+
+    learner_char = db.relationship("Character", back_populates='cls_association')
+    subject_char = db.relationship("Character", back_populates='classed_character_association')
+   
+    def __repr__(self):
+        return f'<CharKnow {self.char_char}>'
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -458,6 +472,12 @@ class Character(db.Model):
     play_notes = db.Column(db.String(5000))
     npc = db.Column(db.Boolean)
     npc_group = db.relationship("Npcpool", secondary=char_npc_pool_table, back_populates="picked_npc")
+    
+    subject_association = db.relationship("CharKnow", back_populates="learner_char")
+    subjects = association_proxy("subject_association", "subject_char")
+
+    learner_association = db.relationship("CharKnow", back_populates="subject_char")
+    learners = association_proxy('learner_association', 'learner_char')
 
     def __repr__(self):
         return f'<Character {self.name}>'
@@ -500,7 +520,7 @@ class Cls_5e(db.Model):
     dmg_immune = db.relationship("Damagetype", secondary=cls_dmg_immune_table, back_populates="cls_immune")
     dmg_vulner = db.relationship("Damagetype", secondary=cls_dmg_vulner_table, back_populates="cls_vulner")    
     spellbook = db.relationship("Spell", secondary=cls_spell_table, back_populates="cls_books") 
-    
+
     def __repr__(self):
         return f'<Cls_5e {self.name}>'
 
