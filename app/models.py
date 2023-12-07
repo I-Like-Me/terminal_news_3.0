@@ -445,7 +445,7 @@ class Character(db.Model):
     cls_association = db.relationship("CharCls", back_populates="classed_character")
     classes = association_proxy("cls_association", "cls")
     life_info = db.relationship("Lifeinfo", back_populates="life_info_holder")
-    cls_info = db.relationship("Clsinfo", secondary=char_cls_info_table, back_populates="cls_info_holder") 
+    cls_info_sheets = db.relationship("Clsinfo", secondary=char_cls_info_table, back_populates="cls_info_holder") 
     weapons = db.relationship("Weapon", secondary=char_weap_table, back_populates="wielder")
     armor = db.relationship("Armor", secondary=char_armor_table, back_populates="wearer")
     gear = db.relationship("Gear", secondary=char_gear_table, back_populates="owner")
@@ -698,14 +698,14 @@ class Lifeinfo(db.Model):
 
 class Clsinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    char_name = db.Column(db.String(64), index=True, unique=True)
+    char_cls_info_name = db.Column(db.String(64), index=True, unique=True)
     archs = db.relationship("Architype", secondary=cls_info_arch_table, back_populates="picked_arch")
     total_hit_dice = db.Column(db.String(64))
     cur_hit_dice = db.Column(db.String(64))
-    cls_info_holder = db.relationship("Character", secondary=char_cls_info_table, back_populates="cls_info")
+    cls_info_holder = db.relationship("Character", secondary=char_cls_info_table, back_populates="cls_info_sheets")
 
     def __repr__(self):
-        return f'<Clsinfo {self.name}>'
+        return f'<Clsinfo {self.char_cls_info_name}>'
 
 class SkillScores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
