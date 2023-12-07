@@ -85,6 +85,24 @@ armor_property_table = db.Table(
     db.Column("property_id", db.ForeignKey("property.id"), primary_key=True),
 )
 
+vehicle_property_table = db.Table(
+    "vehicle_property_table",
+    db.Column("vehicle_id", db.ForeignKey("vehicle.id"), primary_key=True),
+    db.Column("property_id", db.ForeignKey("property.id"), primary_key=True),
+)
+
+mech_property_table = db.Table(
+    "mech_property_table",
+    db.Column("mech_id", db.ForeignKey("mech.id"), primary_key=True),
+    db.Column("property_id", db.ForeignKey("property.id"), primary_key=True),
+)
+
+cyber_property_table = db.Table(
+    "cyber_property_table",
+    db.Column("cybernetic_id", db.ForeignKey("cybernetic.id"), primary_key=True),
+    db.Column("property_id", db.ForeignKey("property.id"), primary_key=True),
+)
+
 user_game_table = db.Table(
     "user_game_table",
     db.Column("user_id", db.ForeignKey("user.id"), primary_key=True),
@@ -295,6 +313,72 @@ char_spell_table = db.Table(
     db.Column("spell_id", db.ForeignKey("spell.id"), primary_key=True),
 )
 
+char_vehicle_table = db.Table(
+    "char_vehicle_table",
+    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("vehicle_id", db.ForeignKey("vehicle.id"), primary_key=True),
+)
+
+char_feat_table = db.Table(
+    "char_feat_table",
+    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("feat_id", db.ForeignKey("feat.id"), primary_key=True),
+)
+
+char_mech_table = db.Table(
+    "char_mech_table",
+    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("mech_id", db.ForeignKey("mech.id"), primary_key=True),
+)
+
+char_cyber_table = db.Table(
+    "char_cyber_table",
+    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("cybernetic_id", db.ForeignKey("cybernetic.id"), primary_key=True),
+)
+
+char_cls_info_table = db.Table(
+    "char_cls_info_table",
+    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("clsinfo_id", db.ForeignKey("clsinfo.id"), primary_key=True),
+)
+
+ammo_power_dmg_type_table = db.Table(
+    "ammo_power_dmg_type_table",
+    db.Column("ammo_power_id", db.ForeignKey("ammo_power.id"), primary_key=True),
+    db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
+)
+
+ammo_power_weap_table = db.Table(
+    "ammo_power_weap_table",
+    db.Column("ammo_power_id", db.ForeignKey("ammo_power.id"), primary_key=True),
+    db.Column("weapon_id", db.ForeignKey("weapon.id"), primary_key=True),
+)
+
+ammo_power_armor_table = db.Table(
+    "ammo_power_armor_table",
+    db.Column("ammo_power_id", db.ForeignKey("ammo_power.id"), primary_key=True),
+    db.Column("armor_id", db.ForeignKey("armor.id"), primary_key=True),
+)
+
+ammo_power_gear_table = db.Table(
+    "ammo_power_gear_table",
+    db.Column("ammo_power_id", db.ForeignKey("ammo_power.id"), primary_key=True),
+    db.Column("gear_id", db.ForeignKey("gear.id"), primary_key=True),
+)
+
+ammo_power_vehicle_table = db.Table(
+    "ammo_power_vehicle_table",
+    db.Column("ammo_power_id", db.ForeignKey("ammo_power.id"), primary_key=True),
+    db.Column("vehicle_id", db.ForeignKey("vehicle.id"), primary_key=True),
+)
+
+ammo_power_mech_table = db.Table(
+    "ammo_power_mech_table",
+    db.Column("ammo_power_id", db.ForeignKey("ammo_power.id"), primary_key=True),
+    db.Column("mech_id", db.ForeignKey("mech.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -348,12 +432,15 @@ class Character(db.Model):
     cls_association = db.relationship("CharCls", back_populates="classed_character")
     classes = association_proxy("cls_association", "cls")
     life_info = db.relationship("Lifeinfo", back_populates="life_info_holder")
-    cls_info = db.relationship("Clsinfo", back_populates="cls_info_holder") #convert to many to many
+    cls_info = db.relationship("Clsinfo", secondary=char_cls_info_table, back_populates="cls_info_holder") 
     weapons = db.relationship("Weapon", secondary=char_weap_table, back_populates="wielder")
     armor = db.relationship("Armor", secondary=char_armor_table, back_populates="wearer")
     gear = db.relationship("Gear", secondary=char_gear_table, back_populates="owner")
+    vehicle = db.relationship("Vehicle", secondary=char_vehicle_table, back_populates="owner")
+    mech = db.relationship("Mech", secondary=char_mech_table, back_populates="owner")
+    cybernetics = db.relationship("Cybernetic", secondary=char_cyber_table, back_populates="owner")
     prepped_spells = db.relationship("Spell", secondary=char_spell_table, back_populates="spell_prepper") 
-    feats =
+    feats = db.relationship("Feat", secondary=char_feat_table, back_populates="char_feat")
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
     npc = db.Column(db.Boolean)
@@ -571,7 +658,7 @@ class Feat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
-    char_feat = 
+    char_feat = db.relationship("Character", secondary=char_feat_table, back_populates="feats")
 
     def __repr__(self):
         return f'<Feat {self.name}>' 
@@ -600,7 +687,7 @@ class Clsinfo(db.Model):
     archs = db.relationship("Architype", secondary=cls_info_arch_table, back_populates="picked_arch")
     total_hit_dice = db.Column(db.String(64))
     cur_hit_dice = db.Column(db.String(64))
-    cls_info_holder = db.relationship("Character", back_populates="cls_info") #convert to many to many
+    cls_info_holder = db.relationship("Character", secondary=char_cls_info_table, back_populates="cls_info")
 
     def __repr__(self):
         return f'<Clsinfo {self.name}>'
@@ -661,7 +748,7 @@ class Weapon(db.Model):
     reach = db.Column(db.Integer)
     normal_range = db.Column(db.Integer)
     long_range = db.Column(db.Integer)
-    martial = db.Column(db.Boolean)
+    ammo = db.relationship("Ammo_Power", secondary=ammo_power_weap_table, back_populates="weap_load")
     weap_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_weap_table, back_populates="weap_pros")
     wielder = db.relationship("Character", secondary=char_weap_table, back_populates="weapon")
 
@@ -674,16 +761,24 @@ class Property(db.Model):
     description = db.Column(db.String(200))
     weap_prop = db.relationship("Weapon", secondary=weapon_property_table, back_populates="properties")
     armor_prop = db.relationship("Armor", secondary=armor_property_table, back_populates="properties")
+    vehicle_prop = db.relationship("Vehicle", secondary=vehicle_property_table, back_populates="vehicle_prop")
+    mech_prop = db.relationship("Mech", secondary=mech_property_table, back_populates="mech_prop")
+    cyber_prop = db.relationship("Cybernetic", secondary=cyber_property_table, back_populates="cyber_prop")
 
     def __repr__(self):
         return f'<Property {self.name}>'
 
-class Ammo(db.Model):
+class Ammo_Power(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
     tech_level = db.Column(db.Integer)
-    device = 
+    dmg_type = db.relationship("Damagetype", secondary=ammo_power_dmg_type_table, back_populates="ammo_source")
+    weap_load = db.relationship("Weapon", secondary=ammo_power_weap_table, back_populates="ammo")
+    armor_load = db.relationship("Armor", secondary=ammo_power_armor_table, back_populates="power")
+    gear_load  = db.relationship("Gear", secondary=ammo_power_gear_table, back_populates="power")
+    vehicle_load = db.relationship("Vehicle", secondary=ammo_power_vehicle_table, back_populates="power")
+    mech_load = db.relationship("Mech", secondary=ammo_power_mech_table, back_populates="power")
 
     def __repr__(self):
         return f'<Ammo {self.name}>' 
@@ -700,9 +795,8 @@ class Armor(db.Model):
     dmg_resist = db.relationship("Damagetype", secondary=armor_dmg_resist_table, back_populates="armor_resist")
     dmg_immune = db.relationship("Damagetype", secondary=armor_dmg_immune_table, back_populates="armor_immune")
     dmg_vulner = db.relationship("Damagetype", secondary=armor_dmg_vulner_table, back_populates="armor_vulner")
-    emp_shielding = db.Column(db.Boolean, default=False)
-    dmg_reduction = db.Column(db.Boolean, default=False)
     tech_level = db.Column(db.Integer)
+    power = db.relationship("Ammo_Power", secondary=ammo_power_armor_table, back_populates="armor_load")
     properties = db.relationship("Property", secondary=armor_property_table, back_populates="armor_prop")
     armor_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_armor_table, back_populates="armor_pros") 
     wearer = db.relationship("Character", secondary=char_armor_table, back_populates="armor")
@@ -713,21 +807,56 @@ class Armor(db.Model):
 class Gear(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    tech_level = db.Column(db.Integer)
+    power = db.relationship("Ammo_Power", secondary=ammo_power_gear_table, back_populates="gear_load")
     tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
     owner = db.relationship("Character", secondary=char_gear_table, back_populates="gear")
     
     def __repr__(self):
         return f'<Gear {self.name}>'
 
-class Powersource(db.Model):
+class Vehicle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
+    type = db.Column(db.String(12))
+    speed = db.Column(db.Integer)
+    capacity = db.Column(db.Integer)
+    power = db.relationship("Ammo_Power", secondary=ammo_power_vehicle_table, back_populates="vehicle_load")
     tech_level = db.Column(db.Integer)
-    device = 
-
+    properties = db.relationship("Property", secondary=vehicle_property_table, back_populates="vehicle_prop")
+    tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
+    owner = db.relationship("Character", secondary=char_vehicle_table, back_populates="vehicle")
+    
     def __repr__(self):
-        return f'<Powersource {self.name}>' 
+        return f'<Vehicle {self.name}>'
+
+class Mech(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    power = db.relationship("Ammo_Power", secondary=ammo_power_mech_table, back_populates="mech_load")
+    tech_level = db.Column(db.Integer)
+    properties = db.relationship("Property", secondary=mech_property_table, back_populates="mech_prop")
+    tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
+    owner = db.relationship("Character", secondary=char_mech_table, back_populates="mech")
+    
+    def __repr__(self):
+        return f'Mech {self.name}>'
+
+class Cybernetic(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    body_part = db.Column(db.String(12))
+    tech_level = db.Column(db.Integer)
+    properties = db.relationship("Property", secondary=cyber_property_table, back_populates="cyber_prop")
+    tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
+    owner = db.relationship("Character", secondary=char_cyber_table, back_populates="cybernetic")
+    
+    def __repr__(self):
+        return f'Mech {self.name}>'
 
 class Spell(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -756,19 +885,10 @@ class Damagetype(db.Model):
     armor_resist = db.relationship("Armor", secondary=armor_dmg_resist_table, back_populates="dmg_resist")
     armor_immune = db.relationship("Armor", secondary=armor_dmg_immune_table, back_populates="dmg_immune")
     armor_vulner = db.relationship("Armor", secondary=armor_dmg_vulner_table, back_populates="dmg_vulner")
+    ammo_source = db.relationship("Ammo_Power", secondary=ammo_power_dmg_type_table, back_populates="dmg_type")
 
     def __repr__(self):
-        return f'<Damagetype {self.name}>'
-
-class Condition(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(200))
-    afflicter = 
-    afflicted = 
-
-    def __repr__(self):
-        return f'<Condition {self.name}>' 
+        return f'<Damagetype {self.name}>' 
 
 class Dice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
