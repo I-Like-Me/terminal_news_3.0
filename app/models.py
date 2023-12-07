@@ -379,11 +379,23 @@ ammo_power_mech_table = db.Table(
     db.Column("mech_id", db.ForeignKey("mech.id"), primary_key=True),
 )
 
+fac_rank_table = db.Table(
+    "fac_rank_table",
+    db.Column("faction_id", db.ForeignKey("faction.id"), primary_key=True),
+    db.Column("rank_id", db.ForeignKey("rank.id"), primary_key=True),
+)
+
+char_rank_table = db.Table(
+    "char_rank_table",
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
+    db.Column("rank_id", db.ForeignKey("rank.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
     character_id = db.Column("character_id", db.Integer, db.ForeignKey("character.id"))
-    cls_5e_id = db.Column("cls_5e_id",db.Integer , db.ForeignKey("cls_5e.id"))
+    cls_5e_id = db.Column("cls_5e_id",db.Integer, db.ForeignKey("cls_5e.id"))
     cls_level = db.Column(db.Integer)
 
     classed_character = db.relationship("Character", back_populates='cls_association')
@@ -426,6 +438,7 @@ class Character(db.Model):
     background = db.relationship("Background", secondary=char_background_table, back_populates="char_bg")
     alignment = db.relationship("Alignment", secondary=char_alignment_table, back_populates="aligned_char")
     factions = db.relationship("Faction", secondary=char_faction_table, back_populates="char_fac")
+    ranks = db.relationship("Rank", secondary=char_rank_table, back_populates="ranked_char")
     ability_numbers = db.relationship("AbilityScores", back_populates="able_char")
     pro_skills = db.relationship("Skill", secondary=char_pro_skill_table, back_populates="skl_trained_char")
     skill_numbers = db.relationship("SkillScores", back_populates="skilled_char")
@@ -581,6 +594,7 @@ class Faction(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
     char_fac = db.relationship("Character", secondary=char_faction_table, back_populates="factions")
+    fac_ranks = db.relationship("Rank", secondary=fac_rank_table, back_populates="ranked_facs")
 
     def __repr__(self):
         return f'<Faction {self.name}>'
@@ -594,7 +608,8 @@ class Rank(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
-    # ranked_facs = change faction association table to object with rank as column
+    ranked_facs = db.relationship("Faction", secondary=fac_rank_table, back_populates="fac_ranks")
+    ranked_char = db.relationship("Character", secondary=char_rank_table, back_populates="ranks")
 
     def __repr__(self):
         return f'<Rank {self.name}>'
