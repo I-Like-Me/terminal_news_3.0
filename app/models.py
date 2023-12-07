@@ -309,37 +309,37 @@ cls_spell_table = db.Table(
 
 char_spell_table = db.Table(
     "char_spell_table",
-    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
     db.Column("spell_id", db.ForeignKey("spell.id"), primary_key=True),
 )
 
 char_vehicle_table = db.Table(
     "char_vehicle_table",
-    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
     db.Column("vehicle_id", db.ForeignKey("vehicle.id"), primary_key=True),
 )
 
 char_feat_table = db.Table(
     "char_feat_table",
-    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
     db.Column("feat_id", db.ForeignKey("feat.id"), primary_key=True),
 )
 
 char_mech_table = db.Table(
     "char_mech_table",
-    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
     db.Column("mech_id", db.ForeignKey("mech.id"), primary_key=True),
 )
 
 char_cyber_table = db.Table(
     "char_cyber_table",
-    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
     db.Column("cybernetic_id", db.ForeignKey("cybernetic.id"), primary_key=True),
 )
 
 char_cls_info_table = db.Table(
     "char_cls_info_table",
-    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("character_id", db.ForeignKey("character.id"), primary_key=True),
     db.Column("clsinfo_id", db.ForeignKey("clsinfo.id"), primary_key=True),
 )
 
@@ -768,7 +768,7 @@ class Property(db.Model):
     def __repr__(self):
         return f'<Property {self.name}>'
 
-class Ammo_Power(db.Model):
+class Ammo_power(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
