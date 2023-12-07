@@ -283,6 +283,18 @@ armor_dmg_vulner_table = db.Table(
     db.Column("damagetype_id", db.ForeignKey("damagetype.id"), primary_key=True),
 )
 
+cls_spell_table = db.Table(
+    "cls_spell_table",
+    db.Column("cls_5e_id", db.ForeignKey("cls_5e.id"), primary_key=True),
+    db.Column("spell_id", db.ForeignKey("spell.id"), primary_key=True),
+)
+
+char_spell_table = db.Table(
+    "char_spell_table",
+    db.Column("character_id", db.ForeignKey("character_5e.id"), primary_key=True),
+    db.Column("spell_id", db.ForeignKey("spell.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -340,7 +352,7 @@ class Character(db.Model):
     weapons = db.relationship("Weapon", secondary=char_weap_table, back_populates="wielder")
     armor = db.relationship("Armor", secondary=char_armor_table, back_populates="wearer")
     gear = db.relationship("Gear", secondary=char_gear_table, back_populates="owner")
-    prepped_spells =
+    prepped_spells = db.relationship("Spell", secondary=char_spell_table, back_populates="spell_prepper") 
     feats =
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
@@ -387,7 +399,7 @@ class Cls_5e(db.Model):
     dmg_resist = db.relationship("Damagetype", secondary=cls_dmg_resist_table, back_populates="cls_resist")
     dmg_immune = db.relationship("Damagetype", secondary=cls_dmg_immune_table, back_populates="cls_immune")
     dmg_vulner = db.relationship("Damagetype", secondary=cls_dmg_vulner_table, back_populates="cls_vulner")    
-    spellbook =
+    spellbook = db.relationship("Spell", secondary=cls_spell_table, back_populates="cls_books") 
     
     def __repr__(self):
         return f'<Cls_5e {self.name}>'
@@ -555,6 +567,15 @@ class Skill(db.Model):
     def __repr__(self):
         return f'<Skill {self.name}>'
 
+class Feat(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    char_feat = 
+
+    def __repr__(self):
+        return f'<Feat {self.name}>' 
+
 class Lifeinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_name = db.Column(db.String(64), index=True, unique=True)
@@ -657,6 +678,16 @@ class Property(db.Model):
     def __repr__(self):
         return f'<Property {self.name}>'
 
+class Ammo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    tech_level = db.Column(db.Integer)
+    device = 
+
+    def __repr__(self):
+        return f'<Ammo {self.name}>' 
+
 class Armor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -684,6 +715,27 @@ class Gear(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
     owner = db.relationship("Character", secondary=char_gear_table, back_populates="gear")
+    
+    def __repr__(self):
+        return f'<Gear {self.name}>'
+
+class Powersource(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    tech_level = db.Column(db.Integer)
+    device = 
+
+    def __repr__(self):
+        return f'<Powersource {self.name}>' 
+
+class Spell(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    level = db.Column(db.Integer, default=1)
+    cls_books = db.relationship("Cls_5e", secondary=cls_spell_table, back_populates="spellbook") 
+    spell_prepper = db.relationship("Character", secondary=char_spell_table, back_populates="prepped_spells") 
 
     def __repr__(self):
         return f'<Gear {self.name}>'
@@ -707,6 +759,16 @@ class Damagetype(db.Model):
 
     def __repr__(self):
         return f'<Damagetype {self.name}>'
+
+class Condition(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
+    afflicter = 
+    afflicted = 
+
+    def __repr__(self):
+        return f'<Condition {self.name}>' 
 
 class Dice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -746,7 +808,3 @@ class Npcpool(db.Model):
 
     def __repr__(self):
         return f'<Npcpool {self.name}>'
-    
-class Condition
-
-class Ammo
