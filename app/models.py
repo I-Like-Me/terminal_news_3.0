@@ -412,8 +412,8 @@ class CharKnow(db.Model):
     subject_id = db.Column("subject_id", db.Integer, db.ForeignKey("character.id"))
     topics = db.Column(JSONB)
 
-    learner_char = db.relationship("Character", back_populates='cls_association')
-    subject_char = db.relationship("Character", back_populates='classed_character_association')
+    learner_char = db.relationship("Character", back_populates='subject_association')
+    subject_char = db.relationship("Character", back_populates='learner_association')
    
     def __repr__(self):
         return f'<CharKnow {self.char_char}>'
