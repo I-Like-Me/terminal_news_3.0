@@ -405,15 +405,29 @@ class CharCls(db.Model):
     def __repr__(self):
         return f'<CharCls {self.char_cls}>'
     
+# class CharKnow(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     char_char = db.Column(db.String(64), index=True, unique=True)
+#     learner_id = db.Column("learner_id", db.Integer, db.ForeignKey("character.id"))
+#     subject_id = db.Column("subject_id", db.Integer, db.ForeignKey("character.id"))
+#     topics = db.Column(JSONB)
+
+#     learner_char = db.relationship("Character", back_populates='subject_association')
+#     subject_char = db.relationship("Character", back_populates='learner_association')
+   
+#     def __repr__(self):
+#         return f'<CharKnow {self.char_char}>'
+
 class CharKnow(db.Model):
+    __tablename__ = 'char_know'
     id = db.Column(db.Integer, primary_key=True)
     char_char = db.Column(db.String(64), index=True, unique=True)
     learner_id = db.Column("learner_id", db.Integer, db.ForeignKey("character.id"))
     subject_id = db.Column("subject_id", db.Integer, db.ForeignKey("character.id"))
     topics = db.Column(JSONB)
 
-    learner_char = db.relationship("Character", back_populates='subject_association')
-    subject_char = db.relationship("Character", back_populates='learner_association')
+    learner_char = db.relationship("Character", foreign_keys=[learner_id])
+    subject_char = db.relationship("Character", foreign_keys=[subject_id])
    
     def __repr__(self):
         return f'<CharKnow {self.char_char}>'
@@ -435,6 +449,7 @@ class User(db.Model):
             self.character.append(char_pick)
 
 class Character(db.Model):
+    __tablename__ = 'character'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     player = db.relationship("User", secondary=user_char_table, back_populates="character")
@@ -453,7 +468,7 @@ class Character(db.Model):
     alignment = db.relationship("Alignment", secondary=char_alignment_table, back_populates="aligned_char")
     factions = db.relationship("Faction", secondary=char_faction_table, back_populates="char_fac")
     ranks = db.relationship("Rank", secondary=char_rank_table, back_populates="ranked_char")
-    ability_numbers = db.relationship("AbilityScores", back_populates="able_char")
+    ability_numbers = db.relationship("AbilityScores", back_populates="able_char") ###
     pro_skills = db.relationship("Skill", secondary=char_pro_skill_table, back_populates="skl_trained_char")
     skill_numbers = db.relationship("SkillScores", back_populates="skilled_char")
     cls_association = db.relationship("CharCls", back_populates="classed_character")
@@ -473,11 +488,19 @@ class Character(db.Model):
     npc = db.Column(db.Boolean)
     npc_group = db.relationship("Npcpool", secondary=char_npc_pool_table, back_populates="picked_npc")
     
-    subject_association = db.relationship("CharKnow", back_populates="learner_char")
-    subjects = association_proxy("subject_association", "subject_char")
+    knows = db.relationship(
+        'Character',
+        secondary='char_know',
+        primaryjoin=id == CharKnow.learner_id,
+        secondaryjoin=id == CharKnow.subject_id,
+        backref='topic_check'
+    )
 
-    learner_association = db.relationship("CharKnow", back_populates="subject_char")
-    learners = association_proxy('learner_association', 'learner_char')
+    # subject_association = db.relationship("CharKnow", back_populates="learner_char")
+    # subjects = association_proxy("subject_association", "subject_char")
+
+    # learner_association = db.relationship("CharKnow", back_populates="subject_char")
+    # learners = association_proxy('learner_association', 'learner_char')
 
     def __repr__(self):
         return f'<Character {self.name}>'
@@ -766,7 +789,7 @@ class AbilityScores(db.Model):
     intelligence = db.Column(db.Integer)
     wisdom = db.Column(db.Integer)
     charisma = db.Column(db.Integer)
-    able_char = db.relationship("Character", back_populates="ability_numbers")
+    able_char = db.relationship("Character", back_populates="ability_numbers") ###
 
     def __repr__(self):
         return f'<AbilityScores {self.char_name}>'
