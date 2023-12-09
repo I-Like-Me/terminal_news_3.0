@@ -468,7 +468,7 @@ class Character(db.Model):
     alignment = db.relationship("Alignment", secondary=char_alignment_table, back_populates="aligned_char")
     factions = db.relationship("Faction", secondary=char_faction_table, back_populates="char_fac")
     ranks = db.relationship("Rank", secondary=char_rank_table, back_populates="ranked_char")
-    ability_numbers = db.relationship("AbilityScores", back_populates="able_char") ###
+    ability_numbers = db.relationship("AbilityScores") ###
     pro_skills = db.relationship("Skill", secondary=char_pro_skill_table, back_populates="skl_trained_char")
     skill_numbers = db.relationship("SkillScores", back_populates="skilled_char")
     cls_association = db.relationship("CharCls", back_populates="classed_character")
@@ -789,7 +789,7 @@ class AbilityScores(db.Model):
     intelligence = db.Column(db.Integer)
     wisdom = db.Column(db.Integer)
     charisma = db.Column(db.Integer)
-    able_char = db.relationship("Character", back_populates="ability_numbers") ###
+    able_char = db.Column(db.Integer, db.ForeignKey("character.id")) ###
 
     def __repr__(self):
         return f'<AbilityScores {self.char_name}>'
