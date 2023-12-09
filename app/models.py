@@ -468,12 +468,12 @@ class Character(db.Model):
     alignment = db.relationship("Alignment", secondary=char_alignment_table, back_populates="aligned_char")
     factions = db.relationship("Faction", secondary=char_faction_table, back_populates="char_fac")
     ranks = db.relationship("Rank", secondary=char_rank_table, back_populates="ranked_char")
-    ability_numbers = db.relationship("AbilityScores") ###
+    ability_numbers = db.relationship("AbilityScores")
     pro_skills = db.relationship("Skill", secondary=char_pro_skill_table, back_populates="skl_trained_char")
-    skill_numbers = db.relationship("SkillScores", back_populates="skilled_char")
+    skill_numbers = db.relationship("SkillScores")
     cls_association = db.relationship("CharCls", back_populates="classed_character")
     classes = association_proxy("cls_association", "cls")
-    life_info = db.relationship("Lifeinfo", back_populates="life_info_holder")
+    life_info = db.relationship("Lifeinfo")
     cls_info_sheets = db.relationship("Clsinfo", secondary=char_cls_info_table, back_populates="cls_info_holder") 
     weapons = db.relationship("Weapon", secondary=char_weap_table, back_populates="wielder")
     armor = db.relationship("Armor", secondary=char_armor_table, back_populates="wearer")
@@ -734,7 +734,7 @@ class Lifeinfo(db.Model):
     public_history = db.Column(db.String(5000))
     learned_history = db.Column(db.String(5000))
     hidden_history = db.Column(db.String(5000))
-    life_info_holder = db.relationship("Character", back_populates="life_info")
+    life_info_holder = db.Column(db.Integer, db.ForeignKey("character.id"))
 
     def __repr__(self):
         return f'<Lifeinfo {self.char_name}>'
@@ -775,7 +775,7 @@ class SkillScores(db.Model):
     sleight_of_hand = db.Column(db.Integer)
     stealth = db.Column(db.Integer)
     survival = db.Column(db.Integer)
-    skilled_char = db.relationship("Character", back_populates="skill_numbers")
+    skilled_char = db.Column(db.Integer, db.ForeignKey("character.id")) 
 
     def __repr__(self):
         return f'<SkillScores {self.char_name}>'
@@ -789,7 +789,7 @@ class AbilityScores(db.Model):
     intelligence = db.Column(db.Integer)
     wisdom = db.Column(db.Integer)
     charisma = db.Column(db.Integer)
-    able_char = db.Column(db.Integer, db.ForeignKey("character.id")) ###
+    able_char = db.Column(db.Integer, db.ForeignKey("character.id"))
 
     def __repr__(self):
         return f'<AbilityScores {self.char_name}>'
