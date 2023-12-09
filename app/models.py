@@ -404,19 +404,6 @@ class CharCls(db.Model):
    
     def __repr__(self):
         return f'<CharCls {self.char_cls}>'
-    
-# class CharKnow(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     char_char = db.Column(db.String(64), index=True, unique=True)
-#     learner_id = db.Column("learner_id", db.Integer, db.ForeignKey("character.id"))
-#     subject_id = db.Column("subject_id", db.Integer, db.ForeignKey("character.id"))
-#     topics = db.Column(JSONB)
-
-#     learner_char = db.relationship("Character", back_populates='subject_association')
-#     subject_char = db.relationship("Character", back_populates='learner_association')
-   
-#     def __repr__(self):
-#         return f'<CharKnow {self.char_char}>'
 
 class CharKnow(db.Model):
     __tablename__ = 'char_know'
@@ -495,12 +482,6 @@ class Character(db.Model):
         secondaryjoin=id == CharKnow.subject_id,
         backref='topic_check'
     )
-
-    # subject_association = db.relationship("CharKnow", back_populates="learner_char")
-    # subjects = association_proxy("subject_association", "subject_char")
-
-    # learner_association = db.relationship("CharKnow", back_populates="subject_char")
-    # learners = association_proxy('learner_association', 'learner_char')
 
     def __repr__(self):
         return f'<Character {self.name}>'
