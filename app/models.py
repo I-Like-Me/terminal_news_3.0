@@ -799,16 +799,16 @@ class Weapon(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     damage_dice = db.relationship("Dice", secondary=weap_dice_table, back_populates="damage_roller")
     num_of_dice = db.Column(db.Integer)
-    dmg_type = db.relationship("DamageType", secondary=weap_dmg_type_table, back_populates="weap_source")
+    dmg_type = db.relationship("Damagetype", secondary=weap_dmg_type_table, back_populates="weap_source")
     properties = db.relationship("Property", secondary=weapon_property_table, back_populates="weap_prop")
     tech_level = db.Column(db.Integer)
     ranged = db.Column(db.Boolean)
     reach = db.Column(db.Integer)
     normal_range = db.Column(db.Integer)
     long_range = db.Column(db.Integer)
-    ammo = db.relationship("Ammo_Power", secondary=ammo_power_weap_table, back_populates="weap_load")
+    ammo = db.relationship("Ammo_power", secondary=ammo_power_weap_table, back_populates="weap_load")
     weap_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_weap_table, back_populates="weap_pros")
-    wielder = db.relationship("Character", secondary=char_weap_table, back_populates="weapon")
+    wielder = db.relationship("Character", secondary=char_weap_table, back_populates="weapons")
 
     def __repr__(self):
         return f'<Weapon {self.name}>'
@@ -819,9 +819,9 @@ class Property(db.Model):
     description = db.Column(db.String(200))
     weap_prop = db.relationship("Weapon", secondary=weapon_property_table, back_populates="properties")
     armor_prop = db.relationship("Armor", secondary=armor_property_table, back_populates="properties")
-    vehicle_prop = db.relationship("Vehicle", secondary=vehicle_property_table, back_populates="vehicle_prop")
-    mech_prop = db.relationship("Mech", secondary=mech_property_table, back_populates="mech_prop")
-    cyber_prop = db.relationship("Cybernetic", secondary=cyber_property_table, back_populates="cyber_prop")
+    vehicle_prop = db.relationship("Vehicle", secondary=vehicle_property_table, back_populates="properties")
+    mech_prop = db.relationship("Mech", secondary=mech_property_table, back_populates="properties")
+    cyber_prop = db.relationship("Cybernetic", secondary=cyber_property_table, back_populates="properties")
 
     def __repr__(self):
         return f'<Property {self.name}>'
@@ -854,7 +854,7 @@ class Armor(db.Model):
     dmg_immune = db.relationship("Damagetype", secondary=armor_dmg_immune_table, back_populates="armor_immune")
     dmg_vulner = db.relationship("Damagetype", secondary=armor_dmg_vulner_table, back_populates="armor_vulner")
     tech_level = db.Column(db.Integer)
-    power = db.relationship("Ammo_Power", secondary=ammo_power_armor_table, back_populates="armor_load")
+    power = db.relationship("Ammo_power", secondary=ammo_power_armor_table, back_populates="armor_load")
     properties = db.relationship("Property", secondary=armor_property_table, back_populates="armor_prop")
     armor_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_armor_table, back_populates="armor_pros") 
     wearer = db.relationship("Character", secondary=char_armor_table, back_populates="armor")
@@ -867,7 +867,7 @@ class Gear(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
     tech_level = db.Column(db.Integer)
-    power = db.relationship("Ammo_Power", secondary=ammo_power_gear_table, back_populates="gear_load")
+    power = db.relationship("Ammo_power", secondary=ammo_power_gear_table, back_populates="gear_load")
     tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
     owner = db.relationship("Character", secondary=char_gear_table, back_populates="gear")
     
@@ -881,10 +881,9 @@ class Vehicle(db.Model):
     type = db.Column(db.String(12))
     speed = db.Column(db.Integer)
     capacity = db.Column(db.Integer)
-    power = db.relationship("Ammo_Power", secondary=ammo_power_vehicle_table, back_populates="vehicle_load")
+    power = db.relationship("Ammo_power", secondary=ammo_power_vehicle_table, back_populates="vehicle_load")
     tech_level = db.Column(db.Integer)
     properties = db.relationship("Property", secondary=vehicle_property_table, back_populates="vehicle_prop")
-    tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
     owner = db.relationship("Character", secondary=char_vehicle_table, back_populates="vehicle")
     
     def __repr__(self):
@@ -894,10 +893,9 @@ class Mech(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
-    power = db.relationship("Ammo_Power", secondary=ammo_power_mech_table, back_populates="mech_load")
+    power = db.relationship("Ammo_power", secondary=ammo_power_mech_table, back_populates="mech_load")
     tech_level = db.Column(db.Integer)
     properties = db.relationship("Property", secondary=mech_property_table, back_populates="mech_prop")
-    tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
     owner = db.relationship("Character", secondary=char_mech_table, back_populates="mech")
     
     def __repr__(self):
@@ -910,8 +908,7 @@ class Cybernetic(db.Model):
     body_part = db.Column(db.String(12))
     tech_level = db.Column(db.Integer)
     properties = db.relationship("Property", secondary=cyber_property_table, back_populates="cyber_prop")
-    tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
-    owner = db.relationship("Character", secondary=char_cyber_table, back_populates="cybernetic")
+    owner = db.relationship("Character", secondary=char_cyber_table, back_populates="cybernetics")
     
     def __repr__(self):
         return f'Mech {self.name}>'
@@ -943,7 +940,7 @@ class Damagetype(db.Model):
     armor_resist = db.relationship("Armor", secondary=armor_dmg_resist_table, back_populates="dmg_resist")
     armor_immune = db.relationship("Armor", secondary=armor_dmg_immune_table, back_populates="dmg_immune")
     armor_vulner = db.relationship("Armor", secondary=armor_dmg_vulner_table, back_populates="dmg_vulner")
-    ammo_source = db.relationship("Ammo_Power", secondary=ammo_power_dmg_type_table, back_populates="dmg_type")
+    ammo_source = db.relationship("Ammo_power", secondary=ammo_power_dmg_type_table, back_populates="dmg_type")
 
     def __repr__(self):
         return f'<Damagetype {self.name}>' 
