@@ -407,17 +407,12 @@ class CharCls(db.Model):
 
 class CharKnow(db.Model):
     __tablename__ = 'char_know'
-    id = db.Column(db.Integer, primary_key=True)
-    char_char = db.Column(db.String(64), index=True, unique=True)
-    learner_id = db.Column("learner_id", db.Integer, db.ForeignKey("character.id"))
-    subject_id = db.Column("subject_id", db.Integer, db.ForeignKey("character.id"))
+    learner_id = db.Column("learner_id", db.Integer, db.ForeignKey("character.id"), primary_key=True)
+    subject_id = db.Column("subject_id", db.Integer, db.ForeignKey("character.id"), primary_key=True)
     topics = db.Column(JSONB)
 
     learner_char = db.relationship("Character", foreign_keys=[learner_id])
     subject_char = db.relationship("Character", foreign_keys=[subject_id])
-   
-    def __repr__(self):
-        return f'<CharKnow {self.char_char}>'
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
