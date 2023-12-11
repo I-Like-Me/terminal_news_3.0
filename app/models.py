@@ -517,6 +517,19 @@ class Character(db.Model):
         db.session.add(learn)
         db.session.commit()
 
+    def check_topic(self, subject_pick, topic_pick):
+        for subject in self.knows:
+            if subject.name == subject_pick:
+                subject_topics = CharKnow.query.get([self.id, subject.id])
+                try:
+                    return subject_topics.topics[topic_pick]
+                except KeyError:
+                    print('Not a topic.')
+
+
+    # def learn_topic(self, subject_pick, topic_pick):
+
+
 class Cls_5e(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
