@@ -465,9 +465,12 @@ class Character(db.Model):
     cybernetics = db.relationship("Cybernetic", secondary=char_cyber_table, back_populates="owner")
     prepped_spells = db.relationship("Spell", secondary=char_spell_table, back_populates="spell_prepper") 
     feats = db.relationship("Feat", secondary=char_feat_table, back_populates="char_feat")
+    job = db.Column(db.String(64))
+    spliced = db.Column(db.Boolean, default= False)
+    robot = db.Column(db.Boolean, default= False)
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
-    npc = db.Column(db.Boolean)
+    npc = db.Column(db.Boolean, default= True)
     npc_group = db.relationship("Npcpool", secondary=char_npc_pool_table, back_populates="picked_npc")
     
     knows = db.relationship(
@@ -500,6 +503,19 @@ class Character(db.Model):
             if cls.name == cls_target:
                 char_cls_entry = CharCls.query.filter_by(char_cls=f'{self.name[:3]}{self.id}_{cls.name[:3]}{cls.id}').first()
                 return char_cls_entry.cls_level      
+            
+    def pick_subject(self, subject_pick):
+        topic_json = { 
+            'char_name': True, 'birth_name': False, 'age': False,
+            'real_age': False, 'cur_race': False, 'birth_race': False,
+            'cur_loc': False, 'birth_loc:': False, 'public_history': True,
+            'learned_history': True, 'hidden_history': False, 'cls': False,
+            'arch': False, 'faction': False, 'rank': False, 'cybernetics': False,
+            'job': False, 'spliced': False, 'robot': False
+        } 
+        learn = CharKnow(learner_id=self.id, subject_id=subject_pick.id, topics=topic_json)
+        db.session.add(learn)
+        db.session.commit()
 
 class Cls_5e(db.Model):
     id = db.Column(db.Integer, primary_key=True)
