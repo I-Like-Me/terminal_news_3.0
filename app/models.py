@@ -1008,6 +1008,7 @@ class Spell(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.String(200))
+    cantrip = db.Column(db.Boolean, default=False)
     level = db.Column(db.Integer, default=1)
     cls_books = db.relationship("Cls_5e", secondary=cls_spell_table, back_populates="spellbook") 
     spell_prepper = db.relationship("Character", secondary=char_spell_table, back_populates="prepped_spells") 
@@ -1015,8 +1016,8 @@ class Spell(db.Model):
     def __repr__(self):
         return f'<Gear {self.name}>'
 
-    def new_spell_adder(spell_name, desc, tl, part):
-        new_spell = Spell(name=spell_name, description=desc, tech_level=tl, body_part=part)
+    def new_spell_adder(spell_name, desc, num, type):
+        new_spell = Spell(name=spell_name, description=desc, level=num, cantrip=type)
         db.session.add(new_spell)
         db.session.commit()
 
