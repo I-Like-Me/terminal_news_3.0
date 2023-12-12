@@ -1,6 +1,7 @@
 from app import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.dialects.postgresql import JSONB, insert
+from sqlalchemy.orm.attributes import flag_modified
 
 user_char_table = db.Table(
     "user_char_table",
@@ -526,9 +527,29 @@ class Character(db.Model):
                 except KeyError:
                     print('Not a topic.')
 
-
-    # def learn_topic(self, subject_pick, topic_pick):
-
+    def learn_topic(self, subject_pick, learned_topics):
+        for subject in self.knows:
+            if subject.name == subject_pick:
+                learn_sub = CharKnow.query.get([self.id, subject.id])
+                for topic in learned_topics:
+                    try:
+                        learn_sub.topics[topic] = True
+                    except KeyError:
+                        print(f'{topic}is not a topic.')
+                flag_modified(learn_sub, "topics")
+                db.session.commit()
+    
+    def unlearn_topic(self, subject_pick, unlearned_topics):
+        for subject in self.knows:
+            if subject.name == subject_pick:
+                learn_sub = CharKnow.query.get([self.id, subject.id])
+                for topic in unlearned_topics:
+                    try:
+                        learn_sub.topics[topic] = False
+                    except KeyError:
+                        print(f'{topic}is not a topic.')
+                flag_modified(learn_sub, "topics")
+                db.session.commit()
 
 class Cls_5e(db.Model):
     id = db.Column(db.Integer, primary_key=True)
