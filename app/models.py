@@ -591,8 +591,8 @@ class Ladder(db.Model):
     def __repr__(self):
         return f'<Ladder {self.name}>'
 
-    def new_ladder_adder(ladder_name):
-        new_ladder = Ladder(name=ladder_name)
+    def new_ladder_adder(ladder_name, desc):
+        new_ladder = Ladder(name=ladder_name, description=desc)
         db.session.add(new_ladder)
         db.session.commit()
 
@@ -610,8 +610,8 @@ class Race(db.Model):
     def __repr__(self):
         return f'<Race {self.name}>'
 
-    def new_race_adder(race_name):
-        new_race = Race(name=race_name)
+    def new_race_adder(race_name, desc):
+        new_race = Race(name=race_name, description=desc)
         db.session.add(new_race)
         db.session.commit()
 
@@ -625,8 +625,8 @@ class Location(db.Model):
     def __repr__(self):
         return f'<Location {self.name}>'
 
-    def new_loc_adder(loc_name):
-        new_loc = Location(name=loc_name)
+    def new_loc_adder(loc_name, desc):
+        new_loc = Location(name=loc_name, description=desc)
         db.session.add(new_loc)
         db.session.commit()
 
@@ -639,8 +639,8 @@ class Background(db.Model):
     def __repr__(self):
         return f'<Background {self.name}>'
 
-    def new_bg_adder(bg_name):
-        new_bg = Background(name=bg_name)
+    def new_bg_adder(bg_name, desc):
+        new_bg = Background(name=bg_name, description=desc)
         db.session.add(new_bg)
         db.session.commit()
 
@@ -653,8 +653,8 @@ class Alignment(db.Model):
     def __repr__(self):
         return f'<Alignment {self.name}>'
 
-    def new_align_adder(align_name):
-        new_align = Alignment(name=align_name)
+    def new_align_adder(align_name, desc):
+        new_align = Alignment(name=align_name, description=desc)
         db.session.add(new_align)
         db.session.commit()
 
@@ -668,8 +668,8 @@ class Faction(db.Model):
     def __repr__(self):
         return f'<Faction {self.name}>'
 
-    def new_fac_adder(fac_name):
-        new_fac = Faction(name=fac_name)
+    def new_fac_adder(fac_name, desc):
+        new_fac = Faction(name=fac_name, description=desc)
         db.session.add(new_fac)
         db.session.commit()
 
@@ -683,8 +683,8 @@ class Rank(db.Model):
     def __repr__(self):
         return f'<Rank {self.name}>'
 
-    def new_rank_adder(rank_name):
-        new_rank = Rank(name=rank_name)
+    def new_rank_adder(rank_name, desc):
+        new_rank = Rank(name=rank_name, description=desc)
         db.session.add(new_rank)
         db.session.commit()
         
@@ -699,8 +699,8 @@ class Architype(db.Model):
     def __repr__(self):
         return f'<Architype {self.name}>'
 
-    def new_arch_adder(arch_name):
-        new_arch = Architype(name=arch_name)
+    def new_arch_adder(arch_name, desc):
+        new_arch = Architype(name=arch_name, description=desc)
         db.session.add(new_arch)
         db.session.commit()
 
@@ -719,6 +719,11 @@ class Feature(db.Model):
 
     def __repr__(self):
         return f'<Feature {self.name}>'
+    
+    def new_feature_adder(feature_name, desc):
+        new_feature = Feature(name=feature_name, description=desc)
+        db.session.add(new_feature)
+        db.session.commit()
 
 class Ability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -728,6 +733,11 @@ class Ability(db.Model):
 
     def __repr__(self):
         return f'<Ability {self.name}>'
+    
+    def new_feature_adder(feature_name):
+        new_feature = Feature(name=feature_name)
+        db.session.add(new_feature)
+        db.session.commit()
 
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -738,6 +748,11 @@ class Skill(db.Model):
     def __repr__(self):
         return f'<Skill {self.name}>'
 
+    def new_skill_adder(skill_name):
+        new_skill = Feature(name=skill_name)
+        db.session.add(new_skill)
+        db.session.commit()
+
 class Feat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -746,6 +761,11 @@ class Feat(db.Model):
 
     def __repr__(self):
         return f'<Feat {self.name}>' 
+    
+    def new_feat_adder(feat_name, desc):
+        new_feat = Feature(name=feat_name, description=desc)
+        db.session.add(new_feat)
+        db.session.commit()
 
 class Lifeinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -823,6 +843,7 @@ class AbilityScores(db.Model):
 class Weapon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(200))
     damage_dice = db.relationship("Dice", secondary=weap_dice_table, back_populates="damage_roller")
     num_of_dice = db.Column(db.Integer)
     dmg_type = db.relationship("Damagetype", secondary=weap_dmg_type_table, back_populates="weap_source")
@@ -839,6 +860,12 @@ class Weapon(db.Model):
     def __repr__(self):
         return f'<Weapon {self.name}>'
 
+    def new_weap_adder(weap_name, desc, d_count, tl, shoots, feet, cd, ld):
+        new_weap = Weapon(name=weap_name, description=desc, num_of_dice=d_count, 
+                           tech_level=tl, ranged=shoots, reach=feet, normal_range=cd, long_range=ld)
+        db.session.add(new_weap)
+        db.session.commit()
+
 class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -851,6 +878,11 @@ class Property(db.Model):
 
     def __repr__(self):
         return f'<Property {self.name}>'
+
+    def new_property_adder(property_name, desc):
+        new_property = property(name=property_name, description=desc)
+        db.session.add(new_property)
+        db.session.commit()
 
 class Ammo_power(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -865,7 +897,12 @@ class Ammo_power(db.Model):
     mech_load = db.relationship("Mech", secondary=ammo_power_mech_table, back_populates="power")
 
     def __repr__(self):
-        return f'<Ammo {self.name}>' 
+        return f'<Ammo_power {self.name}>' 
+    
+    def new_ammo_adder(ammo_name, desc, tl):
+        new_ammo = Ammo_power(name=ammo_name, description=desc, tech_level=tl)
+        db.session.add(new_ammo)
+        db.session.commit()
 
 class Armor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -887,6 +924,13 @@ class Armor(db.Model):
 
     def __repr__(self):
         return f'<Armor {self.name}>'
+    
+    def new_armor_adder(armor_name, desc, size, tl, ac_num, max_num, req_num, sth):
+        new_armor = Armor(name=armor_name, description=desc, armor_size=size, 
+                           tech_level=tl, ac=ac_num, ac_mod_max=max_num, 
+                           str_req=req_num, stealth=sth)
+        db.session.add(new_armor)
+        db.session.commit()
 
 class Gear(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -899,6 +943,11 @@ class Gear(db.Model):
     
     def __repr__(self):
         return f'<Gear {self.name}>'
+    
+    def new_gear_adder(gear_name, desc, tl):
+        new_gear = Gear(name=gear_name, description=desc, tech_level=tl)
+        db.session.add(new_gear)
+        db.session.commit()
 
 class Vehicle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -914,6 +963,12 @@ class Vehicle(db.Model):
     
     def __repr__(self):
         return f'<Vehicle {self.name}>'
+    
+    def new_vehicle_adder(vehicle_name, desc, v_ty, tl, spd_num, cap_num):
+        new_vehicle = Vehicle(name=vehicle_name, description=desc, type=v_ty, 
+                           tech_level=tl, speed=spd_num, capacity=cap_num)
+        db.session.add(new_vehicle)
+        db.session.commit()
 
 class Mech(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -926,6 +981,11 @@ class Mech(db.Model):
     
     def __repr__(self):
         return f'Mech {self.name}>'
+    
+    def new_mech_adder(mech_name, desc, tl):
+        new_mech = Mech(name=mech_name, description=desc, tech_level=tl)
+        db.session.add(new_mech)
+        db.session.commit()
 
 class Cybernetic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -939,6 +999,11 @@ class Cybernetic(db.Model):
     def __repr__(self):
         return f'Mech {self.name}>'
 
+    def new_cyber_adder(cyber_name, desc, tl, part):
+        new_cyber = Cybernetic(name=cyber_name, description=desc, tech_level=tl, body_part=part)
+        db.session.add(new_cyber)
+        db.session.commit()
+
 class Spell(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
@@ -949,6 +1014,11 @@ class Spell(db.Model):
 
     def __repr__(self):
         return f'<Gear {self.name}>'
+
+    def new_spell_adder(spell_name, desc, tl, part):
+        new_spell = Spell(name=spell_name, description=desc, tech_level=tl, body_part=part)
+        db.session.add(new_spell)
+        db.session.commit()
 
 class Damagetype(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -970,6 +1040,11 @@ class Damagetype(db.Model):
 
     def __repr__(self):
         return f'<Damagetype {self.name}>' 
+    
+    def new_dmg_adder(dmg_name):
+        new_dmg = Damagetype(name=dmg_name)
+        db.session.add(new_dmg)
+        db.session.commit()
 
 class Dice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -980,6 +1055,11 @@ class Dice(db.Model):
 
     def __repr__(self):
         return f'<Dice {self.name}>'
+
+    def new_dice_adder(dice_name, num):
+        new_dice = Dice(name=dice_name, value=num)
+        db.session.add(new_dice)
+        db.session.commit()
 
 class Party(db.Model):
     id = db.Column(db.Integer, primary_key=True)
