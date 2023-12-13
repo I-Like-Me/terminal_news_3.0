@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi Like {{ content.food }}!</h1>
+    <h1>I Like {{ content.food }}!</h1>
+
+    <form method="POST" actions="/">
+        {{ form.csrf_token }}
+        <button>Submit</button>
+    </form>
 {% endblock %}

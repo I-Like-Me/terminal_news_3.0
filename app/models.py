@@ -1,7 +1,9 @@
-from app import db
+from app import db, login
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.dialects.postgresql import JSONB, insert
 from sqlalchemy.orm.attributes import flag_modified
+from flask_login import UserMixin
+
 
 user_char_table = db.Table(
     "user_char_table",
@@ -415,7 +417,7 @@ class CharKnow(db.Model):
     learner_char = db.relationship("Character", foreign_keys=[learner_id])
     subject_char = db.relationship("Character", foreign_keys=[subject_id])
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
@@ -430,6 +432,10 @@ class User(db.Model):
     def claim_char(self, char_pick):
         if char_pick.npc != True and len(char_pick.player) == 0:
             self.character.append(char_pick)
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
 
 class Character(db.Model):
     __tablename__ = 'character'
