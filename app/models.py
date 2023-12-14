@@ -490,6 +490,9 @@ class Character(db.Model):
 
     def __repr__(self):
         return f'<Character {self.name}>'
+    
+    def __str__(self):
+        return self.name
 
     def pick_cls(self, cls_pick):
         char_cls_ready = CharCls(classed_character=self, cls=cls_pick, cls_level=1, char_cls=f'{self.name[:3]}{self.id}_{cls_pick.name[:3]}{cls_pick.id}')
@@ -515,7 +518,7 @@ class Character(db.Model):
         topic_json = { 
             'char_name': True, 'birth_name': False, 'age': False,
             'real_age': False, 'cur_race': False, 'birth_race': False,
-            'cur_loc': False, 'birth_loc:': False, 'public_history': True,
+            'cur_loc': False, 'birth_loc': False, 'public_history': True,
             'learned_history': True, 'hidden_history': False, 'cls': False,
             'arch': False, 'faction': False, 'rank': False, 'cybernetics': False,
             'job': False, 'spliced': False, 'robot': False
@@ -532,6 +535,11 @@ class Character(db.Model):
                     return subject_topics.topics[topic_pick]
                 except KeyError:
                     print('Not a topic.')
+
+    def check_all_topics(self, subject_pick):
+        for subject in self.knows:
+            if subject.name == subject_pick:
+                return CharKnow.query.get([self.id, subject.id]).topics
 
     def learn_topic(self, subject_pick, learned_topics):
         for subject in self.knows:
