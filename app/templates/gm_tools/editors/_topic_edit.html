@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Topic Editor</h1>
+    <form method="POST" actions="/">
+        {{ topic_form.csrf_token }}
+        {{ topic_form.topics }}
+        <button>Submit</button>
+    </form>
+{% endblock %}
