@@ -30,3 +30,15 @@ def index():
         print(topic_form.topics.data)
 
     return render_template('index.html', title='Home', content=content, npc_form=npc_form, topic_form=topic_form, preselect=preselect)
+
+@bp.route('/asset_sel')
+def asset_sel():
+
+
+    return render_template('asset_sel.html', title='Home')
+
+@bp.route('/adder/<asset>', methods=["POST", "GET"])
+def adder(asset):
+
+
+    return render_template(f'{asset}_adder.html', title='Home')

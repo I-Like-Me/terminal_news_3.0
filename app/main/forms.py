@@ -36,3 +36,13 @@ class PickNPCs(FlaskForm):
 class AddWeapon(FlaskForm):
     description = TextAreaField('Content', validators=[Length(min=0, max=140)])
     submit = SubmitField('Submit')
+
+class AssetSel(FlaskForm):
+    asset_type = SelectField('types', choices=[
+        ('char_name', 'Ability'), ('birth_name', 'Birth Name'), ('age', 'Age'),
+        ('real_age', 'Real Age'), ('cur_race', 'Current Race'), ('birth_race', 'Birth Race'),
+        ('cur_loc', 'Current Location'), ('birth_loc', 'Birth Location'),
+        ('public_history', 'Public History'), ('learned_history', 'Learned History'),
+        ('hidden_history', 'Hidden History'), ('cls', 'Class'), ('arch', 'Architype'),
+        ('faction', 'Faction'), ('rank', 'Rank'), ('cybernetics', 'Cybernetics'),
+        ('job', 'Job'), ('spliced', 'Spliced'), ('robot', 'Robot')], validators=[DataRequired()])
