@@ -39,10 +39,12 @@ class AddWeapon(FlaskForm):
 
 class AssetSel(FlaskForm):
     asset_type = SelectField('types', choices=[
-        ('char_name', 'Ability'), ('birth_name', 'Birth Name'), ('age', 'Age'),
-        ('real_age', 'Real Age'), ('cur_race', 'Current Race'), ('birth_race', 'Birth Race'),
-        ('cur_loc', 'Current Location'), ('birth_loc', 'Birth Location'),
-        ('public_history', 'Public History'), ('learned_history', 'Learned History'),
-        ('hidden_history', 'Hidden History'), ('cls', 'Class'), ('arch', 'Architype'),
-        ('faction', 'Faction'), ('rank', 'Rank'), ('cybernetics', 'Cybernetics'),
-        ('job', 'Job'), ('spliced', 'Spliced'), ('robot', 'Robot')], validators=[DataRequired()])
+        ('Ability', 'Ability'), ('Alignment', 'Alignment'), ('Ammo_power', 'Ammo and Power'),
+        ('Architype', 'Architype'), ('Armor', 'Armor'), ('Background', 'Background'),
+        ('Character', 'Character'), ('Cls_5e', 'Class'), ('Cybernetic', 'Cybernetic'), 
+        ('Damagetype', 'Damage Type'), ('Dice', 'Dice'), ('Faction', 'Faction'), 
+        ('Feat', 'Feat'), ('Feature', 'Feature'), ('Gear', 'Gear'), ('Ladder', 'Ladder'),
+        ('Location', 'Location'), ('Mech', 'Mech'), ('Property', 'Property'), 
+        ('Race', 'Race'), ('Rank', 'Rank'), ('Skill', 'Skill'), ('Spell', 'Spell'), 
+        ('Vehicle', 'Vehicle'), ('Weapon', 'Weapon')], validators=[DataRequired()])
+    submit = SubmitField('Submit')
