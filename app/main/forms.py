@@ -36,6 +36,11 @@ class PickNPCs(FlaskForm):
 class AssetAdder(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
+    race = QuerySelectField("Races")
+    background = QuerySelectField("Backgrounds")
+    alignment = QuerySelectField("Classes")
+    
+    starting_cls = QuerySelectField("Classes")
     submit = SubmitField('Submit')
 
 class AssetSel(FlaskForm):
