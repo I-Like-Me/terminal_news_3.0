@@ -39,7 +39,7 @@ class AssetAdder(FlaskForm):
     race = QuerySelectField("Races")
     background = QuerySelectField("Backgrounds")
     alignment = QuerySelectField("Classes")
-    
+
     starting_cls = QuerySelectField("Classes")
     submit = SubmitField('Submit')
 
@@ -57,3 +57,6 @@ class AssetSel(FlaskForm):
 
 class CharacterForm(FlaskForm):
     chars = QuerySelectField("Chars")
+
+class AbilityForm(FlaskForm):
+    pass

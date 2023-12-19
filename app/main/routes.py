@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from app import db
 from app.models import User, Character
 from app.main.forms import PickNPCs, PickTopics, AssetSel
-from app.main.toolbox import Converters
+from app.main.toolbox import Converters, Collectors
 from app.main import bp
 
 
@@ -43,9 +43,11 @@ def asset_sel():
 @bp.route('/adder/<asset>', methods=["POST", "GET"])
 def adder(asset):
 
+    ability_form = Converters.str_to_class(f'{asset}Form')()
     char_form = Converters.str_to_class(f'{asset}Form')()
-    char_form.chars.query = Converters.str_to_class(asset).query.all()
-    if char_form.validate_on_submit():
-        print(char_form.chars.data)
+    #char_form.chars.query = Converters.str_to_class(asset).query.all()
+    asset_items = Collectors.get_bin(asset)
+    #if char_form.validate_on_submit():
+        #print(char_form.chars.data)
 
-    return render_template(f'gm_tools/adders/{asset}_adder.html', title='Home', char_form=char_form)
+    return render_template(f'gm_tools/adders/{asset}_adder.html', title='Home', char_form=char_form, asset_items=asset_items, ability_form=ability_form)
