@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets
+from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, RadioField
 from wtforms.validators import Length, DataRequired
-from wtforms_alchemy import QuerySelectMultipleField
+from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
 
 
 # SelectFeild used to pick Class.
@@ -33,8 +33,9 @@ class PickTopics(FlaskForm):
 class PickNPCs(FlaskForm):
     npcs = QuerySelectMultipleField("NPCs")
 
-class AddWeapon(FlaskForm):
-    description = TextAreaField('Content', validators=[Length(min=0, max=140)])
+class AssetAdder(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
 class AssetSel(FlaskForm):
@@ -48,3 +49,6 @@ class AssetSel(FlaskForm):
         ('Race', 'Race'), ('Rank', 'Rank'), ('Skill', 'Skill'), ('Spell', 'Spell'), 
         ('Vehicle', 'Vehicle'), ('Weapon', 'Weapon')], validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+class CharacterForm(FlaskForm):
+    chars = QuerySelectField("Chars")

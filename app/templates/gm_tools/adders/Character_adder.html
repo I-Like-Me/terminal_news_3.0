@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <p>Character_adder</p>
+    <form method="POST" actions="/">
+        {{ char_form.csrf_token }}
+        {{ char_form.chars }}
+        <button>Submit</button>
+    </form>
+{% endblock %}

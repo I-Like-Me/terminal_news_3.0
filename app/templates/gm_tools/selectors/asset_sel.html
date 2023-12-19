@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <p>Asset Selector</p>
+    <form method="POST" actions="/">
+        {{ form.csrf_token }}
+        {{ form.asset_type }}
+        {{ form.submit }}
+    </form>
+{% endblock %}

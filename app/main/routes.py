@@ -5,8 +5,9 @@ import sqlalchemy as sa
 from app import db
 from app.models import User, Character
 from app.main.forms import PickNPCs, PickTopics, AssetSel
-
+from app.main.toolbox import Converters
 from app.main import bp
+
 
 
 @bp.route('/', methods=["POST", "GET"])
@@ -31,31 +32,20 @@ def index():
 
     return render_template('index.html', title='Home', content=content, npc_form=npc_form, topic_form=topic_form, preselect=preselect)
 
-@bp.route('/asset_sel')
+@bp.route('/asset_sel', methods=["POST", "GET"])
 def asset_sel():
     form = AssetSel()
     if form.validate_on_submit():
-        username = request.form.get('username')
-        user = User.query.filter_by(username=username.lower()).first()
-        if user is None:
-            return redirect(url_for('auth.login'))
-        try:
-            duo_client.health_check()
-        except DuoException:
-            traceback.print_exc()
-            if Config.duo_failmode.upper() == "OPEN":
-                return render_template("auth/login.html", message="Login 'Successful', 2FA Not Performed.")
-            else:
-                return render_template("auth/login.html", message="2FA Unavailable.")
-        state = duo_client.generate_state()
-        session['state'] = state
-        session['username'] = username.lower()
-        prompt_uri = duo_client.create_auth_url(username.lower(), state)
-        return redirect(prompt_uri)
-    return render_template('asset_sel.html', title='Home')
+        type = request.form.get('asset_type')
+        return redirect(f'/adder/{type}')
+    return render_template('gm_tools/selectors/asset_sel.html', title='Home', form=form)
 
 @bp.route('/adder/<asset>', methods=["POST", "GET"])
 def adder(asset):
 
+    char_form = Converters.str_to_class(f'{asset}Form')()
+    char_form.chars.query = Converters.str_to_class(asset).query.all()
+    if char_form.validate_on_submit():
+        print(char_form.chars.data)
 
-    return render_template(f'{asset}_adder.html', title='Home')
+    return render_template(f'gm_tools/adders/{asset}_adder.html', title='Home', char_form=char_form)
