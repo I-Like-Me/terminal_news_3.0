@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, RadioField
+from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, RadioField, IntegerField
 from wtforms.validators import Length, DataRequired
 from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
 
@@ -56,11 +56,18 @@ class AssetSel(FlaskForm):
     submit = SubmitField('Submit')
 
 class CharacterForm(FlaskForm):
-
-    background = QuerySelectField("Backgrounds")
-    alignment = QuerySelectField("Alignment")
-    classes = QuerySelectField("Cls_5e")
-    race = QuerySelectField("Race")
+    name = StringField('Name', validators=[DataRequired()])
+    strength = IntegerField('Strength', validators=[DataRequired()])
+    dexterity = IntegerField('Dexterity', validators=[DataRequired()])
+    constitution = IntegerField('Constitution', validators=[DataRequired()])
+    intelligence = IntegerField('Intelligence', validators=[DataRequired()])
+    wisdom = IntegerField('Wisdom', validators=[DataRequired()])
+    charisma = IntegerField('Charisma', validators=[DataRequired()])
+    background = QuerySelectField("Backgrounds", validators=[DataRequired()])
+    alignment = QuerySelectField("Alignment", validators=[DataRequired()])
+    classes = QuerySelectField("Cls_5e", validators=[DataRequired()])
+    race = QuerySelectField("Race", validators=[DataRequired()])
+    job = name = StringField('Job')
 
 class AbilityForm(FlaskForm):
     pass
