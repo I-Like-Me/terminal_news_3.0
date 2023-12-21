@@ -1,5 +1,5 @@
 import sys
-from app.models import Character, Ability
+from app.models import Character, Ability, Background, Alignment, Cls_5e, Race
 from app.main.forms import CharacterForm, AbilityForm
 
 class Converters:
@@ -8,7 +8,7 @@ class Converters:
         return getattr(sys.modules[__name__], str)
     
 class Collectors:
-    def get_bin(asset):
+    def get_bin(asset_type):
         bins = {
             'Character': {'background': "Background", 'alignment': "Alignment", 
                         'classes': 'Cls_5e', 'race': 'Race'}, 
@@ -35,7 +35,16 @@ class Collectors:
             'Mech': {'power': "Ammo_power", 'properties': "Property"},
             'Cybernetic': {'properties': "Property"}
         }
-        if asset in bins:
-            return bins[asset]
+        if asset_type in bins:
+            return bins[asset_type]
         else:
-            return 'Not an asset.'
+            return None
+        
+    def fill_bin(asset_bin):
+        bin = {}
+        if asset_bin is not None:
+            for x, y in asset_bin.items():
+                bin[f"{x}"] = Converters.str_to_class(y).query.all()
+            return bin
+        else:
+            return None

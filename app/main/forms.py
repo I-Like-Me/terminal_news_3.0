@@ -56,7 +56,11 @@ class AssetSel(FlaskForm):
     submit = SubmitField('Submit')
 
 class CharacterForm(FlaskForm):
-    chars = QuerySelectField("Chars")
+
+    background = QuerySelectField("Backgrounds")
+    alignment = QuerySelectField("Alignment")
+    classes = QuerySelectField("Cls_5e")
+    race = QuerySelectField("Race")
 
 class AbilityForm(FlaskForm):
     pass

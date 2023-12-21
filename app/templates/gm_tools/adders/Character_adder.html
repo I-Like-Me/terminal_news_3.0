@@ -3,7 +3,10 @@
 {% block content %}
     <p>Character_adder</p>
     <form method="POST" actions="/">
-        {{ asset_items }}
-        {{ char_form.csrf_token }}
+        {{ asset_form.csrf_token }}
+        {{ asset_form.background }}
+        {{ asset_form.alignment }}
+        {{ asset_form.classes }}
+        {{ asset_form.race }}
     </form>
 {% endblock %}
