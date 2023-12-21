@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, RadioField, IntegerField
-from wtforms.validators import Length, DataRequired
+from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, IntegerField, BooleanField
+from wtforms.validators import Length, NumberRange, DataRequired
 from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
 
 
@@ -56,18 +56,30 @@ class AssetSel(FlaskForm):
     submit = SubmitField('Submit')
 
 class CharacterForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    strength = IntegerField('Strength', validators=[DataRequired()])
-    dexterity = IntegerField('Dexterity', validators=[DataRequired()])
-    constitution = IntegerField('Constitution', validators=[DataRequired()])
-    intelligence = IntegerField('Intelligence', validators=[DataRequired()])
-    wisdom = IntegerField('Wisdom', validators=[DataRequired()])
-    charisma = IntegerField('Charisma', validators=[DataRequired()])
-    background = QuerySelectField("Backgrounds", validators=[DataRequired()])
-    alignment = QuerySelectField("Alignment", validators=[DataRequired()])
-    classes = QuerySelectField("Cls_5e", validators=[DataRequired()])
-    race = QuerySelectField("Race", validators=[DataRequired()])
-    job = name = StringField('Job')
+    name = StringField('Name')
+    birth_name = StringField('Birth Name')
+    strength = IntegerField('Strength', [NumberRange(min=0, max=100)])
+    dexterity = IntegerField('Dexterity', [NumberRange(min=0, max=100)])
+    constitution = IntegerField('Constitution', [NumberRange(min=0, max=100)])
+    intelligence = IntegerField('Intelligence', [NumberRange(min=0, max=100)])
+    wisdom = IntegerField('Wisdom', [NumberRange(min=0, max=100)])
+    charisma = IntegerField('Charisma', [NumberRange(min=0, max=100)])
+    background = QuerySelectField("Backgrounds")
+    alignment = QuerySelectField("Alignment")
+    classes = QuerySelectField("Class")
+    cur_race = QuerySelectField("Race")
+    birth_race = QuerySelectField("Birth Race")
+    age = IntegerField('Age')
+    real_age = IntegerField('Real Age')
+    cur_loc = IntegerField('Current Location')
+    birth_loc = IntegerField('Birth Location')
+    job = StringField('Job')
+    job_desc = TextAreaField('Job Description')
+    spliced = BooleanField('Spliced')
+    robot = BooleanField('Robot')
+    pure = BooleanField('Pure')
+    npc = BooleanField('NPC')
+
 
 class AbilityForm(FlaskForm):
     pass

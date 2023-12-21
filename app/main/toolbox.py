@@ -11,7 +11,7 @@ class Collectors:
     def get_bin(asset_type):
         bins = {
             'Character': {'background': "Background", 'alignment': "Alignment", 
-                        'classes': 'Cls_5e', 'race': 'Race'}, 
+                        'classes': 'Cls_5e', 'cur_race': 'Race', 'birth_race': 'Race'}, 
             'Cls_5e': {'arch_choices': "Architype", 'cls_features': "Feature", 
                     "hit_dice_type": "Dice", 'tool_pros': "Gear", 
                     'weap_pros': "Weapon", 'armor_pros': "Armor", 

@@ -472,9 +472,11 @@ class Character(db.Model):
     cybernetics = db.relationship("Cybernetic", secondary=char_cyber_table, back_populates="owner")
     prepped_spells = db.relationship("Spell", secondary=char_spell_table, back_populates="spell_prepper") 
     feats = db.relationship("Feat", secondary=char_feat_table, back_populates="char_feat")
-    job = db.Column(db.String(64))
+    job = db.Column(db.String(10))
+    job_desc = db.Column(db.String(500))
     spliced = db.Column(db.Boolean, default= False)
     robot = db.Column(db.Boolean, default= False)
+    pure = db.Column(db.Boolean, default= False)
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
     npc = db.Column(db.Boolean, default= True)
@@ -586,6 +588,9 @@ class Cls_5e(db.Model):
 
     def __repr__(self):
         return f'<Cls_5e {self.name}>'
+
+    def __str__(self):
+        return self.name
 
     def new_cls_adder(cls_name):
         new_cls = Cls_5e(name=cls_name)
@@ -783,7 +788,7 @@ class Feat(db.Model):
 
 class Lifeinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    char_name = db.Column(db.String(64), index=True, unique=True)
+    name = db.Column(db.String(64), index=True, unique=True)
     birth_name = db.Column(db.String(64))
     age = db.Column(db.Integer)
     real_age  = db.Column(db.Integer)
@@ -797,7 +802,7 @@ class Lifeinfo(db.Model):
     life_info_holder = db.Column(db.Integer, db.ForeignKey("character.id"))
 
     def __repr__(self):
-        return f'<Lifeinfo {self.char_name}>'
+        return f'<Lifeinfo {self.name}>'
 
 class Clsinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
