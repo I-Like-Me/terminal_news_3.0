@@ -479,6 +479,7 @@ class Character(db.Model):
     pure = db.Column(db.Boolean, default= False)
     backpack = db.Column(db.String(5000))
     play_notes = db.Column(db.String(5000))
+    char_sum = db.Column(db.String(5000))
     npc = db.Column(db.Boolean, default= True)
     npc_group = db.relationship("Npcpool", secondary=char_npc_pool_table, back_populates="picked_npc")
     

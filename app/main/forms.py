@@ -69,16 +69,17 @@ class CharacterForm(FlaskForm):
     classes = QuerySelectField("Class")
     cur_race = QuerySelectField("Race")
     birth_race = QuerySelectField("Birth Race")
-    age = IntegerField('Age')
-    real_age = IntegerField('Real Age')
-    cur_loc = IntegerField('Current Location')
-    birth_loc = IntegerField('Birth Location')
+    age = IntegerField('Age', [NumberRange(min=0, max=10000)])
+    real_age = IntegerField('Real Age', [NumberRange(min=0, max=10000)])
+    cur_loc = QuerySelectField('Current Location')
+    birth_loc = QuerySelectField('Birth Location')
     job = StringField('Job')
     job_desc = TextAreaField('Job Description')
     spliced = BooleanField('Spliced')
     robot = BooleanField('Robot')
     pure = BooleanField('Pure')
     npc = BooleanField('NPC')
+    char_sum = TextAreaField('Character Summery')
 
 
 class AbilityForm(FlaskForm):

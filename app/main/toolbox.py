@@ -1,5 +1,5 @@
 import sys
-from app.models import Character, Ability, Background, Alignment, Cls_5e, Race
+from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location
 from app.main.forms import CharacterForm, AbilityForm
 
 class Converters:
@@ -11,7 +11,8 @@ class Collectors:
     def get_bin(asset_type):
         bins = {
             'Character': {'background': "Background", 'alignment': "Alignment", 
-                        'classes': 'Cls_5e', 'cur_race': 'Race', 'birth_race': 'Race'}, 
+                        'classes': 'Cls_5e', 'cur_race': 'Race', 'birth_race': 'Race',
+                        'cur_loc': 'Location', 'birth_loc': 'Location'}, 
             'Cls_5e': {'arch_choices': "Architype", 'cls_features': "Feature", 
                     "hit_dice_type": "Dice", 'tool_pros': "Gear", 
                     'weap_pros': "Weapon", 'armor_pros': "Armor", 
