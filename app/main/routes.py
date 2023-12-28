@@ -48,3 +48,9 @@ def adder(asset):
         for x, y in asset_items.items():
             asset_form[x].query = Converters.str_to_class(y).query.all()
     return render_template(f'gm_tools/adders/{asset}_adder.html', title='Home', asset_form=asset_form)
+
+@bp.route('/background_process_test')
+def background_process_test():
+    print("clicked")
+    result = "Hello"
+    return result

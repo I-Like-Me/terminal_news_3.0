@@ -1,0 +1,13 @@
+<h1>I Like {{ content.food }}!</h1>
+
+<form method="POST" actions="/">
+    {{ npc_form.csrf_token }}
+    {{ npc_form.npcs }}
+    <button>Submit</button>
+</form>
+{{ preselect }}
+<form method="POST" actions="/">
+    {{ topic_form.csrf_token }}
+    {{ topic_form.topics }}
+    <button>Submit</button>
+</form>

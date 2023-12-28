@@ -1,17 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>I Like {{ content.food }}!</h1>
 
-    <form method="POST" actions="/">
-        {{ npc_form.csrf_token }}
-        {{ npc_form.npcs }}
-        <button>Submit</button>
-    </form>
-    {{ preselect }}
-    <form method="POST" actions="/">
-        {{ topic_form.csrf_token }}
-        {{ topic_form.topics }}
-        <button>Submit</button>
-    </form>
+
+<button onclick="get_sub()">The time is?</button>
+
+<p id="demo"></p>
+
+
+
+<div class='container'>
+    <h3>Test</h3>
+        <form>
+            <a href=# id=test><button class='btn btn-default'>Test</button></a>
+        </form>
+        {{ p1 }}
+    </div>
+
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type=text/javascript>
+    $(function() {
+      $('a#test').on('click', function(e) {
+        e.preventDefault()
+        $.getJSON('/background_process_test',
+            function(data) {
+             console.log(data)
+        });
+      });
+    });
+</script>
+<script>
+    function get_sub() {
+        document.getElementById("demo").innerHTML = '{% include "_page1.html" %}';
+    }
+</script>
 {% endblock %}
