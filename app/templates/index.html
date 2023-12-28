@@ -5,7 +5,7 @@
 
 <button onclick="get_sub()">The time is?</button>
 
-<p id="demo"></p>
+<p id="demo">{% include "_page1.html" %}</p>
 
 
 
@@ -33,7 +33,16 @@
 </script>
 <script>
     function get_sub() {
-        document.getElementById("demo").innerHTML = '{% include "_page1.html" %}';
+        let inhtml = document.getElementById("demo").innerHTML;
+        if (inhtml == '{% include "_page1.html" %}') 
+        {
+            document.getElementById("demo").innerHTML = '{% include "_page2.html" %}';
+        } 
+        else
+        {
+            document.getElementById("demo").innerHTML = '{% include "_page1.html" %}'; 
+        }
+        
     }
 </script>
 {% endblock %}
