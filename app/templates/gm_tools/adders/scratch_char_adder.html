@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <p>Character_adder</p>
+        <form method="POST" actions="/">
+            {{ asset_form.csrf_token }}
+            </br>
+            <div class="row">
+                <div class="col">
+                    <p id="demo"></p>
+                </br>
+                </div>
+                </br>
+                <div class="col">
+                    {{ asset_form.char_sum.label }}
+                    </br>
+                    {{ asset_form.char_sum(style='width: 500px; height: 620px;') }}
+                    <button onclick="get_sub()" type="button" id="myButton">Page 2</button>
+                </div>
+                </br>
+            </div>
+        </form>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        function get_sub() {
+            let inhtml = document.getElementById("myButton").innerText;
+            if (inhtml == "Page 2") 
+            {
+                document.getElementById("demo").innerHTML = `{% include '_page2.html' %}`;
+                document.getElementById("myButton").innerText = 'Page 1';
+            } 
+            else
+            {
+                document.getElementById("demo").innerHTML = `{% include '/gm_tools/adders/_char_page.html' %}`; 
+                document.getElementById("myButton").innerText = 'Page 2';
+            }
+        }
+    </script>
+{% endblock %}

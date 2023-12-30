@@ -42,15 +42,30 @@ def asset_sel():
 
 @bp.route('/adder/<asset>', methods=["POST", "GET"])
 def adder(asset):
+    if asset == 'Character':
+        return redirect(f'/create_char/{asset}')
     asset_form = Converters.str_to_class(f'{asset}Form')()
     asset_items = Collectors.get_bin(asset)
     if asset_items is not None:
         for x, y in asset_items.items():
             asset_form[x].query = Converters.str_to_class(y).query.all()
+    if asset_form.validate_on_submit():
+        arg_dict = {}
+        for k, v in asset_form.data.items():
+            if k not in ['submit', 'csrf_token']:
+                arg_dict[k] = v
+        table_name = Converters.str_to_class(f'{asset}')
+        new_asset = table_name(**arg_dict)
+        db.session.add(new_asset)
+        db.session.commit()
+        return redirect(f'/adder/{asset}')
     return render_template(f'gm_tools/adders/{asset}_adder.html', title='Home', asset_form=asset_form)
 
-@bp.route('/background_process_test')
-def background_process_test():
-    print("clicked")
-    result = "Hello"
-    return result
+@bp.route('/create_char/<asset>', methods=["POST", "GET"])
+def create_char(asset):
+    asset_form = Converters.str_to_class(f'{asset}Form')()
+    asset_items = Collectors.get_bin(asset)
+    if asset_items is not None:
+        for x, y in asset_items.items():
+            asset_form[x].query = Converters.str_to_class(y).query.all()
+    return render_template(f'gm_tools/adders/character_adder.html', title='Home', asset_form=asset_form)

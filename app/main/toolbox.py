@@ -1,6 +1,6 @@
 import sys
-from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location
-from app.main.forms import CharacterForm, AbilityForm
+from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location, Ladder, Skill, Feat
+from app.main.forms import CharacterForm, AbilityForm, FeatForm
 
 class Converters:
 
@@ -12,7 +12,8 @@ class Collectors:
         bins = {
             'Character': {'background': "Background", 'alignment': "Alignment", 
                         'classes': 'Cls_5e', 'cur_race': 'Race', 'birth_race': 'Race',
-                        'cur_loc': 'Location', 'birth_loc': 'Location'}, 
+                        'cur_loc': 'Location', 'birth_loc': 'Location', 'ladder': 'Ladder',
+                        'skill_pro_choice': 'Skill'}, 
             'Cls_5e': {'arch_choices': "Architype", 'cls_features': "Feature", 
                     "hit_dice_type": "Dice", 'tool_pros': "Gear", 
                     'weap_pros': "Weapon", 'armor_pros': "Armor", 
@@ -49,3 +50,7 @@ class Collectors:
             return bin
         else:
             return None
+        
+    # def get_form_data(form_data):
+    #     for k, v in form_data.items():
+

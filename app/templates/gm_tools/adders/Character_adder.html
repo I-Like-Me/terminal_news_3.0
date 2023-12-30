@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="container">
-        <p>Character_adder</p>
+        <h2>Character Creation</h2>
         <form method="POST" actions="/">
             {{ asset_form.csrf_token }}
             </br>
@@ -13,7 +13,7 @@
                 </div>
                 </br>
                 <div class="col">
-                    {{ asset_form.char_sum.label }}
+                    <h2>Character Summery</h2>
                     </br>
                     {{ asset_form.char_sum(style='width: 500px; height: 620px;') }}
                 </div>

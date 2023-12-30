@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <p>Ability_adder</p>
-    {{ asset_form.csrf_token }}
+    <h1>Ability Adder</h1>
+    <form method="POST" actions="">
+        {{ asset_form.csrf_token }}
+        {{ asset_form.name() }}
+        {{ asset_form.submit() }}
+    </form>
 {% endblock %}

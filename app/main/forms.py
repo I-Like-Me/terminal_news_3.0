@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, IntegerField, BooleanField
-from wtforms.validators import Length, NumberRange, DataRequired
+from wtforms.validators import Length, NumberRange, DataRequired, ValidationError
 from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
 
 
@@ -67,6 +67,8 @@ class CharacterForm(FlaskForm):
     background = QuerySelectField("Backgrounds")
     alignment = QuerySelectField("Alignment")
     classes = QuerySelectField("Class")
+    skill_pro_choice = QuerySelectField("Select Skills")
+    ladder = QuerySelectField("Ladder")
     cur_race = QuerySelectField("Race")
     birth_race = QuerySelectField("Birth Race")
     age = IntegerField('Age', [NumberRange(min=0, max=10000)])
@@ -80,7 +82,67 @@ class CharacterForm(FlaskForm):
     pure = BooleanField('Pure')
     npc = BooleanField('NPC')
     char_sum = TextAreaField('Character Summery')
-
+    submit = SubmitField('Submit')
 
 class AbilityForm(FlaskForm):
-    pass
+    name = StringField('Name')
+    submit = SubmitField('Submit')
+
+class SkillForm(FlaskForm):
+    name = StringField('Name')
+    submit = SubmitField('Submit')
+
+class Location(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class BackgroundForm(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class AlignmentForm(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class FactionForm(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class RankForm(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class ArchitypeForm(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class FeatForm(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class FeatureForm(FlaskForm):
+    name = StringField('Name')
+    level_access = IntegerField('Level Access')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class PropertyForm(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class DamagetypeForm(FlaskForm):
+    name = StringField('Name')
+    submit = SubmitField('Submit')
+
+class DiceForm(FlaskForm):
+    name = StringField('Name')
+    value = IntegerField('Dice Value')
+    submit = SubmitField('Submit')

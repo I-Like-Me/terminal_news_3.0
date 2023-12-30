@@ -776,7 +776,7 @@ class Skill(db.Model):
 class Feat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(200))
+    description = db.Column(db.String(2000))
     char_feat = db.relationship("Character", secondary=char_feat_table, back_populates="feats")
 
     def __repr__(self):
