@@ -129,7 +129,7 @@ class FeatForm(FlaskForm):
 
 class FeatureForm(FlaskForm):
     name = StringField('Name')
-    level_access = IntegerField('Level Access')
+    level_access = IntegerField('Level Access', [NumberRange(min=0, max=100)])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
@@ -144,5 +144,5 @@ class DamagetypeForm(FlaskForm):
 
 class DiceForm(FlaskForm):
     name = StringField('Name')
-    value = IntegerField('Dice Value')
+    value = IntegerField('Dice Value', [NumberRange(min=0, max=100)])
     submit = SubmitField('Submit')

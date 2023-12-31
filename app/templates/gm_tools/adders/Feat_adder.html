@@ -1,11 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Ability Adder</h1>
+    <h1>Feat Adder</h1>
     <form method="POST" actions="">
-        {{ asset_form.csrf_token }}
-        {{ asset_form.name() }}
-        {{ asset_form.description(style='width: 500px; height: 620px;') }}
-        {{ asset_form.submit() }}
+        <div class="row">
+            <div class="col">
+                {{ asset_form.csrf_token }}
+                </br>
+                {{ asset_form.name.label() }}
+                </br>
+                {{ asset_form.name() }}
+                </br>
+                </br>
+                {{ asset_form.description.label() }}
+                </br>
+                {{ asset_form.description(style='width: 500px; height: 300px;') }}
+                </br>
+                </br>
+                {{ asset_form.submit() }}
+            </div>
+        </div>
     </form>
 {% endblock %}

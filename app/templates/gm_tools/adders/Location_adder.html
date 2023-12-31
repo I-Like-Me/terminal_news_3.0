@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Location Adder</h1>
+    <form method="POST" actions="">
+        <div class="row">
+            <div class="col">
+                {{ asset_form.csrf_token }}
+                </br>
+                {{ asset_form.name.label() }}
+                </br>
+                {{ asset_form.name() }}
+                </br>
+                </br>
+                {{ asset_form.description.label() }}
+                </br>
+                {{ asset_form.description(style='width: 500px; height: 300px;') }}
+                </br>
+                </br>
+                {{ asset_form.submit() }}
+            </div>
+        </div>
+    </form>
+{% endblock %}
