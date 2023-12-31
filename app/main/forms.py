@@ -100,6 +100,7 @@ class Location(FlaskForm):
 class BackgroundForm(FlaskForm):
     name = StringField('Name')
     description = TextAreaField('Description')
+    extra_languages_num = IntegerField('Number of extra languages', [NumberRange(min=0, max=10)])
     submit = SubmitField('Submit')
 
 class AlignmentForm(FlaskForm):
