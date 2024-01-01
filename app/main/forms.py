@@ -97,6 +97,7 @@ class Location(FlaskForm):
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
+# Missing fields
 class BackgroundForm(FlaskForm):
     name = StringField('Name')
     description = TextAreaField('Description')
@@ -111,9 +112,15 @@ class AlignmentForm(FlaskForm):
 class FactionForm(FlaskForm):
     name = StringField('Name')
     description = TextAreaField('Description')
+    fac_ranks = QuerySelectMultipleField("Select Ranks")
     submit = SubmitField('Submit')
 
 class RankForm(FlaskForm):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+class LocationForm(FlaskForm):
     name = StringField('Name')
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
@@ -131,6 +138,9 @@ class FeatForm(FlaskForm):
 class FeatureForm(FlaskForm):
     name = StringField('Name')
     level_access = IntegerField('Level Access', [NumberRange(min=0, max=100)])
+    dmg_resist = QuerySelectMultipleField("Select Damage Resistance")
+    dmg_immune = QuerySelectMultipleField("Select Damage Immunity")
+    dmg_vulner = QuerySelectMultipleField("Select Damage Vulnerability")
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
