@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, IntegerField, BooleanField
 from wtforms.validators import Length, NumberRange, DataRequired, ValidationError
 from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
+from app import db
+from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location, Ladder, Skill, Feat, Rank, Faction, Damagetype, Feature
 
 
 # SelectFeild used to pick Class.
@@ -85,8 +87,13 @@ class CharacterForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class AbilityForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+    def validate_name(self, name):
+        ability = Ability.query.filter_by(name=name.data).first()
+        if ability is not None:
+            raise ValidationError('Please use a different name.')
 
 class SkillForm(FlaskForm):
     name = StringField('Name')
