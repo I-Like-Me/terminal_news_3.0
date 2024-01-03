@@ -91,59 +91,89 @@ class AbilityForm(FlaskForm):
     submit = SubmitField('Submit')
 
     def validate_name(self, name):
-        ability = Ability.query.filter_by(name=name.data).first()
+        ability = Ability.query.filter_by(name=name.data.lower()).first()
         if ability is not None:
             raise ValidationError('Please use a different name.')
+        if name.data[0] == ' ':
+            raise ValidationError('Please remove leading white space.')
+        if name.data[-1] == ' ':
+            raise ValidationError('Please remove trailing white space.')
+        
 
 class SkillForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
+    ability = QuerySelectField("Ability", validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+    def validate_name(self, name):
+        skill = Skill.query.filter_by(name=name.data.lower()).first()
+        if skill is not None:
+            raise ValidationError('Please use a different name.')
+        if name.data[0] == ' ':
+            raise ValidationError('Please remove leading white space.')
+        if name.data[-1] == ' ':
+            raise ValidationError('Please remove trailing white space.')
+        
+    # def validate_ability(self, ability):                                            
+
+    #     if len(ability.data) != 1:                                          
+    #         raise ValidationError('Please only select 1 item')    
+   
+
 class Location(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
+    def validate_name(self, name):
+        location = Location.query.filter_by(name=name.data.lower()).first()
+        if location is not None:
+            raise ValidationError('Please use a different name.')
+        if name.data[0] == ' ':
+            raise ValidationError('Please remove leading white space.')
+        if name.data[-1] == ' ':
+            raise ValidationError('Please remove trailing white space.')
+
 # Missing fields
 class BackgroundForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     extra_languages_num = IntegerField('Number of extra languages', [NumberRange(min=0, max=10)])
     submit = SubmitField('Submit')
 
 class AlignmentForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
 class FactionForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     fac_ranks = QuerySelectMultipleField("Select Ranks")
     submit = SubmitField('Submit')
 
 class RankForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
 class LocationForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
 class ArchitypeForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
 class FeatForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
 class FeatureForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     level_access = IntegerField('Level Access', [NumberRange(min=0, max=100)])
     dmg_resist = QuerySelectMultipleField("Select Damage Resistance")
     dmg_immune = QuerySelectMultipleField("Select Damage Immunity")
@@ -152,15 +182,24 @@ class FeatureForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class PropertyForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
 class DamagetypeForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+    def validate_name(self, name):
+        damagetype = Damagetype.query.filter_by(name=name.data.lower()).first()
+        if damagetype is not None:
+            raise ValidationError('Please use a different name.')
+        if name.data[0] == ' ':
+            raise ValidationError('Please remove leading white space.')
+        if name.data[-1] == ' ':
+            raise ValidationError('Please remove trailing white space.')    
+
 class DiceForm(FlaskForm):
-    name = StringField('Name')
+    name = StringField('Name', validators=[DataRequired()])
     value = IntegerField('Dice Value', [NumberRange(min=0, max=100)])
     submit = SubmitField('Submit')

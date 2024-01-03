@@ -35,7 +35,8 @@ class Collectors:
             'Gear': {'power': "Ammo_power"},
             'Vehicle': {'power': "Ammo_power", 'properties': "Property"},
             'Mech': {'power': "Ammo_power", 'properties': "Property"},
-            'Cybernetic': {'properties': "Property"}
+            'Cybernetic': {'properties': "Property"},
+            'Skill': {'ability': "Ability"}
         }
         if asset_type in bins:
             return bins[asset_type]
@@ -51,6 +52,23 @@ class Collectors:
         else:
             return None
         
-    # def get_form_data(form_data):
-    #     for k, v in form_data.items():
+class Builders:
+    def build_commit(asset, data, items):
+        arg_dict = {}
+        for k, v in data.items():
+            if k not in ['submit', 'csrf_token']:
+                if k == 'name':
+                    arg_dict[k] = v.lower()
+                else:
+                    if k in items:
+                        if isinstance(data[k], Converters.str_to_class(items[k])):
+                            v = [v]
+                            arg_dict[k] = v
+                        else:
+                            arg_dict[k] = v
+                    else:
+                        arg_dict[k] = v
+        table_name = Converters.str_to_class(f'{asset}')
+        new_asset = table_name(**arg_dict)
+        return new_asset
 

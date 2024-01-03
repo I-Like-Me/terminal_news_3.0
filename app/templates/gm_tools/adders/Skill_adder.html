@@ -11,6 +11,17 @@
                 </br>
                 {{ asset_form.name() }}
                 </br>
+                {% for error in asset_form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                </br>
+                {{ asset_form.ability.label() }}
+                </br>
+                {{ asset_form.ability() }}
+                </br>
+                {% for error in asset_form.ability.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
                 </br>
                 {{ asset_form.submit() }}
             </div>

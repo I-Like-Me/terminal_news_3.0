@@ -521,6 +521,12 @@ race_lang_table = db.Table(
     db.Column("language_id", db.ForeignKey("language.id"), primary_key=True),
 )
 
+ability_skill_table = db.Table(
+    "ability_skill_table",
+    db.Column("ability_id", db.ForeignKey("ability.id"), primary_key=True),
+    db.Column("skill_id", db.ForeignKey("skill.id"), primary_key=True),
+)
+
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -869,6 +875,7 @@ class Ability(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     cls_sav_throw = db.relationship("Cls_5e", secondary=cls_sav_ability_table, back_populates="sav_throws")
     armor_mod = db.relationship("Armor", secondary=ability_armor_mod_table, back_populates="ac_mod_type")
+    skills = db.relationship("Skill", secondary=ability_skill_table, back_populates="ability")
 
     def __repr__(self):
         return f'<Ability {self.name}>'
@@ -881,6 +888,7 @@ class Skill(db.Model):
     skl_trained_bg = db.relationship("Background", secondary=bg_pro_skill_table, back_populates="skill_pros")
     skl_trained_feature = db.relationship("Feature", secondary=feature_pro_skill_table, back_populates="skill_pros")
     skl_trained_char = db.relationship("Character", secondary=char_pro_skill_table, back_populates="skill_pros")
+    ability = db.relationship("Ability", secondary=ability_skill_table, back_populates="skills")
 
     def __repr__(self):
         return f'<Skill {self.name}>'

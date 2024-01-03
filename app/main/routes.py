@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from app import db
 from app.models import User, Character
 from app.main.forms import PickNPCs, PickTopics, AssetSel
-from app.main.toolbox import Converters, Collectors
+from app.main.toolbox import Converters, Collectors, Builders
 from app.main import bp
 
 
@@ -50,12 +50,7 @@ def adder(asset):
         for x, y in asset_items.items():
             asset_form[x].query = Converters.str_to_class(y).query.all()
     if asset_form.validate_on_submit():
-        arg_dict = {}
-        for k, v in asset_form.data.items():
-            if k not in ['submit', 'csrf_token']:
-                arg_dict[k] = v
-        table_name = Converters.str_to_class(f'{asset}')
-        new_asset = table_name(**arg_dict)
+        new_asset = Builders.build_commit(asset, asset_form.data, asset_items)
         db.session.add(new_asset)
         db.session.commit()
         return redirect(f'/adder/{asset}')
