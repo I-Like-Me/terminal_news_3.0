@@ -32,18 +32,26 @@ def index():
 
     return render_template('index.html', title='Home', content=content, npc_form=npc_form, topic_form=topic_form, preselect=preselect)
 
+@bp.route('/viewer/<catagory>/<asset>', methods=["POST", "GET"])
+def asset_view(catagory, asset):
+    cata = catagory
+    asset_item = asset
+    return render_template('asset_viewer.html', title='Home', cata=cata, asset_item=asset_item)
+
 @bp.route('/asset_sel', methods=["POST", "GET"])
 def asset_sel():
     form = AssetSel()
     if form.validate_on_submit():
         type = request.form.get('asset_type')
-        return redirect(f'/adder/{type}')
+        #return redirect(f'/adder/{type}') 
+        return redirect(url_for('main.adder', asset=type))
     return render_template('gm_tools/selectors/asset_sel.html', title='Home', form=form)
 
 @bp.route('/adder/<asset>', methods=["POST", "GET"])
 def adder(asset):
     if asset == 'Character':
-        return redirect(f'/create_char/{asset}')
+        # return redirect(f'/create_char/{asset}')
+        return redirect(url_for('main.create_char', asset=asset))
     asset_form = Converters.str_to_class(f'{asset}Form')()
     asset_items = Collectors.get_bin(asset)
     if asset_items is not None:
@@ -53,7 +61,8 @@ def adder(asset):
         new_asset = Builders.build_commit(asset, asset_form.data, asset_items)
         db.session.add(new_asset)
         db.session.commit()
-        return redirect(f'/adder/{asset}')
+        # return redirect(f'/adder/{asset}')
+        return redirect(url_for('main.adder', asset=asset))
     return render_template(f'gm_tools/adders/{asset}_adder.html', title='Home', asset_form=asset_form)
 
 @bp.route('/create_char/<asset>', methods=["POST", "GET"])
