@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
 from flask import render_template, flash, redirect, url_for, request, g, current_app
 from flask_login import current_user, login_required
-import sqlalchemy as sa
 from app import db
 from app.models import User, Character
 from app.main.forms import PickNPCs, PickTopics, AssetSel
 from app.main.toolbox import Converters, Collectors, Builders
 from app.main import bp
+import markdown
+
 
 
 
@@ -26,6 +27,7 @@ def index():
         if v is True:
             preselect.append(k)
     topic_form = PickTopics(topics = preselect)
+    
 
     if topic_form.validate_on_submit():
         print(topic_form.topics.data)
@@ -34,9 +36,24 @@ def index():
 
 @bp.route('/viewer/<catagory>/<asset>', methods=["POST", "GET"])
 def asset_view(catagory, asset):
+    
     cata = catagory
     asset_item = asset
-    return render_template('asset_viewer.html', title='Home', cata=cata, asset_item=asset_item)
+    
+    return render_template('asset_viewer.html', cata=cata, asset_item=asset_item)
+
+@bp.route('/article', methods=["POST", "GET"])
+def article():
+    
+    data = {}
+    data["page_title"] = "Article"
+
+    with open('/Users/cass/Documents/python/story_keeper/terminal_news_3.0/app/main/content/article.md', 'r') as f:
+        text = f.read()
+        data["html"] = markdown.markdown(text)
+    
+    
+    return render_template('article.html', data=data)
 
 @bp.route('/asset_sel', methods=["POST", "GET"])
 def asset_sel():
