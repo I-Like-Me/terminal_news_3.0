@@ -4,24 +4,25 @@
 
 
 
-<div class="row">
-    <p id="demo">{% include "_page1.html" %}</p>
-</div>
-<button onclick="get_sub()" id="myButton">Page 2</button>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>
-    function get_sub() {
-        let inhtml = document.getElementById("demo").innerHTML;
-        if (inhtml == '{% include "_page1.html" %}') 
-        {
-            document.getElementById("demo").innerHTML = '{% include "_page2.html" %}';
-            document.getElementById("myButton").innerText = 'Page 1';
-        } 
-        else
-        {
-            document.getElementById("demo").innerHTML = '{% include "_page1.html" %}'; 
-            document.getElementById("myButton").innerText = 'Page 2';
+    <div class="row">
+        <p id="demo">{% include "_page1.html" %}</p>
+    </div>
+    <button onclick="get_sub()" id="myButton">Page 2</button>
+    <i class="bi bi-folder-fill"> Folder Selected</i>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        function get_sub() {
+            let inhtml = document.getElementById("demo").innerHTML;
+            if (inhtml == '{% include "_page1.html" %}') 
+            {
+                document.getElementById("demo").innerHTML = '{% include "_page2.html" %}';
+                document.getElementById("myButton").innerText = 'Page 1';
+            } 
+            else
+            {
+                document.getElementById("demo").innerHTML = '{% include "_page1.html" %}'; 
+                document.getElementById("myButton").innerText = 'Page 2';
+            }
         }
-    }
-</script>
+    </script>
 {% endblock %}

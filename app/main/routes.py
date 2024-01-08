@@ -90,3 +90,10 @@ def create_char(asset):
         for x, y in asset_items.items():
             asset_form[x].query = Converters.str_to_class(y).query.all()
     return render_template(f'gm_tools/adders/character_adder.html', title='Home', asset_form=asset_form)
+
+
+@bp.route('/filing/<path>', methods=["POST", "GET"])
+def filing(path):
+    url_path = path
+    
+    return render_template(f'filing_cabinet.html', url_path=url_path)
