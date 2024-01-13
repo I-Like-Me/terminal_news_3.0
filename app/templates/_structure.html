@@ -9,8 +9,8 @@
         <div class="collapse" id="collapse0">
           <div class="card card-body" style="background-color: transparent; border-color: transparent;">
             {% for child in root_folder.children_dirs %}
-              {% set coll_tar = child.name %}
-              {% set coll_tar_hash = '#' + child.name %}
+              {% set coll_tar = child.parent_dir[0].name + child.name %}
+              {% set coll_tar_hash = '#' + child.parent_dir[0].name + child.name %}
               <div class="text-nowrap bd-highlight" type="button" data-bs-toggle="collapse" data-bs-target={{coll_tar_hash}}  aria-expanded="false" style="margin-left: 20px" aria-controls={{coll_tar}}><i class="bi bi-arrow-return-right">{{ child.name }}</i></div>
               <div class="collapse" id={{coll_tar}}>
                 <div class="card card-body" style="background-color: transparent; border-color: transparent;">
