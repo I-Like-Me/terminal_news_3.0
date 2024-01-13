@@ -1,3 +1,10 @@
+.filing_tools {
+    display: flex;
+    align-items: center;
+    border: 1px solid #cbd5e0;
+    width: 100%;
+}
+
 .container__split {
     display: flex;
 

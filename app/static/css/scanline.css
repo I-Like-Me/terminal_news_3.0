@@ -222,7 +222,7 @@ label {
     padding-top: 5px;
 }
 
-input[type=text],
+/* input[type=text],
 textarea {
     background: transparent;
     border: none;
@@ -234,7 +234,7 @@ textarea {
     position: relative;
     width: 80%;
     z-index: 10
-}
+} */
 
 textarea {
     margin-bottom: 20px;
@@ -269,6 +269,32 @@ a.button {
 }
 
 input[type=submit]:hover,
+a.button:hover {
+    background: #00dd00;
+    color: #383838;
+    opacity: 0.8;
+}
+
+input[type=button],
+a.button {
+    background: transparent;
+    border: 1px solid #00dd00;
+    clear: both;
+    color: #00dd00;
+    cursor: hand;
+    display: inline-block;
+    font-family: 'VT323', Courier;
+    font-size: 1em;
+    margin: 20px;
+    opacity: 0.25;
+    padding: 10px 20px;
+    position: relative;
+    text-decoration: none;
+    text-transform: uppercase;
+    z-index: 10;
+}
+
+input[type=button]:hover,
 a.button:hover {
     background: #00dd00;
     color: #383838;

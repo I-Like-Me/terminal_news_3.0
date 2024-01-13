@@ -2,8 +2,8 @@ from datetime import datetime, timezone
 from flask import render_template, flash, redirect, url_for, request, g, current_app
 from flask_login import current_user, login_required
 from app import db
-from app.models import User, Character
-from app.main.forms import PickNPCs, PickTopics, AssetSel
+from app.models import User, Character, Folder
+from app.main.forms import PickNPCs, PickTopics, AssetSel, LoginForm
 from app.main.toolbox import Converters, Collectors, Builders
 from app.main import bp
 import markdown
@@ -33,6 +33,11 @@ def index():
         print(topic_form.topics.data)
 
     return render_template('index.html', title='Home', content=content, npc_form=npc_form, topic_form=topic_form, preselect=preselect)
+
+@bp.route('/login')
+def login():
+    form = LoginForm()
+    return render_template('login.html', title='Sign In', form=form)
 
 @bp.route('/viewer/<catagory>/<asset>', methods=["POST", "GET"])
 def asset_view(catagory, asset):
@@ -95,5 +100,21 @@ def create_char(asset):
 @bp.route('/filing/<path>', methods=["POST", "GET"])
 def filing(path):
     url_path = path
-    
-    return render_template(f'filing_cabinet.html', url_path=url_path)
+    structure_dict = {}
+    par_left2index = []
+    temp_chi_left2index = []
+    all_chi_left2index = []
+    root_folder = Folder.query.filter_by(name='root').first()
+    # for folder in root_folder.children_dirs:
+    #     par_left2index.append(folder)
+    #     structure_dict[folder] = {}
+    #while len(temp_chi_left2index) != 0 and len(par_left2index) != 0:
+    # for par in par_left2index:
+    #     for par_chi in par.children_dirs:
+    #         temp_chi_left2index.append(par_chi)
+
+        
+
+
+  
+    return render_template(f'filing_cabinet.html', url_path=url_path, root_folder=root_folder)

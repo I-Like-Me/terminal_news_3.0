@@ -2,7 +2,19 @@
 
 {% block content %}
 
-
+    <div class="filing_tools">
+        <div class=row>
+            <div class="col">
+                <input type="button" value="New File" />
+            </div>
+            <div class="col">
+                <input type="button" value="New Folder" />
+            </div>
+            <div class="col">
+                <input type="button" value="New File" />
+            </div>
+        </div>
+    </div>
     <div class="container__split">
         <div class="container__left">{% include '_structure.html' %}</div>
         <div class="resizer" id="dragMe"></div>

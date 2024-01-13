@@ -1,28 +1,28 @@
-
+{% set collap_num = 1 %}
+  
   <div class="overflow-scroll">
     <div class="row">
       <div class="col">
-        <div class="text-nowrap bd-highlight" style="width: 8rem;"><i class="bi bi-caret-down"> Caret Down</i></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="text-nowrap bd-highlight" style="width: 8rem; margin-left: 20px"><i class="bi bi-arrow-return-right"> Turn Right Arrow</i></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="text-nowrap bd-highlight" style="width: 8rem; margin-left: 20px"><i class="bi bi-arrow-return-right"> Turn Right Arrow</i></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="text-nowrap bd-highlight" style="width: 8rem; margin-left: 20px"><i class="bi bi-caret-down"> Caret Down</i></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="text-nowrap bd-highlight" style="width: 8rem; margin-left: 45px"><i class="bi bi-arrow-return-right"> Turn Right Arrow</i></div>
+        <div class="text-nowrap bd-highlight" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+          <i class="bi bi-caret-down">{{ root_folder.name }}</i>
+        </div>
+        <div class="collapse" id="collapseExample">
+          <div class="card card-body" style="background-color: transparent; border-color: transparent;">
+            {% for child in root_folder.children_dirs %}
+              
+              <div class="text-nowrap bd-highlight" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" style="margin-left: 20px" aria-controls="collapse1">
+                <i class="bi bi-arrow-return-right">{{ child.name }}</i>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+
+<script>
+  const collaps_num = 1;
+  collaps_num = collaps_num + 1;
+
+</script>

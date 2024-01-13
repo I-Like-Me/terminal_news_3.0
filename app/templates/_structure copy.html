@@ -1,0 +1,38 @@
+
+  <div class="overflow-scroll">
+    <div class="row">
+      <div class="col">
+        <div class="text-nowrap bd-highlight" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+          <i class="bi bi-caret-down">{{ root_folder.name }}</i>
+        </div>
+        <div class="collapse" id="collapseExample">
+          <div class="card card-body" style="background-color: transparent; border-color: transparent;">
+            {% for child in root_folder.children_dirs %}
+              <div class="row">
+                <div class="col">
+                  <div class="text-nowrap bd-highlight" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" style="margin-left: 20px" aria-controls="collapse1"><i class="bi bi-arrow-return-right">{{ child.name }}</i></div></div>
+                  <div class="collapse" id="collapse1">
+                    <div class="card card-body" style="background-color: transparent; border-color: transparent;">
+                      {% for new_child in child.children_dirs %}
+                        <div class="row">
+                          <div class="col">
+                            <div class="text-nowrap bd-highlight" style="margin-left: 20px"><i class="bi bi-arrow-return-right">{{ new_child.name }}</i></div>
+                          </div>
+                        </div>
+                      {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+            <div class="row">
+              <div class="col">
+                <div class="text-nowrap bd-highlight" style="margin-left: 20px"><i class="bi bi-arrow-return-right">{{ root_folder.children_dirs[1].children_dirs[0].name }}</i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

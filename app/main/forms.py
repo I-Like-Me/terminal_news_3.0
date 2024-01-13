@@ -1,10 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, IntegerField, BooleanField
+from wtforms import TextAreaField, SubmitField, SelectField, SelectMultipleField, widgets, StringField, IntegerField, BooleanField, PasswordField
 from wtforms.validators import Length, NumberRange, DataRequired, ValidationError
 from wtforms_alchemy import QuerySelectMultipleField, QuerySelectField
 from app import db
 from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location, Ladder, Skill, Feat, Rank, Faction, Damagetype, Feature
 
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Submit')
 
 # SelectFeild used to pick Class.
 class PickCls(FlaskForm):
