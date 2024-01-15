@@ -72,3 +72,19 @@ class Builders:
         new_asset = table_name(**arg_dict)
         return new_asset
 
+    def build_structure(root):
+        final_order = []
+        par_list = root.children_dirs
+        chi_list = par_list[0].children_dirs
+        while len(par_list) != 0:
+            print(par_list[0])
+            if len(chi_list) > 0:
+                final_order.append(f"{par_list[0].name}-{chi_list[0].name}")
+                par_list.append(chi_list.pop(0))
+            if len(chi_list) == 0:
+                par_list.pop(0)
+                if len(par_list) > 0:
+                    chi_list = par_list[0].children_dirs
+                
+                
+        return final_order
