@@ -76,38 +76,38 @@ class Builders:
 
     def build_structure(root):
         step = 0
-        margin = 0
+        margin = 20
         final_order = []
         folder_dict = {}
         name_dict = {}
         dict_tracker = []
-        cur_par = root
-        final_order.append(cur_par)
-        dict_tracker.append(cur_par.name)
-        folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs, margin]
-        name_dict[cur_par.name] = {}
-        folders_left = folder_dict[cur_par][0]
+        cur_item = root
+        final_order.append(cur_item)
+        dict_tracker.append(cur_item.name)
+        folder_dict[cur_item] = [len(cur_item.children_dirs), cur_item.children_dirs, margin]
+        name_dict[cur_item.name] = {'margin': margin}
+        folders_left = folder_dict[cur_item][0]
         while folders_left != 0:
-            print(folder_dict[cur_par][2])
-            print(cur_par)
+            print(folder_dict[cur_item][2])
+            print(cur_item)
             print(dict_tracker)
             print(step)
             print(name_dict)
-            if folder_dict[cur_par][0] == 0:
-                folder_dict[cur_par.parent_dir[0]][0] -= 1
-            if folder_dict[cur_par][0] != 0:
+            if folder_dict[cur_item][0] == 0:
+                folder_dict[cur_item.parent_dir[0]][0] -= 1
+            if folder_dict[cur_item][0] != 0:
                 margin += 20
                 step += 1
-                cur_par = folder_dict[cur_par][1][len(folder_dict[cur_par][1]) - folder_dict[cur_par][0]]
-                final_order.append(cur_par)
-                dict_tracker.append(cur_par.name)
-                Setter.set_folders(name_dict, dict_tracker, cur_par)
-                folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs, margin]
+                cur_item = folder_dict[cur_item][1][len(folder_dict[cur_item][1]) - folder_dict[cur_item][0]]
+                final_order.append(cur_item)
+                dict_tracker.append(cur_item.name)
+                Setter.set_folders(name_dict, dict_tracker, margin)
+                folder_dict[cur_item] = [len(cur_item.children_dirs), cur_item.children_dirs, margin]
             else:
                 margin -= 20
                 step -= 1
                 dict_tracker.pop()
-                cur_par = cur_par.parent_dir[0]
+                cur_item = cur_item.parent_dir[0]
             folders_left = 0
             for v in folder_dict.values():
                 folders_left += v[0]  
@@ -119,10 +119,10 @@ class Builders:
     
 class Setter:
     
-    def set_folders(dict_t, keys, cur_p):
+    def set_folders(dict_t, keys, mar):
         for key in keys:
             if key not in dict_t:
-                dict_t[key] = {}
+                dict_t[key] = {'margin': mar}
             dict_t = dict_t[key]
         return dict_t
             
