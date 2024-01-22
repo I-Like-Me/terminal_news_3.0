@@ -1,5 +1,7 @@
 import sys
-from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location, Ladder, Skill, Feat, Rank, Faction, Damagetype, Feature
+import json
+from functools import reduce
+from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location, Ladder, Skill, Feat, Rank, Faction, Damagetype, Feature, Folder
 from app.main.forms import CharacterForm, AbilityForm, FeatForm, AlignmentForm, BackgroundForm, DamagetypeForm, DiceForm, FactionForm, FeatureForm, LocationForm, PropertyForm, RankForm, SkillForm
 
 class Converters:
@@ -73,80 +75,57 @@ class Builders:
         return new_asset
 
     def build_structure(root):
+        step = 0
+        margin = 0
         final_order = []
         folder_dict = {}
+        name_dict = {}
+        dict_tracker = []
         cur_par = root
         final_order.append(cur_par)
-        folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs]
+        dict_tracker.append(cur_par.name)
+        folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs, margin]
+        name_dict[cur_par.name] = {}
         folders_left = folder_dict[cur_par][0]
-        count = 0
         while folders_left != 0:
-                if folder_dict[cur_par][0] == 0:
-                    folder_dict[cur_par.parent_dir[0]][0] -= 1
-                print(count)
-                print(cur_par)
-                print(f"{cur_par} parent is {cur_par.parent_dir}")
-                print(f"{cur_par} children are {cur_par.children_dirs}")
-                print(folder_dict[cur_par][0])
-                print(final_order)
-                print(f"{folders_left} left")
-                if folder_dict[cur_par][0] != 0:
-                    cur_par = folder_dict[cur_par][1][len(folder_dict[cur_par][1]) - folder_dict[cur_par][0]]
-                    final_order.append(cur_par)
-                    folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs]
-                else:
-                    cur_par = Builders.step_up(cur_par, folder_dict)
-                folders_left = 0
-                for v in folder_dict.values():
-                    folders_left += v[0]  
-                count += 1
-                
-
-                    
-            
-
-# Version 1
-            # for chi in cur_par.children_dirs:
-            
-            #     cur_par = chi
-            #     final_order.append(cur_par)
-            #     folder_dict[cur_par] = cur_par.children_dirs
-            #     folders_left = 0
-            #     breakpoint()
-            #     if cur_par in folder_dict[cur_par.parent_dir[0]]:
-            #         folder_dict[cur_par.parent_dir[0]].remove(cur_par)
-                
-            #     for v in folder_dict.values():
-            #         folders_left += len(v)    
-            #     if len(folder_dict[cur_par]) == 0:
-            #         Builders.step_up(cur_par, folder_dict)
-
-# Version 2
-        
-                # count = 0
-                # print(count)
-                # print(cur_par)
-                # print(f"{cur_par} parent is {cur_par.parent_dir}")
-                # print(f"{cur_par} children are {cur_par.children_dirs}")
-                # if len(cur_par.children_dirs) != 0:
-                #     cur_par = folder_dict[cur_par][0]
-                #     final_order.append(cur_par)
-                #     folder_dict[cur_par] = cur_par.children_dirs
-                #     folders_left = 0
-                #     if cur_par in folder_dict[cur_par.parent_dir[0]]:
-                #         cur_grand_par = cur_par.parent_dir[0]
-                #         folder_dict[cur_grand_par].remove(cur_par)
-                # else:
-                #     cur_par = Builders.step_up(cur_par, folder_dict)
-                # for v in folder_dict.values():
-                #     folders_left += len(v)    
-
-                # count += 1
-                
-        return final_order
+            print(folder_dict[cur_par][2])
+            print(cur_par)
+            print(dict_tracker)
+            print(step)
+            print(name_dict)
+            if folder_dict[cur_par][0] == 0:
+                folder_dict[cur_par.parent_dir[0]][0] -= 1
+            if folder_dict[cur_par][0] != 0:
+                margin += 20
+                step += 1
+                cur_par = folder_dict[cur_par][1][len(folder_dict[cur_par][1]) - folder_dict[cur_par][0]]
+                final_order.append(cur_par)
+                dict_tracker.append(cur_par.name)
+                Setter.set_folders(name_dict, dict_tracker, cur_par)
+                folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs, margin]
+            else:
+                margin -= 20
+                step -= 1
+                dict_tracker.pop()
+                cur_par = cur_par.parent_dir[0]
+            folders_left = 0
+            for v in folder_dict.values():
+                folders_left += v[0]  
+        return name_dict
     
-   
-    def step_up(cur_p, fol_dict):
-        
-        if len(fol_dict[cur_p]):
-            return cur_p.parent_dir[0]
+    def build_child_list(cur_p):
+        for c in cur_p.children_dirs:
+            return c
+    
+class Setter:
+    
+    def set_folders(dict_t, keys, cur_p):
+        for key in keys:
+            if key not in dict_t:
+                dict_t[key] = {}
+            dict_t = dict_t[key]
+        return dict_t
+            
+
+
+    

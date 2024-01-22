@@ -1,10 +1,25 @@
-
-  
-  <div class="overflow-scroll">
-    <div class="row">
-      <div class="col">
-          {{ order }}
-      </div>
+<div class="overflow-scroll">
+  <div class="row">
+    <div class="col">
+      {{fol_dict}}
     </div>
   </div>
+</div>
 
+  
+<!-- <script>
+function buildStruct(fol_name, indent) {
+  let coll_h = '#collapse${fol_name}';
+  let coll_n = 'collapse${fol_name}';
+  let folder = '${fol_name}';
+  let ind = 'margin-left: "indent"px';
+  return '<div class="text-nowrap bd-highlight" type="button" data-bs-toggle="collapse" data-bs-target="coll_h" aria-expanded="false" style="margin-left: <p id="indy"></p>px" aria-controls="coll_n"><p id="pizza">folder</p></div>'
+
+}
+let result = buildStruct('{{root_folder.name}}', 20);
+let fold_n = '{{root_folder.name}}';
+document.getElementById("test").innerHTML = result;
+document.getElementById("pizza").innerHTML = fold_n
+
+
+</script> -->

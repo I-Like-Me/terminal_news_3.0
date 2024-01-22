@@ -100,18 +100,8 @@ def create_char(asset):
 @bp.route('/filing/<path>', methods=["POST", "GET"])
 def filing(path):
     url_path = path
-    structure_dict = {}
-    par_left2index = []
-    temp_chi_left2index = []
-    all_chi_left2index = []
     root_folder = Folder.query.filter_by(name='root').first()
-    order = Builders.build_structure(root_folder)
-    # for folder in root_folder.children_dirs:
-    #     par_left2index.append(folder)
-    #     structure_dict[folder] = {}
-    #while len(temp_chi_left2index) != 0 and len(par_left2index) != 0:
-    # for par in par_left2index:
-    #     for par_chi in par.children_dirs:
-    #         temp_chi_left2index.append(par_chi)
+    fol_dict = Builders.build_structure(root_folder)
+    
   
-    return render_template(f'filing_cabinet.html', url_path=url_path, root_folder=root_folder, order=order)
+    return render_template(f'filing_cabinet.html', url_path=url_path, root_folder=root_folder, fol_dict=fol_dict)
