@@ -1231,7 +1231,7 @@ class Folder(db.Model):
     owner = db.relationship("User", secondary=user_folder_table, back_populates="folders")
     children_dirs = db.relationship('Folder', secondary=children_folders, primaryjoin=(children_folders.c.parent_folder_id == id), secondaryjoin=(children_folders.c.child_folder_id == id), back_populates='parent_dir')
     parent_dir = db.relationship('Folder', secondary=children_folders, primaryjoin=(children_folders.c.child_folder_id == id), secondaryjoin=(children_folders.c.parent_folder_id == id), back_populates='children_dirs')
-    files = db.relationship("File", secondary=file_folder_table, back_populates="folder")
+    files = db.relationship("File", secondary=file_folder_table, back_populates="parent_dir")
 
     def __repr__(self):
         return f'<Folder {self.name}>'
@@ -1240,7 +1240,7 @@ class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True)
     owner = db.relationship("User", secondary=user_file_table, back_populates="files")
-    folder = db.relationship("Folder", secondary=file_folder_table, back_populates="files")
+    parent_dir = db.relationship("Folder", secondary=file_folder_table, back_populates="files")
 
     def __repr__(self):
         return f'<File {self.name}>'
