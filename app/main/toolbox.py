@@ -75,32 +75,26 @@ class Builders:
         return new_asset   
 
     def build_structure(root):
-        step = 0
-        margin = 0
-        final_order = []
+        margin = 20
         folder_dict = {}
         name_dict = {}
         dict_tracker = []
         cur_par = root
-        final_order.append(cur_par)
         dict_tracker.append(cur_par)
         folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs, margin]
-        name_dict[cur_par] = {}
+        Setter.set_folders(name_dict, dict_tracker, margin)
         folders_left = folder_dict[cur_par][0]
         while folders_left != 0:
             if folder_dict[cur_par][0] == 0:
                 folder_dict[cur_par.parent_dir[0]][0] -= 1
             if folder_dict[cur_par][0] != 0:
                 margin += 20
-                step += 1
                 cur_par = folder_dict[cur_par][1][len(folder_dict[cur_par][1]) - folder_dict[cur_par][0]]
-                final_order.append(cur_par)
                 dict_tracker.append(cur_par)
-                Setter.set_folders(name_dict, dict_tracker)
+                Setter.set_folders(name_dict, dict_tracker, margin)
                 folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs, margin]
             else:
                 margin -= 20
-                step -= 1
                 dict_tracker.pop()
                 cur_par = cur_par.parent_dir[0]
             folders_left = 0
@@ -111,11 +105,10 @@ class Builders:
 
 class Setter:
 
-    def set_folders(dict_t, keys):
+    def set_folders(dict_t, keys, mar):
         for key in keys:
             if key not in dict_t:
-                dict_t[key] = {}
+                dict_t[key] = {'Name': key.name, 'Files': key.files, 'Margin': mar}
             dict_t = dict_t[key]
-        dict_t.setdefault('Files', keys[-1].files)
         return dict_t
     
