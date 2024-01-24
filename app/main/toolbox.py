@@ -1,5 +1,4 @@
 import sys
-import json
 from functools import reduce
 from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location, Ladder, Skill, Feat, Rank, Faction, Damagetype, Feature, Folder, File
 from app.main.forms import CharacterForm, AbilityForm, FeatForm, AlignmentForm, BackgroundForm, DamagetypeForm, DiceForm, FactionForm, FeatureForm, LocationForm, PropertyForm, RankForm, SkillForm
@@ -78,11 +77,13 @@ class Builders:
         margin = 20
         folder_dict = {}
         name_dict = {}
-        dict_tracker = []
+        name_tracker = []
+        object_tracker = []
         cur_par = root
-        dict_tracker.append(cur_par)
+        name_tracker.append(cur_par.name)
+        object_tracker.append(cur_par)
         folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs, margin]
-        Setter.set_folders(name_dict, dict_tracker, margin)
+        Setter.set_folders(name_dict, name_tracker, object_tracker, margin)
         folders_left = folder_dict[cur_par][0]
         while folders_left != 0:
             if folder_dict[cur_par][0] == 0:
@@ -90,12 +91,14 @@ class Builders:
             if folder_dict[cur_par][0] != 0:
                 margin += 20
                 cur_par = folder_dict[cur_par][1][len(folder_dict[cur_par][1]) - folder_dict[cur_par][0]]
-                dict_tracker.append(cur_par)
-                Setter.set_folders(name_dict, dict_tracker, margin)
+                name_tracker.append(cur_par.name)
+                object_tracker.append(cur_par)
+                Setter.set_folders(name_dict, name_tracker, object_tracker, margin)
                 folder_dict[cur_par] = [len(cur_par.children_dirs), cur_par.children_dirs, margin]
             else:
                 margin -= 20
-                dict_tracker.pop()
+                name_tracker.pop()
+                object_tracker.pop()
                 cur_par = cur_par.parent_dir[0]
             folders_left = 0
             for v in folder_dict.values():
@@ -105,10 +108,10 @@ class Builders:
 
 class Setter:
 
-    def set_folders(dict_t, keys, mar):
-        for key in keys:
-            if key not in dict_t:
-                dict_t[key] = {'Name': key.name, 'Files': key.files, 'Margin': mar}
-            dict_t = dict_t[key]
+    def set_folders(dict_t, name_keys, object_keys, mar):
+        for n_key, o_key in zip(name_keys, object_keys):
+            if n_key not in dict_t:
+                dict_t[n_key] = {'Name': o_key.name, 'Files': o_key.files, 'Margin': mar}
+            dict_t = dict_t[n_key]
         return dict_t
     

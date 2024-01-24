@@ -2,11 +2,12 @@ from datetime import datetime, timezone
 from flask import render_template, flash, redirect, url_for, request, g, current_app
 from flask_login import current_user, login_required
 from app import db
-from app.models import User, Character, Folder
+from app.models import User, Character
 from app.main.forms import PickNPCs, PickTopics, AssetSel, LoginForm
-from app.main.toolbox import Converters, Collectors, Builders
+from app.main.toolbox import Converters, Collectors, Builders, Folder
 from app.main import bp
 import markdown
+import json
 
 
 
@@ -102,6 +103,5 @@ def filing(path):
     url_path = path
     root_folder = Folder.query.filter_by(name='root').first()
     fol_dict = Builders.build_structure(root_folder)
-    
-  
-    return render_template(f'filing_cabinet.html', url_path=url_path, root_folder=root_folder, fol_dict=fol_dict)
+    fol_json = json.dumps(fol_dict, indent=4)
+    return render_template(f'filing_cabinet.html', url_path=url_path, root_folder=root_folder, fol_dict=fol_dict, fol_json=fol_json)
