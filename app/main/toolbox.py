@@ -111,7 +111,9 @@ class Setter:
     def set_folders(dict_t, name_keys, object_keys, mar):
         for n_key, o_key in zip(name_keys, object_keys):
             if n_key not in dict_t:
-                dict_t[n_key] = {'Name': o_key.name, 'Files': o_key.files, 'Margin': mar}
+                dict_t[n_key] = {'Name': o_key.name, 'Type': 'folder', 'Margin': mar}
+                for file in o_key.files:
+                    dict_t[n_key][file.name] = {'Name': file.name, 'Type': 'file', 'Margin': mar}
             dict_t = dict_t[n_key]
         return dict_t
     
