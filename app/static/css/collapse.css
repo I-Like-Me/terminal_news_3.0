@@ -1,26 +1,52 @@
 /* Made by ChatGPT 3.5   */
+    ul {
+    list-style-type: none;
+    padding-left: 20px;
+  }
 
-ul {
-  list-style-type: none;
-  padding-left: 20px;
-}
+  .folder {
+    cursor: pointer;
+    position: relative;
+  }
 
-.folder {
-  cursor: pointer;
-  position: relative;
-}
+  .folder::before {
+    content: '\25B6'; /* Unicode character for a right arrow */
+    position: absolute;
+    left: -20px;
+  }
 
-.folder::before {
-  content: '\25B6'; /* Unicode character for a right arrow */
-  position: absolute;
-  left: -20px;
-}
+  .file {
+    padding-left: 20px;
+  }
 
-.file {
-  padding-left: 20px;
-}
+  /* Rotate the arrow when the folder is open */
+  .folder.open::before {
+    transform: rotate(90deg);
+  }
 
-/* Rotate the arrow when the folder is open */
-.folder.open::before {
-  transform: rotate(90deg);
-}
+  /* Remove bullet points for the root folder */
+  .root-folder {
+    list-style-type: none;
+  }
+
+  #searchContainer {
+    display: none;
+    margin-top: 10px;
+  }
+
+  #searchResults {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  #searchResults li {
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+  }
+
+  #toggleBtn {
+    cursor: pointer;
+    margin-bottom: 10px;
+  }

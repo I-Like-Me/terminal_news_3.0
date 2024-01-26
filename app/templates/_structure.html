@@ -1,14 +1,27 @@
 <div class="overflow-scroll">
   <div class="row">
+    <div class="col">
+      <button id="toggleBtn" onclick="toggleFileTreeSearch()">Search</button>
+    </div>
+  </div>
+  <div class="row">
     <div class="col" style="margin-left: 40px">
-      <div class="text-nowrap bd-highlight" id="fileTree"></div>
+      <div class="text-nowrap bd-highlight">
+        <div id="fileTreeContainer">
+          <div id="fileTree" class="root-folder"></div>
+        </div>
+        <div id="searchContainer">
+          <input type="text" id="searchInput" placeholder="Search...">
+          <button onclick="runSearch()">Search</button>
+          <ul id="searchResults" onclick="handleSearchResultClick(event)"></ul>
+        </div>
+    </div>
     </div>
   </div>
 </div>
 
 <!-- Made by ChatGPT 3.5   -->
 <script>
-  // Sample nested JSON representing file structure
   const fileTreeData = {
     name: 'Root',
     type: 'folder',
@@ -41,31 +54,138 @@
     ]
   };
 
-  // Function to create file tree HTML
-  function createFileTree(node, parentElement) {
+  function createFileTree(node, parentElement, isFirstLayer = true) {
     const listItem = document.createElement('li');
-    listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}">${node.name}</div>`;
+    listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}" data-name="${node.name}">${node.name}</div>`;
 
     if (node.children) {
       const childList = document.createElement('ul');
-      childList.style.display = 'none';
-      node.children.forEach(childNode => createFileTree(childNode, childList));
+      if (!isFirstLayer) {
+        childList.style.display = 'none';
+      }
+      node.children.forEach(childNode => createFileTree(childNode, childList, false));
       listItem.appendChild(childList);
 
-      // Add click event listener for folders
       if (node.type === 'folder') {
         const folderElement = listItem.querySelector('.folder');
         folderElement.addEventListener('click', () => {
           childList.style.display = childList.style.display === 'none' ? 'block' : 'none';
           folderElement.classList.toggle('open');
         });
+
+        // Open the folder if it's in the first layer
+        if (isFirstLayer) {
+          childList.style.display = 'block';
+          folderElement.classList.add('open');
+        }
       }
     }
 
     parentElement.appendChild(listItem);
   }
 
-  // Initialize file tree
   const fileTreeElement = document.getElementById('fileTree');
   createFileTree(fileTreeData, fileTreeElement);
+
+  function toggleFileTreeSearch() {
+    const fileTreeContainer = document.getElementById('fileTreeContainer');
+    const searchContainer = document.getElementById('searchContainer');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    if (fileTreeContainer.style.display !== 'none') {
+      fileTreeContainer.style.display = 'none';
+      searchContainer.style.display = 'block';
+      toggleBtn.textContent = 'File Tree';
+    } else {
+      fileTreeContainer.style.display = 'block';
+      searchContainer.style.display = 'none';
+      toggleBtn.textContent = 'Search';
+    }
+  }
+
+  function runSearch() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '';
+
+    if (searchInput.length === 0) {
+      return;
+    }
+
+    // Function to perform a case-insensitive search
+    function searchInTree(node, path) {
+      const matches = [];
+      const nodeName = node.name.toLowerCase();
+
+      if (nodeName.includes(searchInput)) {
+        matches.push({ path, confidence: 5 });
+      }
+
+      if (node.children) {
+        node.children.forEach((child, index) => {
+          const childPath = path ? `${path} > ${child.name}` : child.name;
+          matches.push(...searchInTree(child, childPath));
+        });
+      }
+
+      return matches;
+    }
+
+    const searchResultsData = searchInTree(fileTreeData, '');
+    const sortedResults = searchResultsData.sort((a, b) => b.confidence - a.confidence);
+
+    sortedResults.slice(0, 5).forEach(result => {
+      const listItem = document.createElement('li');
+      listItem.textContent = result.path;
+      listItem.addEventListener('click', () => handleSearchResultClick(result.path));
+      searchResults.appendChild(listItem);
+    });
+  }
+
+  function handleSearchResultClick(path) {
+    const fileTreeContainer = document.getElementById('fileTreeContainer');
+    const searchContainer = document.getElementById('searchContainer');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    const pathArray = path.split(' > ');
+    const lastNodeName = pathArray.pop(); // Remove the last item from the array
+    let currentNode = fileTreeData;
+    let currentElement = fileTreeElement;
+
+    // Open parent folders on the way
+    pathArray.forEach(name => {
+      const child = currentNode.children.find(node => node.name === name);
+      if (child) {
+        currentNode = child;
+        const element = currentElement.querySelector(`[data-name="${currentNode.name}"]`);
+        if (element) {
+          // Open the parent folder
+          if (currentNode.type === 'folder' && !element.classList.contains('open')) {
+            element.classList.add('open');
+            element.nextElementSibling.style.display = 'block';
+          }
+          // Update current element to the child's container
+          currentElement = element.nextElementSibling;
+        }
+      }
+    });
+
+    // Highlight the last node (file) in the file tree
+    const lastElement = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
+    if (lastElement) {
+      lastElement.classList.add('highlight');
+    }
+
+    // Scroll to the element corresponding to the path
+    const element = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
+    if (element) {
+      const container = fileTreeContainer.querySelector('ul');
+      container.scrollTop = element.offsetTop - container.offsetTop;
+    }
+
+    // Hide search container and display file tree container
+    fileTreeContainer.style.display = 'block';
+    searchContainer.style.display = 'none';
+    toggleBtn.textContent = 'Search';
+  }
 </script>
