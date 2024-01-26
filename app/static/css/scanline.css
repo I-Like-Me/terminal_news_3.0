@@ -17,9 +17,9 @@ from { width: 0; }
 100%{ width: 100; } 
 } 
 
-@keyframes blink {
+/* @keyframes blink {
 to{opacity: .0;}
-}
+} */
 
 @keyframes scan {
     from { top: 0 }

@@ -1,0 +1,26 @@
+/* Made by ChatGPT 3.5   */
+
+ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.folder {
+  cursor: pointer;
+  position: relative;
+}
+
+.folder::before {
+  content: '\25B6'; /* Unicode character for a right arrow */
+  position: absolute;
+  left: -20px;
+}
+
+.file {
+  padding-left: 20px;
+}
+
+/* Rotate the arrow when the folder is open */
+.folder.open::before {
+  transform: rotate(90deg);
+}
