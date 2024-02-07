@@ -2,87 +2,265 @@
 
 {% block content %}
 
-    <div class="filing_tools">
-        <div class=row>
-            <div class="col">
-                <input type="button" value="New File" />
-            </div>
-            <div class="col">
-                <input type="button" value="New Folder" />
-            </div>
-            <div class="col">
-                <input type="button" value="New File" />
-            </div>
+<div class="overlay"></div>
+<div class="scanline"></div>
+<div class="wrapper">
+  <div class="content clearfix">
+    <div id="container">
+      <div id="leftPanel">
+        <button id="toggleBtn" onclick="toggleFileTreeSearch()">Search</button>
+        <div id="fileTreeContainer">
+          <div id="fileTree" class="root-folder"></div>
         </div>
-    </div>
-    <div class="container__split">
-        <div class="container__left">{% include '_structure.html' %}</div>
-        <div class="resizer" id="dragMe"></div>
-        <div class="container__right">Subsequent columns continue along the new line.</div>
-    </div>
+        <div id="searchContainer">
+          <input type="text" id="searchInput" placeholder="Search...">
+          <button onclick="runSearch()">Search</button>
+          <ul id="searchResults" onclick="handleSearchResultClick(event)"></ul>
+        </div>
+      </div>
 
+      <div id="separator"></div>
 
+      <div id="rightPanel">
+        <!-- Content for the right panel goes here -->
+      </div>
+    </div>
+  </div>
+</div>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    // Query the element
-    const resizer = document.getElementById('dragMe');
-    const leftSide = resizer.previousElementSibling;
-    const rightSide = resizer.nextElementSibling;
+  const fileTreeData = {
+    name: 'Root',
+    type: 'folder',
+    children: [
+      {
+        name: 'Folder 1',
+        type: 'folder',
+        children: [
+          { name: 'File 1.1', type: 'file', text: 'File 1.1 text' },
+          { name: 'File 1.2', type: 'file', text: 'File 1.2 text' },
+          {
+            name: 'Subfolder 1.3',
+            type: 'folder',
+            children: [
+              { name: 'File 1.3.1', type: 'file', text: 'File 1.3.1 text' },
+              { name: 'File 1.3.2', type: 'file', text: 'File 1.3.2 text' },
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Folder 2',
+        type: 'folder',
+        children: [
+          { name: 'File 2.1', type: 'file', text: 'File 2.1 text' },
+          { name: 'File 2.2', type: 'file', text: 'File 2.2 text' },
+        ]
+      },
+      { name: 'File 3', type: 'file', text: 'File 3 text' },
+    ]
+  };
 
-    // The current position of mouse
-    let x = 0;
-    let y = 0;
-    let leftWidth = 0;
+  function createFileTree(node, parentElement, isFirstLayer = true) {
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}" data-name="${node.name}">${node.name}</div>`;
 
-    // Handle the mousedown event
-    // that's triggered when user drags the resizer
-    const mouseDownHandler = function (e) {
-        // Get the current mouse position
-        x = e.clientX;
-        y = e.clientY;
-        leftWidth = leftSide.getBoundingClientRect().width;
+    if (node.children) {
+      const childList = document.createElement('ul');
+      if (!isFirstLayer) {
+        childList.style.display = 'none';
+      }
+      node.children.forEach(childNode => createFileTree(childNode, childList, false));
+      listItem.appendChild(childList);
 
-        // Attach the listeners to document
-        document.addEventListener('mousemove', mouseMoveHandler);
-        document.addEventListener('mouseup', mouseUpHandler);
-    };
+      if (node.type === 'folder') {
+        const folderElement = listItem.querySelector('.folder');
+        folderElement.addEventListener('click', () => {
+          childList.style.display = childList.style.display === 'none' ? 'block' : 'none';
+          folderElement.classList.toggle('open');
+        });
 
-    const mouseMoveHandler = function (e) {
-        // How far the mouse has been moved
-        const dx = e.clientX - x;
-        const dy = e.clientY - y;
+        // Open the folder if it's in the first layer
+        if (isFirstLayer) {
+          childList.style.display = 'block';
+          folderElement.classList.add('open');
+        }
+      }
+    }
 
-        const newLeftWidth = ((leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
-        leftSide.style.width = newLeftWidth + '%';
+    parentElement.appendChild(listItem);
+  }
 
-        resizer.style.cursor = 'col-resize';
-        document.body.style.cursor = 'col-resize';
+  const fileTreeElement = document.getElementById('fileTree');
+  createFileTree(fileTreeData, fileTreeElement);
 
-        leftSide.style.userSelect = 'none';
-        leftSide.style.pointerEvents = 'none';
+  function toggleFileTreeSearch() {
+    const fileTreeContainer = document.getElementById('fileTreeContainer');
+    const searchContainer = document.getElementById('searchContainer');
+    const toggleBtn = document.getElementById('toggleBtn');
 
-        rightSide.style.userSelect = 'none';
-        rightSide.style.pointerEvents = 'none';
-    };
+    if (fileTreeContainer.style.display !== 'none') {
+      fileTreeContainer.style.display = 'none';
+      searchContainer.style.display = 'block';
+      toggleBtn.textContent = 'File Tree';
+    } else {
+      fileTreeContainer.style.display = 'block';
+      searchContainer.style.display = 'none';
+      toggleBtn.textContent = 'Search';
+    }
+  }
 
-    const mouseUpHandler = function () {
-        resizer.style.removeProperty('cursor');
-        document.body.style.removeProperty('cursor');
+  function runSearch() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '';
 
-        leftSide.style.removeProperty('user-select');
-        leftSide.style.removeProperty('pointer-events');
+    if (searchInput.length === 0) {
+      return;
+    }
 
-        rightSide.style.removeProperty('user-select');
-        rightSide.style.removeProperty('pointer-events');
+    // Function to perform a case-insensitive search
+    function searchInTree(node, path) {
+      const matches = [];
+      const nodeName = node.name.toLowerCase();
 
-        // Remove the handlers of mousemove and mouseup
-        document.removeEventListener('mousemove', mouseMoveHandler);
-        document.removeEventListener('mouseup', mouseUpHandler);
-    };
+      if (nodeName.includes(searchInput)) {
+        matches.push({ path, confidence: 5 });
+      }
 
-    // Attach the handler
-    resizer.addEventListener('mousedown', mouseDownHandler);
+      if (node.children) {
+        node.children.forEach((child, index) => {
+          const childPath = path ? `${path} > ${child.name}` : child.name;
+          matches.push(...searchInTree(child, childPath));
+        });
+      }
+
+      return matches;
+    }
+
+    const searchResultsData = searchInTree(fileTreeData, '');
+    const sortedResults = searchResultsData.sort((a, b) => b.confidence - a.confidence);
+
+    sortedResults.slice(0, 5).forEach(result => {
+      const listItem = document.createElement('li');
+      listItem.textContent = result.path;
+      listItem.addEventListener('click', () => handleSearchResultClick(result.path));
+      searchResults.appendChild(listItem);
     });
+  }
+
+  function handleSearchResultClick(path) {
+    const fileTreeContainer = document.getElementById('fileTreeContainer');
+    const searchContainer = document.getElementById('searchContainer');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    const pathArray = path.split(' > ');
+    const lastNodeName = pathArray.pop(); // Remove the last item from the array
+    let currentNode = fileTreeData;
+    let currentElement = fileTreeElement;
+
+    // Open parent folders on the way
+    pathArray.forEach(name => {
+      const child = currentNode.children.find(node => node.name === name);
+      if (child) {
+        currentNode = child;
+        const element = currentElement.querySelector(`[data-name="${currentNode.name}"]`);
+        if (element) {
+          // Open the parent folder
+          if (currentNode.type === 'folder' && !element.classList.contains('open')) {
+            element.classList.add('open');
+            element.nextElementSibling.style.display = 'block';
+          }
+          // Update current element to the child's container
+          currentElement = element.nextElementSibling;
+        }
+      }
+    });
+
+    // Highlight the last node (file) in the file tree
+    const lastElement = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
+    if (lastElement) {
+      lastElement.classList.add('highlight');
+    }
+
+    // Scroll to the element corresponding to the path
+    const element = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
+    if (element) {
+      const container = fileTreeContainer.querySelector('ul');
+      container.scrollTop = element.offsetTop - container.offsetTop;
+    }
+
+    // Hide search container and display file tree container
+    fileTreeContainer.style.display = 'block';
+    searchContainer.style.display = 'none';
+    toggleBtn.textContent = 'Search';
+  }
+
+  fileTreeElement.addEventListener('click', (event) => {
+    const target = event.target;
+    const fileTypeElement = target.closest('.file');
+
+    if (fileTypeElement) {
+      const fileName = fileTypeElement.getAttribute('data-name');
+      const fileData = findFileData(fileTreeData, fileName);
+
+      if (fileData && fileData.text) {
+        displayTextInRightPanel(fileData.text);
+      }
+    }
+  });
+
+  function findFileData(node, fileName) {
+    if (node.name === fileName && node.type === 'file') {
+      return node;
+    }
+
+    if (node.children) {
+      for (const child of node.children) {
+        const result = findFileData(child, fileName);
+        if (result) {
+          return result;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function displayTextInRightPanel(text) {
+    const rightPanel = document.getElementById('rightPanel');
+    rightPanel.textContent = text;
+  }
+
+  // Add code for handling separator dragging
+  const separator = document.getElementById('separator');
+  const leftPanel = document.getElementById('leftPanel');
+  const rightPanel = document.getElementById('rightPanel');
+  let isResizing = false;
+
+  separator.addEventListener('mousedown', (event) => {
+    isResizing = true;
+    document.body.style.userSelect = 'none'; // Disable text selection
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', () => {
+      isResizing = false;
+      document.body.style.userSelect = ''; // Enable text selection
+      document.removeEventListener('mousemove', handleMouseMove);
+    });
+  });
+
+  function handleMouseMove(event) {
+    if (isResizing) {
+      const containerRect = document.getElementById('container').getBoundingClientRect();
+      const separatorRect = separator.getBoundingClientRect();
+      const mouseX = event.clientX - containerRect.left;
+
+      // Ensure the separator stays within the container bounds
+      const newWidth = Math.min(Math.max(mouseX, 0), containerRect.width);
+
+      leftPanel.style.width = newWidth + 'px';
+      rightPanel.style.width = (containerRect.width - newWidth - separatorRect.width) + 'px';
+    }
+  }
 </script>
 
 {% endblock %}

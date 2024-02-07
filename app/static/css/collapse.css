@@ -1,52 +1,86 @@
-/* Made by ChatGPT 3.5   */
-    ul {
-    list-style-type: none;
-    padding-left: 20px;
-  }
+#under_body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
 
-  .folder {
-    cursor: pointer;
-    position: relative;
-  }
+#container_file {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  .folder::before {
-    content: '\25B6'; /* Unicode character for a right arrow */
-    position: absolute;
-    left: -20px;
-  }
+#leftPanel {
+  flex: 1;
+  overflow-y: auto;
+  border-right: 1px solid #ccc;
+  white-space: nowrap; /* Prevent word wrapping in the left panel */
+}
 
-  .file {
-    padding-left: 20px;
-  }
+#rightPanel {
+  width: 300px;
+  overflow-y: auto;
+  padding: 10px;
+}
 
-  /* Rotate the arrow when the folder is open */
-  .folder.open::before {
-    transform: rotate(90deg);
-  }
+#separator {
+  cursor: ew-resize;
+  background-color: #ddd;
+  width: 10px;
+  height: 100%;
+  position: relative;
+  flex-shrink: 0;
+}
 
-  /* Remove bullet points for the root folder */
-  .root-folder {
-    list-style-type: none;
-  }
+#ul_file {
+  list-style-type: none;
+  padding-left: 20px;
+}
 
-  #searchContainer {
-    display: none;
-    margin-top: 10px;
-  }
+.folder {
+  cursor: pointer;
+  position: relative;
+}
 
-  #searchResults {
-    list-style-type: none;
-    padding: 0;
-  }
+.folder::before {
+  content: '\25B6'; /* Unicode character for a right arrow */
+  position: absolute;
+  left: -20px;
+}
 
-  #searchResults li {
-    cursor: pointer;
-    padding: 5px;
-    border: 1px solid #ccc;
-    margin-bottom: 5px;
-  }
+.file {
+  padding-left: 20px;
+}
 
-  #toggleBtn {
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
+/* Rotate the arrow when the folder is open */
+.folder.open::before {
+  transform: rotate(90deg);
+}
+
+/* Remove bullet points for the root folder */
+.root-folder {
+  list-style-type: none;
+}
+
+#searchContainer {
+  display: none;
+  margin-top: 10px;
+}
+
+#searchResults {
+  list-style-type: none;
+  padding: 0;
+}
+
+#searchResults li {
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 5px;
+}
+
+#toggleBtn {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
