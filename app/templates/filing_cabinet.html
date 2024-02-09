@@ -2,10 +2,6 @@
 
 {% block content %}
 
-<div class="overlay"></div>
-<div class="scanline"></div>
-<div class="wrapper">
-  <div class="content clearfix">
     <div id="container">
       <div id="leftPanel">
         <button id="toggleBtn" onclick="toggleFileTreeSearch()">Search</button>
@@ -25,8 +21,7 @@
         <!-- Content for the right panel goes here -->
       </div>
     </div>
-  </div>
-</div>
+
 <script>
   const fileTreeData = {
     name: 'Root',
@@ -236,9 +231,11 @@
   const leftPanel = document.getElementById('leftPanel');
   const rightPanel = document.getElementById('rightPanel');
   let isResizing = false;
+  let initialMouseX;
 
   separator.addEventListener('mousedown', (event) => {
     isResizing = true;
+    initialMouseX = event.clientX;
     document.body.style.userSelect = 'none'; // Disable text selection
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', () => {
@@ -250,15 +247,14 @@
 
   function handleMouseMove(event) {
     if (isResizing) {
-      const containerRect = document.getElementById('container').getBoundingClientRect();
-      const separatorRect = separator.getBoundingClientRect();
-      const mouseX = event.clientX - containerRect.left;
+      const dx = event.clientX - initialMouseX;
+      const newLeftWidth = parseInt(window.getComputedStyle(leftPanel).width) + dx;
+      const newRightWidth = parseInt(window.getComputedStyle(rightPanel).width) - dx;
 
-      // Ensure the separator stays within the container bounds
-      const newWidth = Math.min(Math.max(mouseX, 0), containerRect.width);
+      leftPanel.style.width = newLeftWidth + 'px';
+      rightPanel.style.width = newRightWidth + 'px';
 
-      leftPanel.style.width = newWidth + 'px';
-      rightPanel.style.width = (containerRect.width - newWidth - separatorRect.width) + 'px';
+      initialMouseX = event.clientX;
     }
   }
 </script>
