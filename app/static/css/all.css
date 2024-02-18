@@ -275,19 +275,21 @@ zoom: 1;
     height: 100vh;
     overflow: hidden;
     border: 5px solid #ddd; /* Add border to the container */
-    padding: 10px; /* Add padding to the container */
+    padding: 0; /* Remove padding from the container */
   }
   
   #leftPanel {
     overflow-y: auto;
     border-right: 1px solid #ccc;
     white-space: nowrap; /* Prevent word wrapping in the left panel */
-    padding: 10px; /* Add padding to the left panel */
+    padding: 10px 10px 10px 20px; /* Add padding to the left panel */
+    width: 33%;
   }
-  
+
   #rightPanel {
     overflow-y: auto;
-    padding: 10px; /* Add padding to the right panel */
+    padding: 10px 20px 10px 10px; /* Add padding to the right panel */
+    width: 67%;
   }
   
   #separator {
@@ -306,20 +308,21 @@ ul {
 }
 
 .folder {
-  cursor: pointer;
-  position: relative;
-}
+    cursor: pointer;
+    position: relative;
+    left: 30px;
+  }
 
-.folder::before {
-  content: '\25B6'; /* Unicode character for a right arrow */
-  position: absolute;
-  left: -20px;
-}
+  .folder::before {
+    content: '\25B6'; /* Unicode character for a right arrow */
+    position: absolute;
+    left: -25px;
+  }
 
-.file {
-  cursor: pointer;
-  padding-left: 20px;
-}
+  .file {
+    cursor: pointer;
+    padding-left: 30px;
+  }
 
 /* Rotate the arrow when the folder is open */
 .folder.open::before {
