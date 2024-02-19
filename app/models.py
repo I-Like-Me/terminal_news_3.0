@@ -527,30 +527,6 @@ ability_skill_table = db.Table(
     db.Column("skill_id", db.ForeignKey("skill.id"), primary_key=True),
 )
 
-user_folder_table = db.Table(
-    "user_folder_table",
-    db.Column("user_id", db.ForeignKey("user.id"), primary_key=True),
-    db.Column("folder_id", db.ForeignKey("folder.id"), primary_key=True),
-)
-
-user_file_table = db.Table(
-    "user_file_table",
-    db.Column("user_id", db.ForeignKey("user.id"), primary_key=True),
-    db.Column("file_id", db.ForeignKey("file.id"), primary_key=True),
-)
-
-file_folder_table = db.Table(
-    "file_folder_table",
-    db.Column("file_id", db.ForeignKey("file.id"), primary_key=True),
-    db.Column("folder_id", db.ForeignKey("folder.id"), primary_key=True),
-)
-
-children_folders = db.Table(
-    "children_folders",
-    db.Column("child_folder_id", db.Integer, db.ForeignKey("folder.id"), primary_key=True),
-    db.Column("parent_folder_id", db.Integer, db.ForeignKey("folder.id"), primary_key=True),
-)
-
 class CharCls(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     char_cls = db.Column(db.String(64), index=True, unique=True)
@@ -580,9 +556,18 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     character = db.relationship("Character", secondary=user_char_table, back_populates="player")
     games = db.relationship("Game", secondary=user_game_table, back_populates="gm")
-    folders = db.relationship("Folder", secondary=user_folder_table, back_populates="owner")
-    files = db.relationship("File", secondary=user_file_table, back_populates="owner")
+    my_documents = db.Column(JSONB)
     admin = db.Column(db.Boolean)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.jsonb_column is None:
+            self.jsonb_column = {"name": self.name, "type": "folder", "children": {
+                {"name": "Games", "type": "folder", "children": {
+                    "name": "READ_ME.txt", "type": "file", "content": "This is the Games folder. It can be collapsed but not renamed. It is where folders, each representing a game you're part of. You can add your own subfolders and files. You can delete this READ_ME file if you like."
+                },
+                "name": "READ_ME.txt", "type": "file", "content": "This is the root folder. It can't be collapsed or renamed. You can add your own subfolders and files. You can delete this READ_ME file if you like."}
+            }}
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -1223,24 +1208,3 @@ class Npcpool(db.Model):
 
     def __repr__(self):
         return f'<Npcpool {self.name}>'
-
-class Folder(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True)
-    is_root = db.Column(db.Boolean, default= False)
-    owner = db.relationship("User", secondary=user_folder_table, back_populates="folders")
-    children_dirs = db.relationship('Folder', secondary=children_folders, primaryjoin=(children_folders.c.parent_folder_id == id), secondaryjoin=(children_folders.c.child_folder_id == id), back_populates='parent_dir')
-    parent_dir = db.relationship('Folder', secondary=children_folders, primaryjoin=(children_folders.c.child_folder_id == id), secondaryjoin=(children_folders.c.parent_folder_id == id), back_populates='children_dirs')
-    files = db.relationship("File", secondary=file_folder_table, back_populates="parent_dir")
-
-    def __repr__(self):
-        return f'<Folder {self.name}>'
-
-class File(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True)
-    owner = db.relationship("User", secondary=user_file_table, back_populates="files")
-    parent_dir = db.relationship("Folder", secondary=file_folder_table, back_populates="files")
-
-    def __repr__(self):
-        return f'<File {self.name}>'
