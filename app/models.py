@@ -3,6 +3,9 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.dialects.postgresql import JSONB, insert
 from sqlalchemy.orm.attributes import flag_modified
 from flask_login import UserMixin
+from app.dbtools import JsonTools
+
+
 
 
 user_char_table = db.Table(
@@ -561,13 +564,24 @@ class User(UserMixin, db.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.jsonb_column is None:
-            self.jsonb_column = {"name": self.name, "type": "folder", "children": {
-                {"name": "Games", "type": "folder", "children": {
-                    "name": "READ_ME.txt", "type": "file", "content": "This is the Games folder. It can be collapsed but not renamed. It is where folders, each representing a game you're part of. You can add your own subfolders and files. You can delete this READ_ME file if you like."
-                },
-                "name": "READ_ME.txt", "type": "file", "content": "This is the root folder. It can't be collapsed or renamed. You can add your own subfolders and files. You can delete this READ_ME file if you like."}
-            }}
+        if self.my_documents is None:
+            self.my_documents = {"name": self.username, "type": "folder", "children": [
+                {"name": "Games", "type": "folder", "children": [
+                    {"name": "READ_ME.txt", "type": "file", "content": "This is the Games folder. It can be collapsed but not renamed. It is where folders, each representing a game you're part of. You can add your own subfolders and files. You can delete this READ_ME file if you like."}]
+                    },
+                {"name": "READ_ME.txt", "type": "file", "content": "This is the Root folder. It can't be collapsed or renamed. You can add your own subfolders and files. You can delete this READ_ME file if you like."}
+            ]}
+            root_rm_path = JsonTools.find_path(self.my_documents, self.my_documents['children'][1]['content'], path=())
+            games_rm_path = JsonTools.find_path(self.my_documents, self.my_documents['children'][0]['children'][0]['content'], path=())
+            r_rm_path_str = JsonTools.path_to_string(root_rm_path)
+            g_rm_path_str = JsonTools.path_to_string(games_rm_path)
+            root_rm_file = File(name=self.my_documents['children'][1]['name'], path=r_rm_path_str, content=self.my_documents['children'][1]['content'])
+            games_rm_file = File(name=self.my_documents['children'][0]['children'][0]['name'], path=g_rm_path_str, content=self.my_documents['children'][0]['children'][0]['content'])
+            db.session.add_all([root_rm_file, games_rm_file])
+            db.session.commit()
+            JsonTools.replace_value_by_path(self.my_documents, root_rm_path, root_rm_file.id)
+            JsonTools.replace_value_by_path(self.my_documents, games_rm_path, games_rm_file.id)
+            
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -575,6 +589,7 @@ class User(UserMixin, db.Model):
     def claim_char(self, char_pick):
         if char_pick.npc != True and len(char_pick.player) == 0:
             self.character.append(char_pick)
+
 
 @login.user_loader
 def load_user(id):
@@ -717,6 +732,12 @@ class Character(db.Model):
                         print(f'{topic}is not a topic.')
                 flag_modified(learn_sub, "topics")
                 db.session.commit()
+    
+    # def join_party(self, party):
+    #     if len(party.members) < party.max_members:
+    #         self.parties.append(party)
+    #         user = self.player
+    #         user.my_documents ?continue here?
 
 class Cls_5e(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -1208,3 +1229,12 @@ class Npcpool(db.Model):
 
     def __repr__(self):
         return f'<Npcpool {self.name}>'
+
+class File(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True)
+    path = db.Column(db.String(10000), index=True)
+    content = db.Column(db.Text)
+
+    def __repr__(self):
+        return f'<File {self.name} at {self.path}>'
