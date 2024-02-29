@@ -3,7 +3,8 @@ from flask import render_template, flash, redirect, url_for, request, g, current
 from flask_login import current_user, login_required
 from app import db
 from app.models import User, Character
-from app.main.forms import PickNPCs, PickTopics, AssetSel, LoginForm
+from app.auth.forms import LoginForm
+from app.main.forms import PickNPCs, PickTopics, AssetSel
 from app.main.toolbox import Converters, Collectors, Builders
 from app.main import bp
 import markdown
@@ -39,6 +40,13 @@ def index():
 def login():
     form = LoginForm()
     return render_template('login.html', title='Sign In', form=form)
+
+@bp.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+
+    return render_template('user.html', user=user)
 
 @bp.route('/viewer/<catagory>/<asset>', methods=["POST", "GET"])
 def asset_view(catagory, asset):
