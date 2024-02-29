@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from flask import render_template, flash, redirect, url_for, request, g, current_app
+from flask import render_template, flash, redirect, url_for, request, g, current_app, jsonify
 from flask_login import current_user, login_required
 from app import db
 from app.models import User, Character
@@ -49,6 +49,7 @@ def user(username):
     return render_template('user.html', user=user)
 
 @bp.route('/viewer/<catagory>/<asset>', methods=["POST", "GET"])
+@login_required
 def asset_view(catagory, asset):
     
     cata = catagory
@@ -57,6 +58,7 @@ def asset_view(catagory, asset):
     return render_template('asset_viewer.html', cata=cata, asset_item=asset_item)
 
 @bp.route('/article', methods=["POST", "GET"])
+@login_required
 def article():
     
     data = {}
@@ -70,6 +72,7 @@ def article():
     return render_template('article.html', data=data)
 
 @bp.route('/asset_sel', methods=["POST", "GET"])
+@login_required
 def asset_sel():
     form = AssetSel()
     if form.validate_on_submit():
@@ -79,6 +82,7 @@ def asset_sel():
     return render_template('gm_tools/selectors/asset_sel.html', title='Home', form=form)
 
 @bp.route('/adder/<asset>', methods=["POST", "GET"])
+@login_required
 def adder(asset):
     if asset == 'Character':
         # return redirect(f'/create_char/{asset}')
@@ -97,6 +101,7 @@ def adder(asset):
     return render_template(f'gm_tools/adders/{asset}_adder.html', title='Home', asset_form=asset_form)
 
 @bp.route('/create_char/<asset>', methods=["POST", "GET"])
+@login_required
 def create_char(asset):
     asset_form = Converters.str_to_class(f'{asset}Form')()
     asset_items = Collectors.get_bin(asset)
@@ -105,12 +110,16 @@ def create_char(asset):
             asset_form[x].query = Converters.str_to_class(y).query.all()
     return render_template(f'gm_tools/adders/character_adder.html', title='Home', asset_form=asset_form)
 
+@bp.route('/filing/<username>', methods=["POST", "GET"])
+@login_required
+def filing(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    #cabinet=jsonify(user.my_documents)
+    #cabinet=json.dumps(user.my_documents)
+    return render_template(f'filing_cabinet.html', cabinet=user.my_documents)
 
-@bp.route('/filing/<path>', methods=["POST", "GET"])
-def filing(path):
-    url_path = path
-    cabinet = filing
-    #root_folder = Folder.query.filter_by(name='root').first()
-    #fol_dict = Builders.build_structure(root_folder)
-    #fol_json = json.dumps(fol_dict, indent=4)
-    return render_template(f'filing_cabinet.html', url_path=url_path, cabinet=cabinet)
+@bp.route('/filing/<username>', methods=['GET'])
+@login_required
+def get_cabinet(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    return jsonify(user.my_documents)

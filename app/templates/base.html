@@ -31,15 +31,21 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  {% if current_user.is_anonymous %}
+                  <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ url_for('main.index') }}">News</a>
+                  </li>
+                  {% else %}
                   <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="{{ url_for('main.index') }}">News</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ url_for('main.filing', path='root') }}">Filing Cabinet</a>
+                    <a class="nav-link" aria-current="page" href="{{ url_for('main.filing', username=current_user.username) }}">Filing Cabinet</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="{{ url_for('main.asset_sel') }}">Select</a>
                   </li>
+                  {% endif %}
                 </ul>
                 <ul class="navbar-nav mb-2 mb-lg-0">
                   {% if current_user.is_anonymous %}
