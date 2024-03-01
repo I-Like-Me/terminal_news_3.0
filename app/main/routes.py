@@ -114,9 +114,13 @@ def create_char(asset):
 @login_required
 def filing(username):
     user = User.query.filter_by(username=username).first_or_404()
-    #cabinet=jsonify(user.my_documents)
-    #cabinet=json.dumps(user.my_documents)
     return render_template(f'filing_cabinet.html', cabinet=user.my_documents)
+
+@bp.route('/process_file_content', methods=['POST'])
+def process_file_content():
+    content = request.json['content']
+    file = Collectors.get_file(content)
+    return jsonify(processed_content=file.content)
 
 @bp.route('/filing/<username>', methods=['GET'])
 @login_required

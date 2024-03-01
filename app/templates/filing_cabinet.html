@@ -181,7 +181,19 @@ fileTreeElement.addEventListener('click', (event) => {
     const fileData = findFileData(fileTreeData, filePath, '');
 
     if (fileData && fileData.content) {
-      displayTextInRightPanel(fileData.content);
+      // Make an AJAX request to the Flask server with the file content
+      fetch('/process_file_content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content: fileData.content })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Display the processed content in the right panel
+        displayTextInRightPanel(data.processed_content);
+      });
     }
   }
 });

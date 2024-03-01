@@ -1,6 +1,6 @@
 import sys
 from functools import reduce
-from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location, Ladder, Skill, Feat, Rank, Faction, Damagetype, Feature
+from app.models import Character, Ability, Background, Alignment, Cls_5e, Race, Location, Ladder, Skill, Feat, Rank, Faction, Damagetype, Feature, File
 from app.main.forms import CharacterForm, AbilityForm, FeatForm, AlignmentForm, BackgroundForm, DamagetypeForm, DiceForm, FactionForm, FeatureForm, LocationForm, PropertyForm, RankForm, SkillForm
 
 class Converters:
@@ -52,6 +52,10 @@ class Collectors:
             return bin
         else:
             return None
+        
+    def get_file(id):
+        file = File.query.get(id)
+        return file
         
 class Builders:
     def build_commit(asset, data, items):
