@@ -9,7 +9,7 @@
       <div id="fileTree" class="root-folder"></div>
     </div>
     <div id="searchContainer">
-      <input type="text" id="searchInput" placeholder="Search...">
+      <input type="text" id="searchInput" placeholder="Search..." onkeyup="handleKeyUp(event)">
       <button onclick="runSearch()">Search</button>
       <ul id="searchResults" onclick="handleSearchResultClick(event)"></ul>
     </div>
@@ -74,6 +74,12 @@ function toggleFileTreeSearch() {
     fileTreeContainer.style.display = 'block';
     searchContainer.style.display = 'none';
     toggleBtn.textContent = 'Search';
+  }
+}
+
+function handleKeyUp(event) {
+  if (event.keyCode === 13) {
+    runSearch();
   }
 }
 
