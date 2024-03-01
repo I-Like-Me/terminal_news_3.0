@@ -356,3 +356,17 @@ ul {
   margin-bottom: 10px;
 }
 
+#editor {
+  height: 100%;
+  background-color: #383838;
+  color: #00dd00;
+  border: 1px solid #ffffff;
+}
+
+.ql-toolbar {
+  background-color: #ffffff;
+}
+
+.ql-editor {
+  font-size: 2em;
+}

@@ -237,7 +237,19 @@ function getFilePath(element) {
 
 function displayTextInRightPanel(content) {
   const rightPanel = document.getElementById('rightPanel');
-  rightPanel.textContent = content;
+  rightPanel.innerHTML = '<div id="editor"></div>'; // Create a new div for the Quill editor
+
+  var quill = new Quill('#editor', {
+    theme: 'snow'
+  });
+
+  // Apply the styles to the Quill editor
+  let quillContent = document.querySelector('.ql-editor');
+  quillContent.style.backgroundColor = '#383838';
+  quillContent.style.color = '#00dd00';
+  quillContent.style.borderColor = '#ffffff';
+  quillContent.style.fontSize = '2em'; // Triple the default text size
+
 }
 
     // Add code for handling separator dragging
