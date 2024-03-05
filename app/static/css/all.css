@@ -365,6 +365,7 @@ ul {
 
 .ql-toolbar {
   background-color: #ffffff;
+  overflow: visible;
 }
 
 .ql-editor {

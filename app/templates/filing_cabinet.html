@@ -239,6 +239,16 @@ function displayTextInRightPanel(content) {
   const rightPanel = document.getElementById('rightPanel');
   rightPanel.innerHTML = '<div id="editor"></div>'; // Create a new div for the Quill editor
 
+  // Import the icons module
+  var icons = Quill.import('ui/icons');
+
+  // Override the markup of each icon
+  icons['ql-header ql-picker'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon class="ql-stroke" points="7 11 9 13 11 11 7 11"></polygon><polygon class="ql-stroke" points="7 7 9 5 11 7 7 7"></polygon></svg>';
+  icons['bold'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ql-stroke" d="M5,4H9.5A2.5,2.5,0,0,1,12,6.5v0A2.5,2.5,0,0,1,9.5,9H5A0,0,0,0,1,5,9V4A0,0,0,0,1,5,4Z"></path><path class="ql-stroke" d="M5,9h5.5A2.5,2.5,0,0,1,13,11.5v0A2.5,2.5,0,0,1,10.5,14H5a0,0,0,0,1,0,0V9A0,0,0,0,1,5,9Z"></path></svg>';
+  icons['italic'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line class="ql-stroke" x1="7" x2="13" y1="4" y2="4"></line><line class="ql-stroke" x1="7" x2="13" y1="4" y2="4"></line><line class="ql-stroke" x1="5" x2="11" y1="14" y2="14"></line><line class="ql-stroke" x1="8" x2="10" y1="14" y2="4"></line></svg>';
+  icons['underline'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ql-stroke" d="M5,3V9a4.012,4.012,0,0,0,4,4H9a4.012,4.012,0,0,0,4-4V3"></path><rect class="ql-fill" height="1" rx="0.5" ry="0.5" width="12" x="3" y="15"></rect></svg>';
+  icons['link'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line class="ql-stroke" x1="7" x2="11" y1="7" y2="11"></line><path class="ql-even ql-stroke" d="M8.9,4.577a3.476,3.476,0,0,1,.36,4.679A3.476,3.476,0,0,1,4.577,8.9C3.185,7.5,2.035,6.4,4.217,4.217S7.5,3.185,8.9,4.577Z"></path><path class="ql-even ql-stroke" d="M13.423,9.1a3.476,3.476,0,0,0-4.679-.36,3.476,3.476,0,0,0,.36,4.679c1.392,1.392,2.5,2.542,4.679.36S14.815,10.5,13.423,9.1Z"></path></svg>';
+
   var quill = new Quill('#editor', {
     theme: 'snow'
   });
@@ -250,7 +260,18 @@ function displayTextInRightPanel(content) {
   quillContent.style.borderColor = '#ffffff';
   quillContent.style.fontSize = '2em'; // Triple the default text size
 
+  // Get the specific element and apply inline styles
+  let pickerElement = document.querySelector('.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg'); 
+  pickerElement.style.position = 'absolute';
+  pickerElement.style.marginTop = '-9px';
+  pickerElement.style.right = '0px';
+  pickerElement.style.top = '23.3%';
+  pickerElement.style.width = '30px';
 }
+
+
+
+
 
     // Add code for handling separator dragging
     const separator = document.getElementById('separator');
