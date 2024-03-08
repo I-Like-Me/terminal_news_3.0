@@ -127,3 +127,9 @@ def process_file_content():
 def get_cabinet(username):
     user = User.query.filter_by(username=username).first_or_404()
     return jsonify(user.my_documents)
+
+@bp.route('/save_updated_content', methods=['POST'])
+def save_updated_content():
+    updated_content = request.json['content']
+    # Save the updated content
+    return jsonify({'status': 'success'})
