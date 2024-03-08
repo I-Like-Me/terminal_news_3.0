@@ -271,6 +271,8 @@ function displayTextInRightPanel(content) {
   pickerElement.style.top = '36%';
   pickerElement.style.width = '30px';
 
+  quill.clipboard.dangerouslyPasteHTML(content);
+
 }
 
     // Add code for handling separator dragging
