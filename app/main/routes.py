@@ -128,8 +128,12 @@ def get_cabinet(username):
     user = User.query.filter_by(username=username).first_or_404()
     return jsonify(user.my_documents)
 
-@bp.route('/save_updated_content', methods=['POST'])
-def save_updated_content():
-    updated_content = request.json['content']
-    # Save the updated content
-    return jsonify({'status': 'success'})
+@bp.route('/save_content', methods=['POST'])
+def save_content():
+    # Get the content from the request
+    content = request.get_json()['content']
+
+    # Print the content to the console
+    print(content)
+
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 

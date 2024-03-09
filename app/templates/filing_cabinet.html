@@ -278,7 +278,23 @@ function displayTextInRightPanel(content) {
 
   quill.clipboard.dangerouslyPasteHTML(content);
   
+  // Get the save button
+  const saveBtn = document.getElementById('saveBtn');
 
+  // Add an event listener to the save button
+  saveBtn.addEventListener('click', function() {
+    // Get the editor's content
+    const editorContent = quill.root.innerHTML;
+
+    // Make a POST request to the Flask server with the editor's content
+    fetch('/save_content', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content: editorContent })
+    });
+  });
 }
 
     // Add code for handling separator dragging
