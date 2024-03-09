@@ -130,11 +130,9 @@ def get_cabinet(username):
 
 @bp.route('/save_content', methods=['POST'])
 def save_content():
-  data = request.get_json()
-  content = data['content']
-  kevin = data['f_id']
-  print(content)
-  print(kevin)
-  # Now you have both the original content and the new content from the editor
-  # You can process them as needed
-  return 'Success!', 200
+    data = request.get_json()
+    new_content = data['content']
+    desired_file = Collectors.get_file(data['f_id'])
+    desired_file.content = new_content
+    db.session.commit()
+    return 'Success!', 200
