@@ -360,7 +360,7 @@ ul {
   height: 100%;
   background-color: #383838;
   color: #00dd00;
-  border: 1px solid #ffffff;
+  border: 2px solid #ffffff;
 }
 
 .ql-toolbar {
@@ -459,4 +459,8 @@ ul {
 
 .highlight {
   background-color: #ddd; /* Change this to the color you want */
+}
+
+#saveBtn {
+  margin-bottom: 23px;
 }

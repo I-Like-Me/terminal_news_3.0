@@ -212,7 +212,7 @@ fileTreeElement.addEventListener('click', (event) => {
     }
   } else {
     // Hide the save button if the clicked element is not a file
-    document.getElementById('saveBtn').style.display = 'none';
+    document.getElementById('right_stuff').style.display = 'none';
   }
 });
 
@@ -249,7 +249,7 @@ function getFilePath(element) {
 
 function displayTextInRightPanel(content, file_id) {
   const rightPanel = document.getElementById('rightPanel');
-  rightPanel.innerHTML = '<button id="saveBtn" style="display: block;">Save</button><div id="editor"></div>'; // Create a new div for the Quill editor
+  rightPanel.innerHTML = '<div id="right_stuff"><button id="saveBtn" style="display: block;">Save</button><div id="editor"></div></div>'; // Create a new div for the Quill editor
 
   // Import the icons module
   var icons = Quill.import('ui/icons');
