@@ -456,3 +456,7 @@ ul {
 .ql-editor {
   font-size: 2em;
 }
+
+.highlight {
+  background-color: #ddd; /* Change this to the color you want */
+}
