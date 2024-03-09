@@ -130,10 +130,11 @@ def get_cabinet(username):
 
 @bp.route('/save_content', methods=['POST'])
 def save_content():
-    # Get the content from the request
-    content = request.get_json()['content']
-
-    # Print the content to the console
-    print(content)
-
-    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
+  data = request.get_json()
+  content = data['content']
+  kevin = data['f_id']
+  print(content)
+  print(kevin)
+  # Now you have both the original content and the new content from the editor
+  # You can process them as needed
+  return 'Success!', 200

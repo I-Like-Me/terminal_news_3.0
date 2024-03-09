@@ -199,7 +199,7 @@ fileTreeElement.addEventListener('click', (event) => {
       .then(response => response.json())
       .then(data => {
         // Display the processed content in the right panel
-        displayTextInRightPanel(data.processed_content);
+        displayTextInRightPanel(data.processed_content, fileData.content);
       });
       document.getElementById('saveBtn').style.display = 'block';
     }
@@ -240,7 +240,7 @@ function getFilePath(element) {
   return path;
 }
 
-function displayTextInRightPanel(content) {
+function displayTextInRightPanel(content, file_id) {
   const rightPanel = document.getElementById('rightPanel');
   rightPanel.innerHTML = '<button id="saveBtn" style="display: block;">Save</button><div id="editor"></div>'; // Create a new div for the Quill editor
 
@@ -286,13 +286,16 @@ function displayTextInRightPanel(content) {
     // Get the editor's content
     const editorContent = quill.root.innerHTML;
 
-    // Make a POST request to the Flask server with the editor's content
+    // Make a POST request to the Flask server with the editor's content and the original file content
     fetch('/save_content', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ content: editorContent })
+      body: JSON.stringify({ 
+        content: editorContent,
+        f_id: file_id
+      })
     });
   });
 }
