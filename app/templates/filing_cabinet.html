@@ -28,7 +28,7 @@ const fileTreeData = JSON.parse('{{ cabinet | tojson | safe }}');
 
 function createFileTree(node, parentElement, isFirstLayer = true) {
   const listItem = document.createElement('li');
-  listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}" data-name="${node.name}">${node.name}</div>`;
+  listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}" data-name="${node.name}"><span class="arrow">${node.type === 'folder' ? '<i class="bi bi-caret-right-fill"></i>' : ''}</span>${node.name}</div>`;
 
   if (node.children) {
     const childList = document.createElement('ul');
@@ -39,25 +39,24 @@ function createFileTree(node, parentElement, isFirstLayer = true) {
     listItem.appendChild(childList);
 
     if (node.type === 'folder') {
-      const folderElement = listItem.querySelector('.folder');
-      folderElement.addEventListener('click', () => {
-        // Check if the folder is a top-level folder
-        if (!isFirstLayer) {
-          childList.style.display = childList.style.display === 'none' ? 'block' : 'none';
-          folderElement.classList.toggle('open');
-        }
+      const arrowElement = listItem.querySelector('.arrow');
+      arrowElement.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent the event from bubbling up to the folder
+        childList.style.display = childList.style.display === 'none' ? 'block' : 'none';
+        arrowElement.innerHTML = arrowElement.innerHTML === '<i class="bi bi-caret-right-fill"></i>' ? '<i class="bi bi-caret-down-fill"></i>' : '<i class="bi bi-caret-right-fill"></i>';
       });
 
       // Open the folder if it's in the first layer
       if (isFirstLayer) {
         childList.style.display = 'block';
-        folderElement.classList.add('open');
+        arrowElement.innerHTML = '<i class="bi bi-caret-down-fill"></i>';
       }
     }
   }
 
   parentElement.appendChild(listItem);
 }
+
 
 const fileTreeElement = document.getElementById('fileTree');
 createFileTree(fileTreeData, fileTreeElement);
@@ -181,6 +180,7 @@ function handleSearchResultClick(path) {
 fileTreeElement.addEventListener('click', (event) => {
   const target = event.target;
   const fileTypeElement = target.closest('.file');
+  const folderTypeElement = target.closest('.folder');
 
   const allItems = fileTreeElement.querySelectorAll('.file, .folder');
   allItems.forEach(item => {
@@ -210,6 +210,9 @@ fileTreeElement.addEventListener('click', (event) => {
       });
       document.getElementById('saveBtn').style.display = 'block';
     }
+  } else if (folderTypeElement) {
+    folderTypeElement.classList.add('highlight');
+    document.getElementById('right_stuff').style.display = 'none';
   } else {
     // Hide the save button if the clicked element is not a file
     document.getElementById('right_stuff').style.display = 'none';

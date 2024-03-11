@@ -310,24 +310,13 @@ ul {
 .folder {
     cursor: pointer;
     position: relative;
-    left: 30px;
-  }
-
-  .folder::before {
-    content: '\25B6'; /* Unicode character for a right arrow */
-    position: absolute;
-    left: -25px;
+    left: 0px;
   }
 
   .file {
     cursor: pointer;
-    padding-left: 30px;
+    padding-left: 0px;
   }
-
-/* Rotate the arrow when the folder is open */
-.folder.open::before {
-  transform: rotate(90deg);
-}
 
 /* Remove bullet points for the root folder */
 .root-folder {
@@ -464,3 +453,4 @@ ul {
 #saveBtn {
   margin-bottom: 23px;
 }
+
