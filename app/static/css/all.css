@@ -315,7 +315,7 @@ ul {
 
   .file {
     cursor: pointer;
-    padding-left: 0px;
+    padding-left: 12px;
   }
 
 /* Remove bullet points for the root folder */
@@ -447,6 +447,7 @@ ul {
 }
 
 .highlight {
+  color: #000000;
   background-color: #ddd; /* Change this to the color you want */
 }
 
