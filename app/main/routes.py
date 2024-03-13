@@ -136,3 +136,9 @@ def save_content():
     desired_file.content = new_content
     db.session.commit()
     return 'Success!', 200
+
+@bp.route('/update_json', methods=['POST'])
+def update_json():
+    new_json = request.get_json()
+    # Process the new JSON...
+    return jsonify(success=True)

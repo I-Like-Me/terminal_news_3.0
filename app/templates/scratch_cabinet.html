@@ -29,7 +29,6 @@
       <input type="text" id="newFileName" placeholder="Enter file name">
       <button onclick="confirmFile()">Confirm</button>
     </div>
-    <div id="editorContainer"></div> <!-- New container for the Quill.js editor -->
   </div>
 </div>
 
@@ -204,23 +203,16 @@ fileTreeElement.addEventListener('click', (event) => {
         displayTextInRightPanel(data.processed_content, fileData.content);
       });
       document.getElementById('saveBtn').style.display = 'block';
-      document.getElementById('addFile').style.display = 'none';
-      document.getElementById('addFolder').style.display = 'none';
     }
   } else if (folderTypeElement) {
     folderTypeElement.classList.add('highlight');
-    document.getElementById('saveBtn').style.display = 'none';
-    document.getElementById('addFile').style.display = 'block';
-    document.getElementById('addFolder').style.display = 'block';
-    selectedItem = findFileData(fileTreeData, getFilePath(folderTypeElement), '');
-    
-    // Add this code to hide the editor and save button
-    const editorContainer = document.getElementById('editorContainer');
-    editorContainer.innerHTML = '';
+    document.getElementById('right_stuff').style.display = 'none';
+    document.getElementById('addFileBtn').style.display = 'block';
+    document.getElementById('addFolderBtn').style.display = 'block';
   } else {
-    document.getElementById('saveBtn').style.display = 'none';
-    document.getElementById('addFile').style.display = 'block';
-    document.getElementById('addFolder').style.display = 'block';
+    document.getElementById('right_stuff').style.display = 'none';
+    document.getElementById('addFileBtn').style.display = 'none';
+    document.getElementById('addFolderBtn').style.display = 'none';
   }
 });
 
@@ -303,11 +295,9 @@ function getFilePath(element) {
   return path;
 }
 
-
-
 function displayTextInRightPanel(content, file_id) {
-  const editorContainer = document.getElementById('editorContainer');
-  editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
+  const rightPanel = document.getElementById('rightPanel');
+  rightPanel.innerHTML = '<div id="right_stuff"><button id="saveBtn" style="display: block;">Save</button><div id="editor"></div></div>';
   var icons = Quill.import('ui/icons');
 
   icons['ql-header ql-picker'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon class="ql-stroke" points="7 11 9 13 11 11 7 11"></polygon><polygon class="ql-stroke" points="7 7 9 5 11 7 7 7"></polygon></svg>';
