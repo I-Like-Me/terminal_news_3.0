@@ -20,16 +20,16 @@
   <div id="rightPanel">
     <button id="saveBtn" style="display: none;">Save</button>
     <div id="addFolder" style="display: none;">
-      <button onclick="addFolder()">Add Folder</button>
-      <input type="text" id="newFolderName" placeholder="Enter folder name">
-      <button onclick="confirmFolder()">Confirm</button>
+      <button onclick="showInputField('folder')">Add Folder</button>
+      <input type="text" id="newFolderName" placeholder="Enter folder name" style="display: none;">
+      <button id="confirmFolderBtn" onclick="confirmNewItem()" style="display: none;">Confirm</button>
     </div>
     <div id="addFile" style="display: none;">
-      <button onclick="addFile()">Add File</button>
-      <input type="text" id="newFileName" placeholder="Enter file name">
-      <button onclick="confirmFile()">Confirm</button>
+      <button onclick="showInputField('file')">Add File</button>
+      <input type="text" id="newFileName" placeholder="Enter file name" style="display: none;">
+      <button id="confirmFileBtn" onclick="confirmNewItem()" style="display: none;">Confirm</button>
     </div>
-    <div id="editorContainer"></div> <!-- New container for the Quill.js editor -->
+    <div id="editorContainer"></div> 
   </div>
 </div>
 
@@ -226,11 +226,26 @@ fileTreeElement.addEventListener('click', (event) => {
 
 function showInputField(type) {
   newItemType = type;
-  document.getElementById('inputField').style.display = 'block';
+  if (type === 'folder') {
+    document.getElementById('newFileName').style.display = 'none';
+    document.getElementById('confirmFileBtn').style.display = 'none';
+    document.getElementById('newFolderName').style.display = 'block';
+    document.getElementById('confirmFolderBtn').style.display = 'block';
+  } else if (type === 'file') {
+    document.getElementById('newFileName').style.display = 'block';
+    document.getElementById('confirmFileBtn').style.display = 'block';
+    document.getElementById('newFolderName').style.display = 'none';
+    document.getElementById('confirmFolderBtn').style.display = 'none';
+  }
 }
 
 function confirmNewItem() {
-  const newItemName = document.getElementById('newItemName').value;
+  let newItemName;
+  if (newItemType === 'folder') {
+    newItemName = document.getElementById('newFolderName').value;
+  } else if (newItemType === 'file') {
+    newItemName = document.getElementById('newFileName').value;
+  }
   if (newItemName && !doesNameExist(newItemName)) {
     const newItem = { type: newItemType, name: newItemName, children: [] };
     addItemToTree(newItem);
@@ -364,7 +379,8 @@ document.getElementById('addFile').addEventListener('click', function() {
   showInputField('file');
 });
 
-document.getElementById('confirmBtn').addEventListener('click', confirmNewItem);
+document.getElementById('confirmFolderBtn').addEventListener('click', confirmNewItem);
+document.getElementById('confirmFileBtn').addEventListener('click', confirmNewItem);
 
     const separator = document.getElementById('separator');
     const leftPanel = document.getElementById('leftPanel');
@@ -399,7 +415,7 @@ document.getElementById('confirmBtn').addEventListener('click', confirmNewItem);
         initialMouseX = clientX;
       }
     }
-
+    
     function stopResize() {
       isResizing = false;
       document.body.style.userSelect = ''; 
