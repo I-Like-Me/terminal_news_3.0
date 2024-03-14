@@ -36,7 +36,7 @@
 
 <script>
 const fileTreeData = JSON.parse('{{ cabinet | tojson | safe }}');
-
+console.log(fileTreeData);
 function createFileTree(node, parentElement, isFirstLayer = true) {
   const listItem = document.createElement('li');
   listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}" data-name="${node.name}"><span class="arrow">${node.type === 'folder' ? '<i class="bi bi-caret-right-fill"></i>' : ''}</span>${node.name}</div>`;
@@ -185,7 +185,7 @@ fileTreeElement.addEventListener('click', (event) => {
     const filePath = getFilePath(fileTypeElement);
     const fileData = findFileData(fileTreeData, filePath, '');
     fileTypeElement.classList.add('highlight');
-    selectedElement = fileTypeElement; // Set selectedElement
+    selectedElement = fileTypeElement;
     if (fileData && fileData.content) {
       fetch('/process_file_content', {
         method: 'POST',
@@ -204,11 +204,11 @@ fileTreeElement.addEventListener('click', (event) => {
     }
   } else if (folderTypeElement) {
     folderTypeElement.classList.add('highlight');
-    selectedElement = folderTypeElement; // Set selectedElement
+    selectedElement = folderTypeElement;
     document.getElementById('saveBtn').style.display = 'none';
     document.getElementById('addFile').style.display = 'block';
     document.getElementById('addFolder').style.display = 'block';
-    selectedItem = findFileData(fileTreeData, getFilePath(folderTypeElement), '');
+    selectedItem = selectedElement;
     const editorContainer = document.getElementById('editorContainer');
     editorContainer.innerHTML = '';
   } else {
@@ -216,6 +216,7 @@ fileTreeElement.addEventListener('click', (event) => {
     document.getElementById('addFile').style.display = 'block';
     document.getElementById('addFolder').style.display = 'block';
   }
+  console.log(selectedElement);
 });
 
 console.log(selectedItem);
@@ -252,13 +253,19 @@ function confirmNewItem(event) {
   }
   
   const newItem = { type: newItemType, name: newItemName, children: [] };
+  console.log(newItem);
+
+  console.log("About to call addItemToTree");
   addItemToTree(newItem);
+  console.log("Finished calling addItemToTree");
+
+  console.log("About to call updateJsonFile");
   updateJsonFile();
+  console.log("Finished calling updateJsonFile");
 }
 
 
 function doesNameExist(name) {
-  console.log('checking name');
   if (selectedElement) {
     const siblings = selectedElement.nextElementSibling.children;
     for (let i = 0; i < siblings.length; i++) {
@@ -273,30 +280,45 @@ function doesNameExist(name) {
 function addItemToTree(item) {
   const listItem = document.createElement('li');
   listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
-  selectedItem.nextElementSibling.appendChild(listItem);
-  selectedItem.children.push(item);
+  console.log(selectedItem);
+  selectedItem.appendChild(listItem);
+  const path = getFilePath(selectedElement);
+  const pathArray = path.split(' > ');
+  let currentNode = fileTreeData;
+  for (let i = 0; i < pathArray.length; i++) {
+    const child = currentNode.children.find(node => node.name === pathArray[i]);
+    if (child) {
+      currentNode = child;
+    }
+  }
+  currentNode.children.push(item);
 }
+
 
 function updateJsonFile() {
   const updatedJson = JSON.stringify(fileTreeData);
-  console.log('data');
+  console.log(updatedJson);
   fetch('/update_json', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ json: updatedJson })
-  }).then(response => {
+    body: JSON.stringify(fileTreeData)
+  })
+  .then(response => {
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     return response.json();
-  }).then(data => {
+  })
+  .then(data => {
     console.log('Success:', data);
-  }).catch(error => {
+  })
+  .catch(error => {
     console.error('Error:', error);
   });
 }
+
 
 function findFileData(node, filePath, path) {
   const currentPath = path ? `${path} > ${node.name}` : node.name;

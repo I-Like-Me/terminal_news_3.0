@@ -11,8 +11,6 @@ import markdown
 import json
 
 
-
-
 @bp.route('/', methods=["POST", "GET"])
 @bp.route('/index', methods=["POST", "GET"])
 def index():
@@ -140,6 +138,6 @@ def save_content():
 @bp.route('/update_json', methods=['POST'])
 def update_json():
     data = request.get_json()
-    print(data['json'])
+    print(data)
     return {'status': 'success'}, 200
 
