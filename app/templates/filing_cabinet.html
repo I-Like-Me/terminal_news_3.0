@@ -169,7 +169,7 @@ function handleSearchResultClick(path) {
 
 let selectedItem;
 let newItemType;
-let selectedElement; // New variable
+let selectedElement; 
 
 fileTreeElement.addEventListener('click', (event) => {
   const target = event.target;
@@ -264,7 +264,6 @@ function confirmNewItem(event) {
   console.log("Finished calling updateJsonFile");
 }
 
-
 function doesNameExist(name) {
   if (selectedElement) {
     const siblings = selectedElement.nextElementSibling.children;
@@ -291,8 +290,14 @@ function addItemToTree(item) {
       currentNode = child;
     }
   }
-  currentNode.children.push(item);
+  currentNode.children.push(item); // Append the new item to the currentNode's children array
+  console.log('---------');
+  console.log(currentNode);
+  console.log('---------');
+  fileTreeElement.innerHTML = '';
+  createFileTree(fileTreeData, fileTreeElement);
 }
+
 
 
 function updateJsonFile() {
@@ -318,7 +323,6 @@ function updateJsonFile() {
     console.error('Error:', error);
   });
 }
-
 
 function findFileData(node, filePath, path) {
   const currentPath = path ? `${path} > ${node.name}` : node.name;

@@ -112,6 +112,7 @@ def create_char(asset):
 @login_required
 def filing(username):
     user = User.query.filter_by(username=username).first_or_404()
+    print(user.my_documents)
     return render_template(f'filing_cabinet.html', cabinet=user.my_documents)
 
 @bp.route('/process_file_content', methods=['POST'])
