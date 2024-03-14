@@ -169,6 +169,7 @@ function handleSearchResultClick(path) {
 
 let selectedItem;
 let newItemType;
+let selectedElement; // New variable
 
 fileTreeElement.addEventListener('click', (event) => {
   const target = event.target;
@@ -184,7 +185,7 @@ fileTreeElement.addEventListener('click', (event) => {
     const filePath = getFilePath(fileTypeElement);
     const fileData = findFileData(fileTreeData, filePath, '');
     fileTypeElement.classList.add('highlight');
-
+    selectedElement = fileTypeElement; // Set selectedElement
     if (fileData && fileData.content) {
       fetch('/process_file_content', {
         method: 'POST',
@@ -203,6 +204,7 @@ fileTreeElement.addEventListener('click', (event) => {
     }
   } else if (folderTypeElement) {
     folderTypeElement.classList.add('highlight');
+    selectedElement = folderTypeElement; // Set selectedElement
     document.getElementById('saveBtn').style.display = 'none';
     document.getElementById('addFile').style.display = 'block';
     document.getElementById('addFolder').style.display = 'block';
@@ -216,6 +218,7 @@ fileTreeElement.addEventListener('click', (event) => {
   }
 });
 
+console.log(selectedItem);
 function showInputField(type) {
   newItemType = type;
   if (type === 'folder') {
@@ -239,7 +242,6 @@ function confirmNewItem(event) {
   } else if (newItemType === 'file' && document.getElementById('newFileName').style.display !== 'none') {
     newItemName = document.getElementById('newFileName').value;
   }
-  console.log(newItemName);
   if (!newItemName) {
     alert('The name field is empty. Please enter a name.');
     return;
@@ -256,10 +258,13 @@ function confirmNewItem(event) {
 
 
 function doesNameExist(name) {
-  const siblings = selectedItem.nextElementSibling.children;
-  for (let i = 0; i < siblings.length; i++) {
-    if (siblings[i].firstElementChild.getAttribute('data-name').toLowerCase() === name.toLowerCase()) {
-      return true;
+  console.log('checking name');
+  if (selectedElement) {
+    const siblings = selectedElement.nextElementSibling.children;
+    for (let i = 0; i < siblings.length; i++) {
+      if (siblings[i].firstElementChild.getAttribute('data-name').toLowerCase() === name.toLowerCase()) {
+        return true;
+      }
     }
   }
   return false;
