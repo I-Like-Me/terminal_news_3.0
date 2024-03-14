@@ -139,6 +139,7 @@ def save_content():
 
 @bp.route('/update_json', methods=['POST'])
 def update_json():
-    new_json = request.get_json()
-    # Process the new JSON...
-    return jsonify(success=True)
+    data = request.get_json()
+    print(data['json'])
+    return {'status': 'success'}, 200
+

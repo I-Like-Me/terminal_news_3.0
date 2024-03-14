@@ -22,12 +22,13 @@
     <div id="addFolder" style="display: none;">
       <button onclick="showInputField('folder')">Add Folder</button>
       <input type="text" id="newFolderName" placeholder="Enter folder name" style="display: none;">
-      <button id="confirmFolderBtn" onclick="confirmNewItem()" style="display: none;">Confirm</button>
+      <button id="confirmFolderBtn" onclick="confirmNewItem(event)" style="display: none;">Confirm</button>
     </div>
     <div id="addFile" style="display: none;">
       <button onclick="showInputField('file')">Add File</button>
       <input type="text" id="newFileName" placeholder="Enter file name" style="display: none;">
-      <button id="confirmFileBtn" onclick="confirmNewItem()" style="display: none;">Confirm</button>
+      <button id="confirmFileBtn" onclick="confirmNewItem(event)" style="display: none;">Confirm</button>
+      
     </div>
     <div id="editorContainer"></div> 
   </div>
@@ -112,7 +113,6 @@ function runSearch() {
   }
   const searchResultsData = searchInTree(fileTreeData, '');
   const sortedResults = searchResultsData.sort((a, b) => b.confidence - a.confidence);
-
   sortedResults.slice(0, 5).forEach(result => {
     const listItem = document.createElement('li');
     listItem.textContent = result.path;
@@ -144,12 +144,10 @@ function handleSearchResultClick(path) {
       currentNode = child;
       const element = currentElement.querySelector(`[data-name="${currentNode.name}"]`);
       if (element) {
-        
         if (currentNode.type === 'folder' && !element.classList.contains('open')) {
           element.classList.add('open');
           element.nextElementSibling.style.display = 'block';
         }
-
         currentElement = element.nextElementSibling;
       }
     }
@@ -159,13 +157,11 @@ function handleSearchResultClick(path) {
   if (lastElement) {
     lastElement.classList.add('highlight');
   }
-
   const element = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
   if (element) {
     const container = fileTreeContainer.querySelector('ul');
     container.scrollTop = element.offsetTop - container.offsetTop;
   }
-
   fileTreeContainer.style.display = 'block';
   searchContainer.style.display = 'none';
   toggleBtn.textContent = 'Search';
@@ -178,7 +174,6 @@ fileTreeElement.addEventListener('click', (event) => {
   const target = event.target;
   const fileTypeElement = target.closest('.file');
   const folderTypeElement = target.closest('.folder');
-
   const allItems = fileTreeElement.querySelectorAll('.file, .folder');
   allItems.forEach(item => {
     item.classList.remove('highlight');
@@ -188,7 +183,6 @@ fileTreeElement.addEventListener('click', (event) => {
     const fileName = fileTypeElement.getAttribute('data-name');
     const filePath = getFilePath(fileTypeElement);
     const fileData = findFileData(fileTreeData, filePath, '');
-
     fileTypeElement.classList.add('highlight');
 
     if (fileData && fileData.content) {
@@ -213,8 +207,6 @@ fileTreeElement.addEventListener('click', (event) => {
     document.getElementById('addFile').style.display = 'block';
     document.getElementById('addFolder').style.display = 'block';
     selectedItem = findFileData(fileTreeData, getFilePath(folderTypeElement), '');
-    
-    // Add this code to hide the editor and save button
     const editorContainer = document.getElementById('editorContainer');
     editorContainer.innerHTML = '';
   } else {
@@ -239,19 +231,29 @@ function showInputField(type) {
   }
 }
 
-function confirmNewItem() {
+function confirmNewItem(event) {
+  event.stopPropagation();
   let newItemName;
-  if (newItemType === 'folder') {
+  if (newItemType === 'folder' && document.getElementById('newFolderName').style.display !== 'none') {
     newItemName = document.getElementById('newFolderName').value;
-  } else if (newItemType === 'file') {
+  } else if (newItemType === 'file' && document.getElementById('newFileName').style.display !== 'none') {
     newItemName = document.getElementById('newFileName').value;
   }
-  if (newItemName && !doesNameExist(newItemName)) {
-    const newItem = { type: newItemType, name: newItemName, children: [] };
-    addItemToTree(newItem);
-    updateJsonFile();
+  console.log(newItemName);
+  if (!newItemName) {
+    alert('The name field is empty. Please enter a name.');
+    return;
   }
+  if (doesNameExist(newItemName)) {
+    alert('A folder or file with this name already exists. Please enter a unique name.');
+    return;
+  }
+  
+  const newItem = { type: newItemType, name: newItemName, children: [] };
+  addItemToTree(newItem);
+  updateJsonFile();
 }
+
 
 function doesNameExist(name) {
   const siblings = selectedItem.nextElementSibling.children;
@@ -272,7 +274,7 @@ function addItemToTree(item) {
 
 function updateJsonFile() {
   const updatedJson = JSON.stringify(fileTreeData);
-
+  console.log('data');
   fetch('/update_json', {
     method: 'POST',
     headers: {
@@ -317,8 +319,6 @@ function getFilePath(element) {
   }
   return path;
 }
-
-
 
 function displayTextInRightPanel(content, file_id) {
   const editorContainer = document.getElementById('editorContainer');
@@ -371,26 +371,14 @@ function displayTextInRightPanel(content, file_id) {
   });
 }
 
-document.getElementById('addFolder').addEventListener('click', function() {
-  showInputField('folder');
-});
-
-document.getElementById('addFile').addEventListener('click', function() {
-  showInputField('file');
-});
-
-document.getElementById('confirmFolderBtn').addEventListener('click', confirmNewItem);
-document.getElementById('confirmFileBtn').addEventListener('click', confirmNewItem);
 
     const separator = document.getElementById('separator');
     const leftPanel = document.getElementById('leftPanel');
     const rightPanel = document.getElementById('rightPanel');
     let isResizing = false;
     let initialMouseX;
-
     separator.addEventListener('mousedown', startResize);
     separator.addEventListener('touchstart', startResize);
-
     function startResize(event) {
       isResizing = true;
       initialMouseX = event.clientX || event.touches[0].clientX; 
@@ -423,5 +411,6 @@ document.getElementById('confirmFileBtn').addEventListener('click', confirmNewIt
       document.removeEventListener('touchmove', handleMouseMove);
     }
 </script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 {% endblock %}
