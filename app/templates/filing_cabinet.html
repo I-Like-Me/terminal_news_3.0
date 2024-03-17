@@ -35,8 +35,24 @@
 </div>
 
 <script>
-const fileTreeData = JSON.parse('{{ cabinet | tojson | safe }}');
-console.log(fileTreeData);
+cur_user = '{{ user_name }}'
+console.log(cur_user);
+let fileTreeData;
+const fileTreeElement = document.getElementById('fileTree');
+window.onload = function() {
+  var username = cur_user; // replace with the actual username
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      fileTreeData = JSON.parse(this.responseText);
+      console.log(fileTreeData);
+      createFileTree(fileTreeData, fileTreeElement);
+    }
+  };
+  xhttp.open("GET", "/get_cabinet/" + username, true);
+  xhttp.send();
+}
+
 function createFileTree(node, parentElement, isFirstLayer = true) {
   const listItem = document.createElement('li');
   listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}" data-name="${node.name}"><span class="arrow">${node.type === 'folder' ? '<i class="bi bi-caret-right-fill"></i>' : ''}</span>${node.name}</div>`;
@@ -65,9 +81,6 @@ function createFileTree(node, parentElement, isFirstLayer = true) {
   }
   parentElement.appendChild(listItem);
 }
-
-const fileTreeElement = document.getElementById('fileTree');
-createFileTree(fileTreeData, fileTreeElement);
 
 function toggleFileTreeSearch() {
   const fileTreeContainer = document.getElementById('fileTreeContainer');
@@ -299,10 +312,7 @@ function addItemToTree(item) {
 }
 
 
-
 function updateJsonFile() {
-  const updatedJson = JSON.stringify(fileTreeData);
-  console.log(updatedJson);
   fetch('/update_json', {
     method: 'POST',
     headers: {
@@ -323,6 +333,7 @@ function updateJsonFile() {
     console.error('Error:', error);
   });
 }
+
 
 function findFileData(node, filePath, path) {
   const currentPath = path ? `${path} > ${node.name}` : node.name;

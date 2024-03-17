@@ -5,9 +5,10 @@ from app import db
 from app.models import User, Character
 from app.auth.forms import LoginForm
 from app.main.forms import PickNPCs, PickTopics, AssetSel
-from app.main.toolbox import Converters, Collectors, Builders
+from app.main.toolbox import Converters, Collectors, Builders, Organizer
 from app.main import bp
 import markdown
+from collections import OrderedDict
 import json
 
 
@@ -113,7 +114,7 @@ def create_char(asset):
 def filing(username):
     user = User.query.filter_by(username=username).first_or_404()
     print(user.my_documents)
-    return render_template(f'filing_cabinet.html', cabinet=user.my_documents)
+    return render_template('filing_cabinet.html', user_name=user.username)
 
 @bp.route('/process_file_content', methods=['POST'])
 def process_file_content():
@@ -121,8 +122,7 @@ def process_file_content():
     file = Collectors.get_file(content)
     return jsonify(processed_content=file.content)
 
-@bp.route('/filing/<username>', methods=['GET'])
-@login_required
+@bp.route('/get_cabinet/<username>', methods=['GET'])
 def get_cabinet(username):
     user = User.query.filter_by(username=username).first_or_404()
     return jsonify(user.my_documents)
@@ -139,6 +139,9 @@ def save_content():
 @bp.route('/update_json', methods=['POST'])
 def update_json():
     data = request.get_json()
-    print(data)
+    order = ['name', 'type', 'content', 'children']
+    ready_data = Organizer.reorder_keys(data, order)
+    print(ready_data)
     return {'status': 'success'}, 200
+
 
