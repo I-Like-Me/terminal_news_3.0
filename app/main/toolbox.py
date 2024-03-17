@@ -122,5 +122,11 @@ class Setter:
         return dict_t
 
 class Organizer:
+
     def reorder_keys(d, key_order):
-        return {k: Organizer.reorder_keys(d[k], key_order) if isinstance(d.get(k), dict) else d.get(k) for k in key_order if k in d}
+        if isinstance(d, dict):
+            return {k: Organizer.reorder_keys(d.get(k), key_order) for k in key_order if k in d}
+        elif isinstance(d, list):
+            return [Organizer.reorder_keys(x, key_order) for x in d]
+        else:
+            return d
