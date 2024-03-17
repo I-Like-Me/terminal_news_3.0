@@ -248,6 +248,8 @@ function showInputField(type) {
   }
 }
 
+
+
 function confirmNewItem(event) {
   event.stopPropagation();
   let newItemName;
@@ -290,13 +292,14 @@ function doesNameExist(name) {
   return false;
 }
 
+let itemPath
 function addItemToTree(item) {
   const listItem = document.createElement('li');
   listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
   console.log(selectedItem);
   selectedItem.appendChild(listItem);
-  const path = getFilePath(selectedElement);
-  const pathArray = path.split(' > ');
+  itemPath = getFilePath(selectedElement);
+  const pathArray = itemPath.split(' > ');
   let currentNode = fileTreeData;
   for (let i = 0; i < pathArray.length; i++) {
     const child = currentNode.children.find(node => node.name === pathArray[i]);
@@ -314,12 +317,18 @@ function addItemToTree(item) {
 
 
 function updateJsonFile() {
+  
+  let dataToSend = {
+    updatedJSON: fileTreeData,
+    changeLocation: itemPath
+  };
+
   fetch('/update_json', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(fileTreeData)
+    body: JSON.stringify(dataToSend)
   })
   .then(response => {
     if (!response.ok) {

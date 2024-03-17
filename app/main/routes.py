@@ -140,8 +140,10 @@ def save_content():
 def update_json():
     data = request.get_json()
     order = ['name', 'type', 'content', 'children']
-    ready_data = Organizer.reorder_keys(data, order)
+    ready_data = Organizer.reorder_keys(data['updatedJSON'], order)
     print(ready_data)
+    print(data['changeLocation'])
     return {'status': 'success'}, 200
 
 
+  
