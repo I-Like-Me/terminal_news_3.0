@@ -251,10 +251,13 @@ function showInputField(type) {
 function confirmNewItem(event) {
   event.stopPropagation();
   let newItemName;
+  let newItem;
   if (newItemType === 'folder' && document.getElementById('newFolderName').style.display !== 'none') {
     newItemName = document.getElementById('newFolderName').value;
+    newItem = { name: newItemName, type: newItemType, children: [] };
   } else if (newItemType === 'file' && document.getElementById('newFileName').style.display !== 'none') {
     newItemName = document.getElementById('newFileName').value;
+    newItem = { name: newItemName, type: newItemType, content: 'Type Here' };
   }
   if (!newItemName) {
     alert('The name field is empty. Please enter a name.');
@@ -264,8 +267,6 @@ function confirmNewItem(event) {
     alert('A folder or file with this name already exists. Please enter a unique name.');
     return;
   }
-  
-  const newItem = { type: newItemType, name: newItemName, children: [] };
   console.log(newItem);
 
   console.log("About to call addItemToTree");
