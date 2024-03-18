@@ -2,14 +2,13 @@ from datetime import datetime, timezone
 from flask import render_template, flash, redirect, url_for, request, g, current_app, jsonify
 from flask_login import current_user, login_required
 from app import db
-from app.models import User, Character
+from app.models import User, Character, File
 from app.auth.forms import LoginForm
 from app.main.forms import PickNPCs, PickTopics, AssetSel
-from app.main.toolbox import Converters, Collectors, Builders, Organizer
+from app.main.toolbox import Converters, Collectors, Builders, Organizer, JsonTools
 from app.main import bp
 import markdown
 from collections import OrderedDict
-import json
 
 
 @bp.route('/', methods=["POST", "GET"])
@@ -141,8 +140,20 @@ def update_json():
     data = request.get_json()
     order = ['name', 'type', 'content', 'children']
     ready_data = Organizer.reorder_keys(data['updatedJSON'], order)
-    print(ready_data)
-    print(data['changeLocation'])
+    if data['itemType'] == 'folder':
+        user = User.query.filter_by(username=data['author']).first_or_404()
+        user.my_documents = ready_data
+        db.session.commit()
+    if data['itemType'] == 'file':
+        pathTuple = JsonTools.find_path(ready_data, 'Type Here', path=())
+        pathString = JsonTools.path_to_string(pathTuple)
+        new_file = File(name=data['itemName'], path=pathString, content='Type Here')
+        db.session.add(new_file)
+        db.session.commit()
+        user = User.query.filter_by(username=data['author']).first_or_404()
+        JsonTools.update_nested_dict(ready_data, pathTuple, new_file.id)
+        user.my_documents = ready_data
+        db.session.commit()
     return {'status': 'success'}, 200
 
 

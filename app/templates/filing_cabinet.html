@@ -248,11 +248,9 @@ function showInputField(type) {
   }
 }
 
-
-
+let newItemName;
 function confirmNewItem(event) {
   event.stopPropagation();
-  let newItemName;
   let newItem;
   if (newItemType === 'folder' && document.getElementById('newFolderName').style.display !== 'none') {
     newItemName = document.getElementById('newFolderName').value;
@@ -319,7 +317,10 @@ function addItemToTree(item) {
 function updateJsonFile() {
   
   let dataToSend = {
+    author: cur_user,
     updatedJSON: fileTreeData,
+    itemName: newItemName,
+    itemType: newItemType,
     changeLocation: itemPath
   };
 

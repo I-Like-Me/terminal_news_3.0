@@ -162,14 +162,13 @@ class JsonTools:
                 json_obj = json_obj.get(key)
         return json_obj
     
-    def replace_value_by_path(json_obj, path, new_value):
-        *path, last_key = path
-        for key in path:
-            if isinstance(key, int):
-                json_obj = json_obj[key]
+    def update_nested_dict(d, path, value):
+        for p in path[:-1]:
+            if isinstance(p, int):
+                d = d[p]
             else:
-                json_obj = json_obj.get(key)
-        if isinstance(last_key, int):
-            json_obj[last_key] = new_value
+                d = d.get(p)
+        if isinstance(path[-1], int):
+            d[path[-1]] = value
         else:
-            json_obj[last_key] = new_value  
+            d[path[-1]] = value
