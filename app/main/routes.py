@@ -154,7 +154,7 @@ def add_to_json():
         JsonTools.update_nested_dict(ready_data, pathTuple, new_file.id)
         user.my_documents = ready_data
         db.session.commit()
-    return {'status': 'success'}, 200
+    return jsonify(user.my_documents)
 
 
   
