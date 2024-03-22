@@ -348,9 +348,7 @@ function addItemToTree(item) {
 }
 
 
-
 async function addItemToJsonFile() {
-  
   let dataToSend = {
     author: cur_user,
     updatedJSON: fileTreeData,
@@ -376,13 +374,32 @@ async function addItemToJsonFile() {
   fileTreeData = data;
   fileTreeElement.innerHTML = '';
   createFileTree(fileTreeData, fileTreeElement, true, newItemName);
-
   // Simulate a click on the newly added item
   const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
   if (newItemElement) {
     newItemElement.click();
   }
+
+  // Open each folder in the path to the new item
+  openPathToNewItem(itemPath);
 }
+
+function openPathToNewItem(path) {
+  const pathArray = path.split(' > ');
+  let currentElement = fileTreeElement;
+
+  pathArray.forEach(name => {
+    const childElement = currentElement.querySelector(`div[data-name="${name}"]`);
+    if (childElement) {
+      if (childElement.classList.contains('folder')) {
+        childElement.classList.add('open');
+        childElement.nextElementSibling.style.display = 'block';
+      }
+      currentElement = childElement.nextElementSibling;
+    }
+  });
+}
+
 
 
 function findFileData(node, filePath, path) {
