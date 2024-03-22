@@ -268,14 +268,7 @@ function showInputField(type) {
   } else if (type === 'delete_folder') {
     const rightPanel = document.getElementById('rightPanel');
     const confirmWindow = document.createElement('div');
-    confirmWindow.style.position = 'absolute';
-    confirmWindow.style.width = '300px';
-    confirmWindow.style.height = '200px';
-    confirmWindow.style.backgroundColor = '#fff';
-    confirmWindow.style.border = '30px solid #000';
-    confirmWindow.style.top = '50%';
-    confirmWindow.style.left = '50%';
-    confirmWindow.style.transform = 'translate(-50%, -50%)';
+    confirmWindow.className = 'deleteConfirm';
     confirmWindow.innerHTML = `
       <p>Are you sure you want to delete this item?</p>
       <button onclick="deleteFolder()">Confirm</button>
@@ -358,7 +351,6 @@ function addItemToTree(item) {
   }
   currentNode.children.push(item); 
 }
-
 
 async function addItemToJsonFile() {
   let dataToSend = {
