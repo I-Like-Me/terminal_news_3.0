@@ -224,6 +224,10 @@ fileTreeElement.addEventListener('click', (event) => {
       document.getElementById('saveBtn').style.display = 'block';
       document.getElementById('folder_buttons').style.display = 'none';
       document.getElementById('folder_fields').style.display = 'none';
+      document.getElementById('newFileName').style.display = 'none';
+      document.getElementById('confirmFileBtn').style.display = 'none';
+      document.getElementById('newFolderName').style.display = 'none';
+      document.getElementById('confirmFolderBtn').style.display = 'none';
     }
   } else if (folderTypeElement) {
     folderTypeElement.classList.add('highlight');
@@ -231,6 +235,10 @@ fileTreeElement.addEventListener('click', (event) => {
     document.getElementById('saveBtn').style.display = 'none';
     document.getElementById('folder_buttons').style.display = 'block';
     document.getElementById('folder_fields').style.display = 'block';
+    document.getElementById('newFileName').style.display = 'none';
+    document.getElementById('confirmFileBtn').style.display = 'none';
+    document.getElementById('newFolderName').style.display = 'none';
+    document.getElementById('confirmFolderBtn').style.display = 'none';
     selectedItem = selectedElement;
     const editorContainer = document.getElementById('editorContainer');
     editorContainer.innerHTML = '';
@@ -238,6 +246,10 @@ fileTreeElement.addEventListener('click', (event) => {
     document.getElementById('saveBtn').style.display = 'none';
     document.getElementById('folder_buttons').style.display = 'block';
     document.getElementById('folder_fields').style.display = 'block';
+    document.getElementById('newFileName').style.display = 'none';
+    document.getElementById('confirmFileBtn').style.display = 'none';
+    document.getElementById('newFolderName').style.display = 'none';
+    document.getElementById('confirmFolderBtn').style.display = 'none';
   }
 });
 
@@ -372,15 +384,16 @@ async function addItemToJsonFile() {
   const data = await response.json();
   
   fileTreeData = data;
+  document.getElementById('newFileName').style.display = 'none';
+  document.getElementById('confirmFileBtn').style.display = 'none';
+  document.getElementById('newFolderName').style.display = 'none';
+  document.getElementById('confirmFolderBtn').style.display = 'none';
   fileTreeElement.innerHTML = '';
   createFileTree(fileTreeData, fileTreeElement, true, newItemName);
-  // Simulate a click on the newly added item
   const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
   if (newItemElement) {
     newItemElement.click();
   }
-
-  // Open each folder in the path to the new item
   openPathToNewItem(itemPath);
 }
 
@@ -399,8 +412,6 @@ function openPathToNewItem(path) {
     }
   });
 }
-
-
 
 function findFileData(node, filePath, path) {
   const currentPath = path ? `${path} > ${node.name}` : node.name;
