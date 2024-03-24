@@ -24,7 +24,7 @@
             <button onclick="showInputField('folder')">Add Folder</button>
             <button onclick="showInputField('file')">Add File</button>
             <button onclick="showInputField('move')">Move Folder</button>
-            <button style="background-color: red;" onclick="showInputField('delete_folder')">Delete Folder</button>
+            <button style="background-color: red;" onclick="showInputField('delete_folder', event)">Delete Folder</button>
         </div>   
     </div>
     <div id="folder_fields" style="display: none;">
@@ -253,7 +253,7 @@ fileTreeElement.addEventListener('click', (event) => {
   }
 });
 
-function showInputField(type) {
+function showInputField(type, event) {
   newItemType = type;
   if (type === 'folder') {
     document.getElementById('newFileName').style.display = 'none';
@@ -275,6 +275,15 @@ function showInputField(type) {
       <button onclick="this.parentElement.remove()">Cancel</button>
     `;
     rightPanel.appendChild(confirmWindow);
+    document.addEventListener('click', function onClickOutside(event) {
+      if (!confirmWindow.contains(event.target)) {
+        confirmWindow.remove();
+        document.removeEventListener('click', onClickOutside);
+      }
+    });
+    if (event) {
+      event.stopPropagation();
+    }
   }
 }
 
