@@ -191,8 +191,13 @@ function handleSearchResultClick(path) {
 }
 
 let selectedItem;
+let newItemName;
 let newItemType;
 let selectedElement; 
+let itemPath;
+let parentPath;
+let parentItemName;
+const removeFileList = [];
 
 fileTreeElement.addEventListener('click', (event) => {
   const target = event.target;
@@ -205,7 +210,7 @@ fileTreeElement.addEventListener('click', (event) => {
 
   if (fileTypeElement) {
     const fileName = fileTypeElement.getAttribute('data-name');
-    const filePath = getFilePath(fileTypeElement);
+    const filePath = getItemPath(fileTypeElement);
     const fileData = findFileData(fileTreeData, filePath, '');
     fileTypeElement.classList.add('highlight');
     selectedElement = fileTypeElement;
@@ -271,7 +276,7 @@ function showInputField(type, event) {
     confirmWindow.className = 'deleteConfirm';
     confirmWindow.innerHTML = `
       <p>Are you sure you want to delete this item?</p>
-      <button onclick="deleteFolder()">Confirm</button>
+      <button onclick="deleteItem()">Confirm</button>
       <button onclick="this.parentElement.remove()">Cancel</button>
     `;
     rightPanel.appendChild(confirmWindow);
@@ -287,29 +292,6 @@ function showInputField(type, event) {
   }
 }
 
-function deleteFolder() {
-  const folderPath = getFilePath(selectedElement);
-  deleteItemFromJson(fileTreeData, folderPath.split(' > '));
-  fileTreeElement.innerHTML = '';
-  createFileTree(fileTreeData, fileTreeElement);
-
-}
-
-function deleteItemFromJson(node, pathArray) {
-  if (pathArray.length === 1) {
-    const index = node.children.findIndex(child => child.name === pathArray[0]);
-    if (index !== -1) {
-      node.children.splice(index, 1);
-    }
-  } else {
-    const nextNode = node.children.find(child => child.name === pathArray[0]);
-    if (nextNode) {
-      deleteItemFromJson(nextNode, pathArray.slice(1));
-    }
-  }
-}
-
-let newItemName;
 function confirmNewItem(event) {
   event.stopPropagation();
   let newItem;
@@ -329,7 +311,7 @@ function confirmNewItem(event) {
     return;
   }
   addItemToTree(newItem);
-  addItemToJsonFile();
+  updateJsonFile();
 }
 
 function doesNameExist(name) {
@@ -344,33 +326,19 @@ function doesNameExist(name) {
   return false;
 }
 
-let itemPath
-function addItemToTree(item) {
-  const listItem = document.createElement('li');
-  listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
-  selectedItem.appendChild(listItem);
-  itemPath = getFilePath(selectedElement);
-  const pathArray = itemPath.split(' > ');
-  let currentNode = fileTreeData;
-  for (let i = 0; i < pathArray.length; i++) {
-    const child = currentNode.children.find(node => node.name === pathArray[i]);
-    if (child) {
-      currentNode = child;
-    }
-  }
-  currentNode.children.push(item); 
-}
-
-async function addItemToJsonFile() {
+async function updateJsonFile() {
   let dataToSend = {
     author: cur_user,
     updatedJSON: fileTreeData,
     itemName: newItemName,
     itemType: newItemType,
-    changeLocation: itemPath
+    changeLocation: itemPath,
+    parentName: parentItemName,
+    fileList: removeFileList,
+    parentLocation: parentPath
   };
 
-  const response = await fetch('/add_to_json', {
+  const response = await fetch('/update_json', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -395,10 +363,84 @@ async function addItemToJsonFile() {
   if (newItemElement) {
     newItemElement.click();
   }
-  openPathToNewItem(itemPath);
+  openPathToItem(itemPath);
 }
 
-function openPathToNewItem(path) {
+function addItemToTree(item) {
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
+  selectedItem.appendChild(listItem);
+  itemPath = getItemPath(selectedElement);
+  const pathArray = itemPath.split(' > ');
+  let currentNode = fileTreeData;
+  for (let i = 0; i < pathArray.length; i++) {
+    const child = currentNode.children.find(node => node.name === pathArray[i]);
+    if (child) {
+      currentNode = child;
+    }
+  }
+  currentNode.children.push(item); 
+}
+
+function getParentItem(item) {
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
+  selectedItem.appendChild(listItem);
+  itemPath = getItemPath(selectedElement);
+}
+
+function deleteItem() {
+  console.log('fewdwvfs');
+  itemPath = getItemPath(selectedElement);
+  
+  pathArray = itemPath.split(' > ');
+  console.log(pathArray);
+  let currentNode = fileTreeData;
+  for (let i = 0; i < pathArray.length; i++) {
+    const child = currentNode.children.find(node => node.name === pathArray[i]);
+    if (child) {
+      currentNode = child;
+    }
+  }
+  // Recursively check all children of the node being deleted
+  function checkChildren(node) {
+    if (node.type === 'file') {
+      removeFileList.push(node.content);
+    } else if (node.children) {
+      node.children.forEach(checkChildren);
+    }
+  }
+  checkChildren(currentNode);
+  deleteItemFromJson(fileTreeData, pathArray);
+  fileTreeElement.innerHTML = '';
+  createFileTree(fileTreeData, fileTreeElement);
+}
+
+function deleteItemFromJson(node, pathArray) {
+  if (pathArray.length === 1) {
+    const index = node.children.findIndex(child => child.name === pathArray[0]);
+    if (index !== -1) {
+      if (node.children[index].type === 'folder') {
+        node.children[index].children.forEach(child => {
+          if (child.type === 'file') {
+            removeFileList.push(child.content);
+          }
+        });
+      } else if (node.children[index].type === 'file') {
+        removeFileList.push(node.children[index].content);
+      }
+      node.children.splice(index, 1);
+    }
+  } else {
+    const nextNode = node.children.find(child => child.name === pathArray[0]);
+    if (nextNode) {
+      deleteItemFromJson(nextNode, pathArray.slice(1));
+    }
+  }
+  console.log(removeFileList);
+}
+
+function openPathToItem(path) {
   const pathArray = path.split(' > ');
   let currentElement = fileTreeElement;
 
@@ -430,7 +472,7 @@ function findFileData(node, filePath, path) {
   return null;
 }
 
-function getFilePath(element) {
+function getItemPath(element) {
   let path = element.getAttribute('data-name');
   let parentElement = element.parentElement.parentElement.previousElementSibling;
 
@@ -491,7 +533,6 @@ function displayTextInRightPanel(content, file_id) {
     });
   });
 }
-
 
     const separator = document.getElementById('separator');
     const leftPanel = document.getElementById('leftPanel');

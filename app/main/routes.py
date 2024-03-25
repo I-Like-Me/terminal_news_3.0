@@ -135,8 +135,8 @@ def save_content():
     db.session.commit()
     return 'Success!', 200
 
-@bp.route('/add_to_json', methods=['POST'])
-def add_to_json():
+@bp.route('/update_json', methods=['POST'])
+def update_json():
     data = request.get_json()
     order = ['name', 'type', 'content', 'children']
     ready_data = Organizer.reorder_keys(data['updatedJSON'], order)

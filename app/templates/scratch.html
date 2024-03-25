@@ -1,13 +1,510 @@
-<h1>I Like {{ content.food }}!</h1>
+{% extends "base.html" %}
 
-<form method="POST" actions="/">
-    {{ npc_form.csrf_token }}
-    {{ npc_form.npcs }}
-    <button>Submit</button>
-</form>
-{{ preselect }}
-<form method="POST" actions="/">
-    {{ topic_form.csrf_token }}
-    {{ topic_form.topics }}
-    <button>Submit</button>
-</form>
+{% block content %}
+
+<div id="container">
+  <div id="leftPanel">
+    <button id="toggleBtn" onclick="toggleFileTreeSearch()">Search</button>
+    <div id="fileTreeContainer">
+      <div id="fileTree" class="root-folder"></div>
+    </div>
+    <div id="searchContainer">
+      <input type="text" id="searchInput" placeholder="Search..." onkeyup="handleKeyUp(event)">
+      <button onclick="runSearch()">Search</button>
+      <ul id="searchResults" onclick="handleSearchResultClick(event)"></ul>
+    </div>
+  </div>
+
+  <div id="separator"></div>
+
+  <div id="rightPanel">
+    <button id="saveBtn" style="display: none;">Save</button>
+    <div id="folder_buttons" class="row" style="display: none;">
+        <div class="column">
+            <button onclick="showInputField('folder')">Add Folder</button>
+            <button onclick="showInputField('file')">Add File</button>
+            <button onclick="showInputField('move')">Move Folder</button>
+            <button style="background-color: red;" onclick="showInputField('delete_folder', event)">Delete Folder</button>
+        </div>   
+    </div>
+    <div id="folder_fields" style="display: none;">
+
+        <input type="text" id="newFolderName" placeholder="Enter folder name" style="display: none;">
+        <button id="confirmFolderBtn" onclick="confirmNewItem(event)" style="display: none;">Confirm</button>
+        <input type="text" id="newFileName" placeholder="Enter file name" style="display: none;">
+        <button id="confirmFileBtn" onclick="confirmNewItem(event)" style="display: none;">Confirm</button>
+
+    </div>
+    <div id="editorContainer"></div> 
+  </div>
+</div>
+
+<script>
+cur_user = '{{ user_name }}'
+let fileTreeData;
+const fileTreeElement = document.getElementById('fileTree');
+window.onload = function() {
+  var username = cur_user; 
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      fileTreeData = JSON.parse(this.responseText);
+      createFileTree(fileTreeData, fileTreeElement);
+    }
+  };
+  xhttp.open("GET", "/get_cabinet/" + username, true);
+  xhttp.send();
+}
+
+function createFileTree(node, parentElement, isFirstLayer = true, newItemName = null) {
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}" data-name="${node.name}"><span class="arrow">${node.type === 'folder' ? '<i class="bi bi-caret-right-fill"></i>' : ''}</span>${node.name}</div>`;
+
+  if (node.children) {
+    const childList = document.createElement('ul');
+    if (!isFirstLayer) {
+      childList.style.display = 'none';
+    }
+    node.children.forEach(childNode => createFileTree(childNode, childList, false, newItemName));
+    listItem.appendChild(childList);
+
+    if (node.type === 'folder') {
+      const arrowElement = listItem.querySelector('.arrow');
+      arrowElement.addEventListener('click', (event) => {
+        event.stopPropagation();
+        childList.style.display = childList.style.display === 'none' ? 'block' : 'none';
+        arrowElement.innerHTML = arrowElement.innerHTML === '<i class="bi bi-caret-right-fill"></i>' ? '<i class="bi bi-caret-down-fill"></i>' : '<i class="bi bi-caret-right-fill"></i>';
+      });
+
+      if (isFirstLayer || node.name === newItemName) {
+        childList.style.display = 'block';
+        arrowElement.innerHTML = '<i class="bi bi-caret-down-fill"></i>';
+      }
+    }
+  }
+
+  if (node.name === newItemName) {
+    listItem.querySelector(`div[data-name="${newItemName}"]`).classList.add('highlight');
+    console.log('New Item');
+    console.log(fileTreeData);
+
+  }
+  parentElement.appendChild(listItem);
+}
+
+function toggleFileTreeSearch() {
+  const fileTreeContainer = document.getElementById('fileTreeContainer');
+  const searchContainer = document.getElementById('searchContainer');
+  const toggleBtn = document.getElementById('toggleBtn');
+
+  if (fileTreeContainer.style.display !== 'none') {
+    fileTreeContainer.style.display = 'none';
+    searchContainer.style.display = 'block';
+    toggleBtn.textContent = 'File Tree';
+  } else {
+    fileTreeContainer.style.display = 'block';
+    searchContainer.style.display = 'none';
+    toggleBtn.textContent = 'Search';
+  }
+}
+function handleKeyUp(event) {
+  if (event.keyCode === 13) {
+    runSearch();
+  }
+}
+function runSearch() {
+  const searchInput = document.getElementById('searchInput').value.toLowerCase();
+  const searchResults = document.getElementById('searchResults');
+  searchResults.innerHTML = '';
+
+  if (searchInput.length === 0) {
+    return;
+  }
+  function searchInTree(node, path) {
+    const matches = [];
+    const nodeName = node.name.toLowerCase();
+    if (nodeName.includes(searchInput)) {
+      matches.push({ path, confidence: 5 });
+    }
+    if (node.children) {
+      node.children.forEach((child, index) => {
+        const childPath = path ? `${path} > ${child.name}` : child.name;
+        matches.push(...searchInTree(child, childPath));
+      });
+    }
+    return matches;
+  }
+  const searchResultsData = searchInTree(fileTreeData, '');
+  const sortedResults = searchResultsData.sort((a, b) => b.confidence - a.confidence);
+  sortedResults.slice(0, 5).forEach(result => {
+    const listItem = document.createElement('li');
+    listItem.textContent = result.path;
+    listItem.addEventListener('click', () => handleSearchResultClick(result.path));
+    searchResults.appendChild(listItem);
+  });
+}
+
+function handleSearchResultClick(path) {
+  const fileTreeContainer = document.getElementById('fileTreeContainer');
+  const searchContainer = document.getElementById('searchContainer');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const pathArray = path.split(' > ');
+  const lastNodeName = pathArray.pop(); 
+  let currentNode = fileTreeData;
+  let currentElement = fileTreeElement;
+  const allFolders = fileTreeElement.querySelectorAll('.folder');
+  allFolders.forEach(folder => {
+    
+    if (folder.parentElement.parentElement.id !== 'fileTree') {
+      folder.nextElementSibling.style.display = 'none';
+      folder.classList.remove('open');
+    }
+  });
+
+  pathArray.forEach(name => {
+    const child = currentNode.children.find(node => node.name === name);
+    if (child) {
+      currentNode = child;
+      const element = currentElement.querySelector(`[data-name="${currentNode.name}"]`);
+      if (element) {
+        if (currentNode.type === 'folder' && !element.classList.contains('open')) {
+          element.classList.add('open');
+          element.nextElementSibling.style.display = 'block';
+        }
+        currentElement = element.nextElementSibling;
+      }
+    }
+  });
+
+  const lastElement = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
+  if (lastElement) {
+    lastElement.classList.add('highlight');
+  }
+  const element = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
+  if (element) {
+    const container = fileTreeContainer.querySelector('ul');
+    container.scrollTop = element.offsetTop - container.offsetTop;
+  }
+  fileTreeContainer.style.display = 'block';
+  searchContainer.style.display = 'none';
+  toggleBtn.textContent = 'Search';
+}
+
+let selectedItem;
+let newItemName;
+let newItemType;
+let selectedElement; 
+let itemPath;
+let parentPath;
+let parentItemName;
+const removeFileList = [];
+
+fileTreeElement.addEventListener('click', (event) => {
+  const target = event.target;
+  const fileTypeElement = target.closest('.file');
+  const folderTypeElement = target.closest('.folder');
+  const allItems = fileTreeElement.querySelectorAll('.file, .folder');
+  allItems.forEach(item => {
+    item.classList.remove('highlight');
+  });
+
+  if (fileTypeElement) {
+    const fileName = fileTypeElement.getAttribute('data-name');
+    const filePath = getItemPath(fileTypeElement);
+    const fileData = findFileData(fileTreeData, filePath, '');
+    fileTypeElement.classList.add('highlight');
+    selectedElement = fileTypeElement;
+    if (fileData && fileData.content) {
+      fetch('/process_file_content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content: fileData.content })
+      })
+      .then(response => response.json())
+      .then(data => {
+        displayTextInRightPanel(data.processed_content, fileData.content);
+      });
+      document.getElementById('saveBtn').style.display = 'block';
+      document.getElementById('folder_buttons').style.display = 'none';
+      document.getElementById('folder_fields').style.display = 'none';
+      document.getElementById('newFileName').style.display = 'none';
+      document.getElementById('confirmFileBtn').style.display = 'none';
+      document.getElementById('newFolderName').style.display = 'none';
+      document.getElementById('confirmFolderBtn').style.display = 'none';
+    }
+  } else if (folderTypeElement) {
+    folderTypeElement.classList.add('highlight');
+    selectedElement = folderTypeElement;
+    document.getElementById('saveBtn').style.display = 'none';
+    document.getElementById('folder_buttons').style.display = 'block';
+    document.getElementById('folder_fields').style.display = 'block';
+    document.getElementById('newFileName').style.display = 'none';
+    document.getElementById('confirmFileBtn').style.display = 'none';
+    document.getElementById('newFolderName').style.display = 'none';
+    document.getElementById('confirmFolderBtn').style.display = 'none';
+    selectedItem = selectedElement;
+    const editorContainer = document.getElementById('editorContainer');
+    editorContainer.innerHTML = '';
+  } else {
+    document.getElementById('saveBtn').style.display = 'none';
+    document.getElementById('folder_buttons').style.display = 'block';
+    document.getElementById('folder_fields').style.display = 'block';
+    document.getElementById('newFileName').style.display = 'none';
+    document.getElementById('confirmFileBtn').style.display = 'none';
+    document.getElementById('newFolderName').style.display = 'none';
+    document.getElementById('confirmFolderBtn').style.display = 'none';
+  }
+});
+
+function showInputField(type, event) {
+  newItemType = type;
+  if (type === 'folder') {
+    document.getElementById('newFileName').style.display = 'none';
+    document.getElementById('confirmFileBtn').style.display = 'none';
+    document.getElementById('newFolderName').style.display = 'block';
+    document.getElementById('confirmFolderBtn').style.display = 'block';
+  } else if (type === 'file') {
+    document.getElementById('newFileName').style.display = 'block';
+    document.getElementById('confirmFileBtn').style.display = 'block';
+    document.getElementById('newFolderName').style.display = 'none';
+    document.getElementById('confirmFolderBtn').style.display = 'none';
+  } else if (type === 'delete_folder') {
+    const rightPanel = document.getElementById('rightPanel');
+    const confirmWindow = document.createElement('div');
+    confirmWindow.className = 'deleteConfirm';
+    confirmWindow.innerHTML = `
+      <p>Are you sure you want to delete this item?</p>
+      <button id="confirmDelete">Confirm</button>
+      <button onclick="this.parentElement.remove()">Cancel</button>
+    `;
+    rightPanel.appendChild(confirmWindow);
+    document.getElementById('confirmDelete').addEventListener('click', deleteItem());
+    if (event) {
+      event.stopPropagation();
+    }
+  }
+}
+
+function confirmNewItem(event) {
+  event.stopPropagation();
+  let newItem;
+  if (newItemType === 'folder' && document.getElementById('newFolderName').style.display !== 'none') {
+    newItemName = document.getElementById('newFolderName').value;
+    newItem = { name: newItemName, type: newItemType, children: [] };
+  } else if (newItemType === 'file' && document.getElementById('newFileName').style.display !== 'none') {
+    newItemName = document.getElementById('newFileName').value;
+    newItem = { name: newItemName, type: newItemType, content: 'Type Here' };
+  }
+  if (!newItemName) {
+    alert('The name field is empty. Please enter a name.');
+    return;
+  }
+  if (doesNameExist(newItemName)) {
+    alert('A folder or file with this name already exists. Please enter a unique name.');
+    return;
+  }
+  addItemToTree(newItem);
+  updateJsonFile();
+}
+
+function doesNameExist(name) {
+  if (selectedElement) {
+    const siblings = selectedElement.nextElementSibling.children;
+    for (let i = 0; i < siblings.length; i++) {
+      if (siblings[i].firstElementChild.getAttribute('data-name').toLowerCase() === name.toLowerCase()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+async function updateJsonFile() {
+  let dataToSend = {
+    author: cur_user,
+    updatedJSON: fileTreeData,
+    itemName: newItemName,
+    itemType: newItemType,
+    changeLocation: itemPath,
+    parentName: parentItemName,
+    fileList: removeFileList,
+    parentLocation: parentPath
+  };
+
+  const response = await fetch('/update_json', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataToSend)
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  
+  fileTreeData = data;
+  document.getElementById('newFileName').style.display = 'none';
+  document.getElementById('confirmFileBtn').style.display = 'none';
+  document.getElementById('newFolderName').style.display = 'none';
+  document.getElementById('confirmFolderBtn').style.display = 'none';
+  fileTreeElement.innerHTML = '';
+  createFileTree(fileTreeData, fileTreeElement, true, newItemName);
+  const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
+  if (newItemElement) {
+    newItemElement.click();
+  }
+  openPathToItem(itemPath);
+}
+
+function addItemToTree(item) {
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
+  selectedItem.appendChild(listItem);
+  itemPath = getItemPath(selectedElement);
+  const pathArray = itemPath.split(' > ');
+  let currentNode = fileTreeData;
+  for (let i = 0; i < pathArray.length; i++) {
+    const child = currentNode.children.find(node => node.name === pathArray[i]);
+    if (child) {
+      currentNode = child;
+    }
+  }
+  currentNode.children.push(item); 
+}
+
+function getParentItem(item) {
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
+  selectedItem.appendChild(listItem);
+  itemPath = getItemPath(selectedElement);
+}
+
+function deleteItem() {
+  console.log('fewdwvfs');
+  itemPath = getItemPath(selectedElement);
+  
+  pathArray = itemPath.split(' > ');
+  console.log(pathArray);
+  let currentNode = fileTreeData;
+  for (let i = 0; i < pathArray.length; i++) {
+    const child = currentNode.children.find(node => node.name === pathArray[i]);
+    if (child) {
+      currentNode = child;
+    }
+  }
+  // Recursively check all children of the node being deleted
+  function checkChildren(node) {
+    if (node.type === 'file') {
+      removeFileList.push(node.content);
+    } else if (node.children) {
+      node.children.forEach(checkChildren);
+    }
+  }
+  checkChildren(currentNode);
+  deleteItemFromJson(fileTreeData, pathArray);
+  fileTreeElement.innerHTML = '';
+  createFileTree(fileTreeData, fileTreeElement);
+}
+
+
+function deleteItemFromJson(node, pathArray) {
+  console.log('pizza');
+  if (pathArray.length === 1) {
+    const index = node.children.findIndex(child => child.name === pathArray[0]);
+    if (index !== -1) {
+      // Recursively check all children of the node being deleted
+      function checkChildren(node) {
+        if (node.type === 'file') {
+          removeFileList.push(node.content);
+        } else if (node.children) {
+          node.children.forEach(checkChildren);
+        }
+      }
+      checkChildren(node.children[index]);
+      node.children.splice(index, 1);
+    }
+  } else {
+    const nextNode = node.children.find(child => child.name === pathArray[0]);
+    if (nextNode) {
+      deleteItemFromJson(nextNode, pathArray.slice(1));
+    }
+  }
+  console.log(removeFileList);
+}
+
+function openPathToItem(path) {
+  const pathArray = path.split(' > ');
+  let currentElement = fileTreeElement;
+
+  pathArray.forEach(name => {
+    const childElement = currentElement.querySelector(`div[data-name="${name}"]`);
+    if (childElement) {
+      if (childElement.classList.contains('folder')) {
+        childElement.classList.add('open');
+        childElement.nextElementSibling.style.display = 'block';
+      }
+      currentElement = childElement.nextElementSibling;
+    }
+  });
+}
+
+function findFileData(node, filePath, path) {
+  const currentPath = path ? `${path} > ${node.name}` : node.name;
+  if (currentPath === filePath && node.type === 'file') {
+    return node;
+  }
+  if (node.children) {
+    for (const child of node.children) {
+      const result = findFileData(child, filePath, currentPath);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
+}
+
+function getItemPath(element) {
+  let path = element.getAttribute('data-name');
+  let parentElement = element.parentElement.parentElement.previousElementSibling;
+
+  while (parentElement) {
+    path = `${parentElement.getAttribute('data-name')} > ${path}`;
+    parentElement = parentElement.parentElement.parentElement.previousElementSibling;
+  }
+  return path;
+}
+
+function displayTextInRightPanel(content, file_id) {
+  const editorContainer = document.getElementById('editorContainer');
+  editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
+  var icons = Quill.import('ui/icons');
+
+  var quill = new Quill('#editor', {
+    theme: 'snow'
+  });
+
+  quill.clipboard.dangerouslyPasteHTML(content);
+  
+  const saveBtn = document.getElementById('saveBtn');
+
+  saveBtn.addEventListener('click', function() {
+    const editorContent = quill.root.innerHTML;
+
+    fetch('/save_content', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        content: editorContent,
+        f_id: file_id
+      })
+    });
+  });
+}
