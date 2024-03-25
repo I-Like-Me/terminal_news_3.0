@@ -197,6 +197,7 @@ let selectedElement;
 let itemPath;
 let parentPath;
 let parentItemName;
+let actionType;
 const removeFileList = [];
 
 fileTreeElement.addEventListener('click', (event) => {
@@ -335,7 +336,8 @@ async function updateJsonFile() {
     changeLocation: itemPath,
     parentName: parentItemName,
     fileList: removeFileList,
-    parentLocation: parentPath
+    parentLocation: parentPath,
+    action: actionType
   };
 
   const response = await fetch('/update_json', {
@@ -367,6 +369,7 @@ async function updateJsonFile() {
 }
 
 function addItemToTree(item) {
+  actionType = 'add';
   const listItem = document.createElement('li');
   listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
   selectedItem.appendChild(listItem);
@@ -392,7 +395,7 @@ function getParentItem(item) {
 function deleteItem() {
   console.log('fewdwvfs');
   itemPath = getItemPath(selectedElement);
-  
+  actionType = 'delete';
   pathArray = itemPath.split(' > ');
   console.log(pathArray);
   let currentNode = fileTreeData;
