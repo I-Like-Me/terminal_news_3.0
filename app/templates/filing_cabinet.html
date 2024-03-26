@@ -18,7 +18,12 @@
   <div id="separator"></div>
 
   <div id="rightPanel">
-    <button id="saveBtn" style="display: none;">Save</button>
+    <div id="file_buttons" class="row" style="display: none;">
+        <div class="column">
+            <button id="saveBtn">Save</button>
+            <button id="deleteBtn" style="background-color: red;" onclick="showInputField('delete_file', event)">Delete File</button>
+        </div>
+    </div>
     <div id="folder_buttons" class="row" style="display: none;">
         <div class="column">
             <button onclick="showInputField('folder')">Add Folder</button>
@@ -200,6 +205,25 @@ let parentItemName;
 let actionType;
 const removeFileList = [];
 
+function fileButtonsVis() {
+    document.getElementById('file_buttons').style.display = 'block';
+    document.getElementById('folder_buttons').style.display = 'none';
+    document.getElementById('folder_fields').style.display = 'none';
+    document.getElementById('newFileName').style.display = 'none';
+    document.getElementById('confirmFileBtn').style.display = 'none';
+    document.getElementById('newFolderName').style.display = 'none';
+    document.getElementById('confirmFolderBtn').style.display = 'none';
+}
+function folderButtonsVis() {
+    document.getElementById('file_buttons').style.display = 'none';
+    document.getElementById('folder_buttons').style.display = 'block';
+    document.getElementById('folder_fields').style.display = 'block';
+    document.getElementById('newFileName').style.display = 'none';
+    document.getElementById('confirmFileBtn').style.display = 'none';
+    document.getElementById('newFolderName').style.display = 'none';
+    document.getElementById('confirmFolderBtn').style.display = 'none';
+}
+
 fileTreeElement.addEventListener('click', (event) => {
   const target = event.target;
   const fileTypeElement = target.closest('.file');
@@ -227,35 +251,17 @@ fileTreeElement.addEventListener('click', (event) => {
       .then(data => {
         displayTextInRightPanel(data.processed_content, fileData.content);
       });
-      document.getElementById('saveBtn').style.display = 'block';
-      document.getElementById('folder_buttons').style.display = 'none';
-      document.getElementById('folder_fields').style.display = 'none';
-      document.getElementById('newFileName').style.display = 'none';
-      document.getElementById('confirmFileBtn').style.display = 'none';
-      document.getElementById('newFolderName').style.display = 'none';
-      document.getElementById('confirmFolderBtn').style.display = 'none';
+      fileButtonsVis();
     }
   } else if (folderTypeElement) {
     folderTypeElement.classList.add('highlight');
     selectedElement = folderTypeElement;
-    document.getElementById('saveBtn').style.display = 'none';
-    document.getElementById('folder_buttons').style.display = 'block';
-    document.getElementById('folder_fields').style.display = 'block';
-    document.getElementById('newFileName').style.display = 'none';
-    document.getElementById('confirmFileBtn').style.display = 'none';
-    document.getElementById('newFolderName').style.display = 'none';
-    document.getElementById('confirmFolderBtn').style.display = 'none';
+    folderButtonsVis();
     selectedItem = selectedElement;
     const editorContainer = document.getElementById('editorContainer');
     editorContainer.innerHTML = '';
   } else {
-    document.getElementById('saveBtn').style.display = 'none';
-    document.getElementById('folder_buttons').style.display = 'block';
-    document.getElementById('folder_fields').style.display = 'block';
-    document.getElementById('newFileName').style.display = 'none';
-    document.getElementById('confirmFileBtn').style.display = 'none';
-    document.getElementById('newFolderName').style.display = 'none';
-    document.getElementById('confirmFolderBtn').style.display = 'none';
+    folderButtonsVis();
   }
 });
 
@@ -271,7 +277,7 @@ function showInputField(type, event) {
     document.getElementById('confirmFileBtn').style.display = 'block';
     document.getElementById('newFolderName').style.display = 'none';
     document.getElementById('confirmFolderBtn').style.display = 'none';
-  } else if (type === 'delete_folder') {
+  } else if (type === 'delete_folder' || type === 'delete_file') {
     const rightPanel = document.getElementById('rightPanel');
     const confirmWindow = document.createElement('div');
     confirmWindow.className = 'deleteConfirm';
