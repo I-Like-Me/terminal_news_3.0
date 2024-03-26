@@ -277,7 +277,6 @@ function showInputField(type, event) {
   }
 }
 
-
 function confirmNewItem(event) {
   event.stopPropagation();
   let newItem;
@@ -297,6 +296,7 @@ function confirmNewItem(event) {
   }
   addItemToTree(newItem);
   updateJsonFile();
+  document.querySelector('.addConfirm').remove();
 }
 
 function doesNameExist(name) {
@@ -394,6 +394,7 @@ function deleteItem() {
   }
   checkChildren(currentNode);
   deleteItemFromJson(fileTreeData, pathArray);
+  document.querySelector('.deleteConfirm').remove();
   fileTreeElement.innerHTML = '';
   createFileTree(fileTreeData, fileTreeElement);
 }
