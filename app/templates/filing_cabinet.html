@@ -32,14 +32,6 @@
             <button style="background-color: red;" onclick="showInputField('delete_folder', event)">Delete Folder</button>
         </div>   
     </div>
-    <div id="folder_fields" style="display: none;">
-
-        <input type="text" id="newFolderName" placeholder="Enter folder name" style="display: none;">
-        <button id="confirmFolderBtn" onclick="confirmNewItem(event)" style="display: none;">Confirm</button>
-        <input type="text" id="newFileName" placeholder="Enter file name" style="display: none;">
-        <button id="confirmFileBtn" onclick="confirmNewItem(event)" style="display: none;">Confirm</button>
-
-    </div>
     <div id="editorContainer"></div> 
   </div>
 </div>
@@ -208,20 +200,10 @@ const removeFileList = [];
 function fileButtonsVis() {
     document.getElementById('file_buttons').style.display = 'block';
     document.getElementById('folder_buttons').style.display = 'none';
-    document.getElementById('folder_fields').style.display = 'none';
-    document.getElementById('newFileName').style.display = 'none';
-    document.getElementById('confirmFileBtn').style.display = 'none';
-    document.getElementById('newFolderName').style.display = 'none';
-    document.getElementById('confirmFolderBtn').style.display = 'none';
 }
 function folderButtonsVis() {
     document.getElementById('file_buttons').style.display = 'none';
     document.getElementById('folder_buttons').style.display = 'block';
-    document.getElementById('folder_fields').style.display = 'block';
-    document.getElementById('newFileName').style.display = 'none';
-    document.getElementById('confirmFileBtn').style.display = 'none';
-    document.getElementById('newFolderName').style.display = 'none';
-    document.getElementById('confirmFolderBtn').style.display = 'none';
 }
 
 fileTreeElement.addEventListener('click', (event) => {
@@ -267,16 +249,17 @@ fileTreeElement.addEventListener('click', (event) => {
 
 function showInputField(type, event) {
   newItemType = type;
-  if (type === 'folder') {
-    document.getElementById('newFileName').style.display = 'none';
-    document.getElementById('confirmFileBtn').style.display = 'none';
-    document.getElementById('newFolderName').style.display = 'block';
-    document.getElementById('confirmFolderBtn').style.display = 'block';
-  } else if (type === 'file') {
-    document.getElementById('newFileName').style.display = 'block';
-    document.getElementById('confirmFileBtn').style.display = 'block';
-    document.getElementById('newFolderName').style.display = 'none';
-    document.getElementById('confirmFolderBtn').style.display = 'none';
+  if (type === 'folder' || type === 'file') {
+    const rightPanel = document.getElementById('rightPanel');
+    const confirmWindow = document.createElement('div');
+    confirmWindow.className = 'addConfirm';
+    confirmWindow.innerHTML = `
+      <p>Are you sure you want to add this item?</p>
+      <input type="text" id="newItemText" placeholder="Enter item name here.">
+      <button onclick="confirmNewItem(event)">Confirm</button>
+      <button onclick="this.parentElement.remove()">Cancel</button>
+    `;
+    rightPanel.appendChild(confirmWindow);
   } else if (type === 'delete_folder' || type === 'delete_file') {
     const rightPanel = document.getElementById('rightPanel');
     const confirmWindow = document.createElement('div');
@@ -286,6 +269,15 @@ function showInputField(type, event) {
       <button onclick="deleteItem()">Confirm</button>
       <button onclick="this.parentElement.remove()">Cancel</button>
     `;
+    document.addEventListener('click', function onClickOutside(event) {
+      if (!confirmWindow.contains(event.target)) {
+        confirmWindow.remove();
+        document.removeEventListener('click', onClickOutside);
+      }
+    });
+    if (event) {
+      event.stopPropagation();
+    }
     rightPanel.appendChild(confirmWindow);
     document.addEventListener('click', function onClickOutside(event) {
       if (!confirmWindow.contains(event.target)) {
@@ -302,11 +294,10 @@ function showInputField(type, event) {
 function confirmNewItem(event) {
   event.stopPropagation();
   let newItem;
-  if (newItemType === 'folder' && document.getElementById('newFolderName').style.display !== 'none') {
-    newItemName = document.getElementById('newFolderName').value;
+  newItemName = document.getElementById('newItemText').value;
+  if (newItemType === 'folder' && document.getElementById('newItemText').style.display !== 'none') {
     newItem = { name: newItemName, type: newItemType, children: [] };
-  } else if (newItemType === 'file' && document.getElementById('newFileName').style.display !== 'none') {
-    newItemName = document.getElementById('newFileName').value;
+  } else if (newItemType === 'file' && document.getElementById('newItemText').style.display !== 'none') {
     newItem = { name: newItemName, type: newItemType, content: 'Type Here' };
   }
   if (!newItemName) {
@@ -361,10 +352,6 @@ async function updateJsonFile() {
   const data = await response.json();
   
   fileTreeData = data;
-  document.getElementById('newFileName').style.display = 'none';
-  document.getElementById('confirmFileBtn').style.display = 'none';
-  document.getElementById('newFolderName').style.display = 'none';
-  document.getElementById('confirmFolderBtn').style.display = 'none';
   fileTreeElement.innerHTML = '';
   createFileTree(fileTreeData, fileTreeElement, true, newItemName);
   const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
@@ -399,7 +386,6 @@ function getParentItem(item) {
 }
 
 function deleteItem() {
-  console.log('fewdwvfs');
   itemPath = getItemPath(selectedElement);
   actionType = 'delete';
   pathArray = itemPath.split(' > ');
