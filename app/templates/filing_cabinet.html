@@ -26,8 +26,8 @@
     </div>
     <div id="folder_buttons" class="row" style="display: none;">
         <div class="column">
-            <button onclick="showInputField('folder')">Add Folder</button>
-            <button onclick="showInputField('file')">Add File</button>
+            <button onclick="showInputField('folder', event)">Add Folder</button>
+            <button onclick="showInputField('file', event)">Add File</button>
             <button onclick="showInputField('move')">Move Folder</button>
             <button style="background-color: red;" onclick="showInputField('delete_folder', event)">Delete Folder</button>
         </div>   
@@ -249,47 +249,34 @@ fileTreeElement.addEventListener('click', (event) => {
 
 function showInputField(type, event) {
   newItemType = type;
-  if (type === 'folder' || type === 'file') {
-    const rightPanel = document.getElementById('rightPanel');
-    const confirmWindow = document.createElement('div');
-    confirmWindow.className = 'addConfirm';
-    confirmWindow.innerHTML = `
-      <p>Are you sure you want to add this item?</p>
-      <input type="text" id="newItemText" placeholder="Enter item name here.">
-      <button onclick="confirmNewItem(event)">Confirm</button>
-      <button onclick="this.parentElement.remove()">Cancel</button>
-    `;
-    rightPanel.appendChild(confirmWindow);
-  } else if (type === 'delete_folder' || type === 'delete_file') {
-    const rightPanel = document.getElementById('rightPanel');
-    const confirmWindow = document.createElement('div');
-    confirmWindow.className = 'deleteConfirm';
-    confirmWindow.innerHTML = `
-      <p>Are you sure you want to delete this item?</p>
-      <button onclick="deleteItem()">Confirm</button>
-      <button onclick="this.parentElement.remove()">Cancel</button>
-    `;
-    document.addEventListener('click', function onClickOutside(event) {
-      if (!confirmWindow.contains(event.target)) {
-        confirmWindow.remove();
-        document.removeEventListener('click', onClickOutside);
-      }
-    });
-    if (event) {
-      event.stopPropagation();
+  const rightPanel = document.getElementById('rightPanel');
+  
+  // Remove any existing confirm windows
+  const existingConfirmWindow = rightPanel.querySelector('.addConfirm, .deleteConfirm');
+  if (existingConfirmWindow) {
+    existingConfirmWindow.remove();
+  }
+
+  const confirmWindow = document.createElement('div');
+  confirmWindow.className = type === 'folder' || type === 'file' ? 'addConfirm' : 'deleteConfirm';
+  confirmWindow.innerHTML = `
+    <p>Are you sure you want to ${type.includes('delete') ? 'delete' : 'add'} this item?</p>
+    ${type === 'folder' || type === 'file' ? '<input type="text" id="newItemText" placeholder="Enter item name here.">' : ''}
+    <button onclick="${type.includes('delete') ? 'deleteItem()' : 'confirmNewItem(event)'}">Confirm</button>
+    <button onclick="this.parentElement.remove()">Cancel</button>
+  `;
+  rightPanel.appendChild(confirmWindow);
+  document.addEventListener('click', function onClickOutside(event) {
+    if (!confirmWindow.contains(event.target)) {
+      confirmWindow.remove();
+      document.removeEventListener('click', onClickOutside);
     }
-    rightPanel.appendChild(confirmWindow);
-    document.addEventListener('click', function onClickOutside(event) {
-      if (!confirmWindow.contains(event.target)) {
-        confirmWindow.remove();
-        document.removeEventListener('click', onClickOutside);
-      }
-    });
-    if (event) {
-      event.stopPropagation();
-    }
+  });
+  if (event) {
+    event.stopPropagation();
   }
 }
+
 
 function confirmNewItem(event) {
   event.stopPropagation();
