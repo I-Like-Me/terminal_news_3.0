@@ -376,7 +376,8 @@ function deleteItem() {
   itemPath = getItemPath(selectedElement);
   actionType = 'delete';
   pathArray = itemPath.split(' > ');
-  console.log(pathArray);
+  parentItemName = pathArray[pathArray.length - 2]; // Get parent's name
+  parentPath = pathArray.slice(0, pathArray.length - 1).join(' > '); // Get parent's path
   let currentNode = fileTreeData;
   for (let i = 0; i < pathArray.length; i++) {
     const child = currentNode.children.find(node => node.name === pathArray[i]);
