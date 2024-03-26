@@ -320,7 +320,7 @@ async function updateJsonFile() {
     changeLocation: itemPath,
     parentName: parentItemName,
     fileList: removeFileList,
-    parentLocation: parentPath,
+    parentLocation: parentPath, 
     action: actionType
   };
 
@@ -420,6 +420,14 @@ function deleteItemFromJson(node, pathArray) {
       deleteItemFromJson(nextNode, pathArray.slice(1));
     }
   }
+  console.log(selectedItem);
+  console.log(newItemName);
+  console.log(newItemType);
+  console.log(selectedElement);
+  console.log(itemPath);
+  console.log(parentPath);
+  console.log(parentItemName);
+  console.log(actionType);
   console.log(removeFileList);
 }
 
