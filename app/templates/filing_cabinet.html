@@ -394,42 +394,28 @@ function deleteItem() {
     }
   }
   checkChildren(currentNode);
-  deleteItemFromJson(fileTreeData, pathArray);
+  deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
-  fileTreeElement.innerHTML = '';
-  createFileTree(fileTreeData, fileTreeElement);
+  updateJsonFile()
+
 }
 
-function deleteItemFromJson(node, pathArray) {
-  if (pathArray.length === 1) {
-    const index = node.children.findIndex(child => child.name === pathArray[0]);
-    if (index !== -1) {
-      if (node.children[index].type === 'folder') {
-        node.children[index].children.forEach(child => {
-          if (child.type === 'file') {
-            removeFileList.push(child.content);
-          }
-        });
-      } else if (node.children[index].type === 'file') {
-        removeFileList.push(node.children[index].content);
+function deleteItemFromTree(path) {
+  const pathArray = path.split(' > ');
+  let currentNode = fileTreeData;
+  let parent = null;
+
+  for (let i = 0; i < pathArray.length; i++) {
+    const childIndex = currentNode.children.findIndex(node => node.name === pathArray[i]);
+    if (childIndex !== -1) {
+      parent = currentNode;
+      currentNode = currentNode.children[childIndex];
+      if (i === pathArray.length - 1) {
+        parent.children.splice(childIndex, 1);
       }
-      node.children.splice(index, 1);
-    }
-  } else {
-    const nextNode = node.children.find(child => child.name === pathArray[0]);
-    if (nextNode) {
-      deleteItemFromJson(nextNode, pathArray.slice(1));
     }
   }
-  console.log(selectedItem);
-  console.log(newItemName);
-  console.log(newItemType);
-  console.log(selectedElement);
-  console.log(itemPath);
-  console.log(parentPath);
-  console.log(parentItemName);
-  console.log(actionType);
-  console.log(removeFileList);
+  console.log(fileTreeData);
 }
 
 function openPathToItem(path) {

@@ -18,22 +18,19 @@
   <div id="separator"></div>
 
   <div id="rightPanel">
-    <button id="saveBtn" style="display: none;">Save</button>
+    <div id="file_buttons" class="row" style="display: none;">
+        <div class="column">
+            <button id="saveBtn">Save</button>
+            <button id="deleteBtn" style="background-color: red;" onclick="showInputField('delete_file', event)">Delete File</button>
+        </div>
+    </div>
     <div id="folder_buttons" class="row" style="display: none;">
         <div class="column">
-            <button onclick="showInputField('folder')">Add Folder</button>
-            <button onclick="showInputField('file')">Add File</button>
+            <button onclick="showInputField('folder', event)">Add Folder</button>
+            <button onclick="showInputField('file', event)">Add File</button>
             <button onclick="showInputField('move')">Move Folder</button>
             <button style="background-color: red;" onclick="showInputField('delete_folder', event)">Delete Folder</button>
         </div>   
-    </div>
-    <div id="folder_fields" style="display: none;">
-
-        <input type="text" id="newFolderName" placeholder="Enter folder name" style="display: none;">
-        <button id="confirmFolderBtn" onclick="confirmNewItem(event)" style="display: none;">Confirm</button>
-        <input type="text" id="newFileName" placeholder="Enter file name" style="display: none;">
-        <button id="confirmFileBtn" onclick="confirmNewItem(event)" style="display: none;">Confirm</button>
-
     </div>
     <div id="editorContainer"></div> 
   </div>
@@ -197,7 +194,17 @@ let selectedElement;
 let itemPath;
 let parentPath;
 let parentItemName;
+let actionType;
 const removeFileList = [];
+
+function fileButtonsVis() {
+    document.getElementById('file_buttons').style.display = 'block';
+    document.getElementById('folder_buttons').style.display = 'none';
+}
+function folderButtonsVis() {
+    document.getElementById('file_buttons').style.display = 'none';
+    document.getElementById('folder_buttons').style.display = 'block';
+}
 
 fileTreeElement.addEventListener('click', (event) => {
   const target = event.target;
@@ -226,75 +233,57 @@ fileTreeElement.addEventListener('click', (event) => {
       .then(data => {
         displayTextInRightPanel(data.processed_content, fileData.content);
       });
-      document.getElementById('saveBtn').style.display = 'block';
-      document.getElementById('folder_buttons').style.display = 'none';
-      document.getElementById('folder_fields').style.display = 'none';
-      document.getElementById('newFileName').style.display = 'none';
-      document.getElementById('confirmFileBtn').style.display = 'none';
-      document.getElementById('newFolderName').style.display = 'none';
-      document.getElementById('confirmFolderBtn').style.display = 'none';
+      fileButtonsVis();
     }
   } else if (folderTypeElement) {
     folderTypeElement.classList.add('highlight');
     selectedElement = folderTypeElement;
-    document.getElementById('saveBtn').style.display = 'none';
-    document.getElementById('folder_buttons').style.display = 'block';
-    document.getElementById('folder_fields').style.display = 'block';
-    document.getElementById('newFileName').style.display = 'none';
-    document.getElementById('confirmFileBtn').style.display = 'none';
-    document.getElementById('newFolderName').style.display = 'none';
-    document.getElementById('confirmFolderBtn').style.display = 'none';
+    folderButtonsVis();
     selectedItem = selectedElement;
     const editorContainer = document.getElementById('editorContainer');
     editorContainer.innerHTML = '';
   } else {
-    document.getElementById('saveBtn').style.display = 'none';
-    document.getElementById('folder_buttons').style.display = 'block';
-    document.getElementById('folder_fields').style.display = 'block';
-    document.getElementById('newFileName').style.display = 'none';
-    document.getElementById('confirmFileBtn').style.display = 'none';
-    document.getElementById('newFolderName').style.display = 'none';
-    document.getElementById('confirmFolderBtn').style.display = 'none';
+    folderButtonsVis();
   }
 });
 
 function showInputField(type, event) {
   newItemType = type;
-  if (type === 'folder') {
-    document.getElementById('newFileName').style.display = 'none';
-    document.getElementById('confirmFileBtn').style.display = 'none';
-    document.getElementById('newFolderName').style.display = 'block';
-    document.getElementById('confirmFolderBtn').style.display = 'block';
-  } else if (type === 'file') {
-    document.getElementById('newFileName').style.display = 'block';
-    document.getElementById('confirmFileBtn').style.display = 'block';
-    document.getElementById('newFolderName').style.display = 'none';
-    document.getElementById('confirmFolderBtn').style.display = 'none';
-  } else if (type === 'delete_folder') {
-    const rightPanel = document.getElementById('rightPanel');
-    const confirmWindow = document.createElement('div');
-    confirmWindow.className = 'deleteConfirm';
-    confirmWindow.innerHTML = `
-      <p>Are you sure you want to delete this item?</p>
-      <button id="confirmDelete">Confirm</button>
-      <button onclick="this.parentElement.remove()">Cancel</button>
-    `;
-    rightPanel.appendChild(confirmWindow);
-    document.getElementById('confirmDelete').addEventListener('click', deleteItem());
-    if (event) {
-      event.stopPropagation();
+  const rightPanel = document.getElementById('rightPanel');
+  
+  // Remove any existing confirm windows
+  const existingConfirmWindow = rightPanel.querySelector('.addConfirm, .deleteConfirm');
+  if (existingConfirmWindow) {
+    existingConfirmWindow.remove();
+  }
+
+  const confirmWindow = document.createElement('div');
+  confirmWindow.className = type === 'folder' || type === 'file' ? 'addConfirm' : 'deleteConfirm';
+  confirmWindow.innerHTML = `
+    <p>Are you sure you want to ${type.includes('delete') ? 'delete' : 'add'} this item?</p>
+    ${type === 'folder' || type === 'file' ? '<input type="text" id="newItemText" placeholder="Enter item name here.">' : ''}
+    <button onclick="${type.includes('delete') ? 'deleteItem()' : 'confirmNewItem(event)'}">Confirm</button>
+    <button onclick="this.parentElement.remove()">Cancel</button>
+  `;
+  rightPanel.appendChild(confirmWindow);
+  document.addEventListener('click', function onClickOutside(event) {
+    if (!confirmWindow.contains(event.target)) {
+      confirmWindow.remove();
+      document.removeEventListener('click', onClickOutside);
     }
+  });
+  if (event) {
+    event.stopPropagation();
   }
 }
 
 function confirmNewItem(event) {
   event.stopPropagation();
   let newItem;
-  if (newItemType === 'folder' && document.getElementById('newFolderName').style.display !== 'none') {
-    newItemName = document.getElementById('newFolderName').value;
+  newItemName = document.getElementById('newItemText').value;
+  if (newItemType === 'folder' && document.getElementById('newItemText').style.display !== 'none') {
     newItem = { name: newItemName, type: newItemType, children: [] };
-  } else if (newItemType === 'file' && document.getElementById('newFileName').style.display !== 'none') {
-    newItemName = document.getElementById('newFileName').value;
+  } else if (newItemType === 'file' && document.getElementById('newItemText').style.display !== 'none') {
     newItem = { name: newItemName, type: newItemType, content: 'Type Here' };
   }
   if (!newItemName) {
@@ -307,6 +296,7 @@ function confirmNewItem(event) {
   }
   addItemToTree(newItem);
   updateJsonFile();
+  document.querySelector('.addConfirm').remove();
 }
 
 function doesNameExist(name) {
@@ -330,7 +320,8 @@ async function updateJsonFile() {
     changeLocation: itemPath,
     parentName: parentItemName,
     fileList: removeFileList,
-    parentLocation: parentPath
+    parentLocation: parentPath, 
+    action: actionType
   };
 
   const response = await fetch('/update_json', {
@@ -348,10 +339,6 @@ async function updateJsonFile() {
   const data = await response.json();
   
   fileTreeData = data;
-  document.getElementById('newFileName').style.display = 'none';
-  document.getElementById('confirmFileBtn').style.display = 'none';
-  document.getElementById('newFolderName').style.display = 'none';
-  document.getElementById('confirmFolderBtn').style.display = 'none';
   fileTreeElement.innerHTML = '';
   createFileTree(fileTreeData, fileTreeElement, true, newItemName);
   const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
@@ -362,6 +349,7 @@ async function updateJsonFile() {
 }
 
 function addItemToTree(item) {
+  actionType = 'add';
   const listItem = document.createElement('li');
   listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
   selectedItem.appendChild(listItem);
@@ -385,11 +373,11 @@ function getParentItem(item) {
 }
 
 function deleteItem() {
-  console.log('fewdwvfs');
   itemPath = getItemPath(selectedElement);
-  
+  actionType = 'delete';
   pathArray = itemPath.split(' > ');
-  console.log(pathArray);
+  parentItemName = pathArray[pathArray.length - 2]; 
+  parentPath = pathArray.slice(0, pathArray.length - 1).join(' > '); 
   let currentNode = fileTreeData;
   for (let i = 0; i < pathArray.length; i++) {
     const child = currentNode.children.find(node => node.name === pathArray[i]);
@@ -397,7 +385,6 @@ function deleteItem() {
       currentNode = child;
     }
   }
-  // Recursively check all children of the node being deleted
   function checkChildren(node) {
     if (node.type === 'file') {
       removeFileList.push(node.content);
@@ -407,25 +394,25 @@ function deleteItem() {
   }
   checkChildren(currentNode);
   deleteItemFromJson(fileTreeData, pathArray);
+  document.querySelector('.deleteConfirm').remove();
+  updateJsonFile()
   fileTreeElement.innerHTML = '';
   createFileTree(fileTreeData, fileTreeElement);
 }
 
-
 function deleteItemFromJson(node, pathArray) {
-  console.log('pizza');
   if (pathArray.length === 1) {
     const index = node.children.findIndex(child => child.name === pathArray[0]);
     if (index !== -1) {
-      // Recursively check all children of the node being deleted
-      function checkChildren(node) {
-        if (node.type === 'file') {
-          removeFileList.push(node.content);
-        } else if (node.children) {
-          node.children.forEach(checkChildren);
-        }
+      if (node.children[index].type === 'folder') {
+        node.children[index].children.forEach(child => {
+          if (child.type === 'file') {
+            removeFileList.push(child.content);
+          }
+        });
+      } else if (node.children[index].type === 'file') {
+        removeFileList.push(node.children[index].content);
       }
-      checkChildren(node.children[index]);
       node.children.splice(index, 1);
     }
   } else {
@@ -434,7 +421,6 @@ function deleteItemFromJson(node, pathArray) {
       deleteItemFromJson(nextNode, pathArray.slice(1));
     }
   }
-  console.log(removeFileList);
 }
 
 function openPathToItem(path) {
@@ -488,6 +474,7 @@ function displayTextInRightPanel(content, file_id) {
   var quill = new Quill('#editor', {
     theme: 'snow'
   });
+
 
   quill.clipboard.dangerouslyPasteHTML(content);
   
