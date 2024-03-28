@@ -157,12 +157,11 @@ def update_json():
             db.session.commit()
     if data['action'] == 'delete':
         user = User.query.filter_by(username=data['author']).first_or_404()
-        delFileList = []
+        user.my_documents = ready_data
         for item in data['fileList']:
-            delFileList.append(File.query.get(item))
-        print(delFileList)
-        print(ready_data)
-
+            print(item)
+            db.session.delete(File.query.get(item))
+        db.session.commit()
     return jsonify(user.my_documents)
 
 

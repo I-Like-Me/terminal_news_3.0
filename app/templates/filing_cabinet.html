@@ -396,8 +396,8 @@ function deleteItem() {
   checkChildren(currentNode);
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
+  
   updateJsonFile()
-
 }
 
 function deleteItemFromTree(path) {
