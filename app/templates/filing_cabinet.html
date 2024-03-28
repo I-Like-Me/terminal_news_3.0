@@ -372,7 +372,7 @@ function getParentItem(item) {
   itemPath = getItemPath(selectedElement);
 }
 
-function deleteItem() {
+async function deleteItem() {
   itemPath = getItemPath(selectedElement);
   actionType = 'delete';
   pathArray = itemPath.split(' > ');
@@ -396,8 +396,13 @@ function deleteItem() {
   checkChildren(currentNode);
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
-  
-  updateJsonFile()
+
+  const response = await updateJsonFile();
+
+  if (response.ok) {
+    const updatedData = await response.json();
+    fileTreeData = updatedData;  // Update the client-side data
+  }
 }
 
 function deleteItemFromTree(path) {
@@ -415,7 +420,6 @@ function deleteItemFromTree(path) {
       }
     }
   }
-  console.log(fileTreeData);
 }
 
 function openPathToItem(path) {
