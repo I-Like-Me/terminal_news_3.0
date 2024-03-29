@@ -21,6 +21,7 @@
     <div id="file_buttons" class="row" style="display: none;">
         <div class="column">
             <button id="saveBtn">Save</button>
+            <button onclick="showInputField('move', event)">Move File</button>
             <button id="deleteBtn" style="background-color: red;" onclick="showInputField('delete_file', event)">Delete File</button>
         </div>
     </div>
@@ -330,7 +331,10 @@ async function moveItem() {
   const destinationPath = getItemPath(destinationFolder);
   let sourceNode = findNodeInTree(fileTreeData, sourcePath.split(' > '));
   let destinationNode = findNodeInTree(fileTreeData, destinationPath.split(' > '));
-
+  console.log(sourcePath);
+  console.log(destinationPath);
+  console.log(sourceNode);
+  console.log(destinationNode);
   if (!sourceNode || !destinationNode) {
     alert('Error in moving item. Please try again.');
     return;
