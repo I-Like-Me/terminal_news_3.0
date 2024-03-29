@@ -140,6 +140,7 @@ def update_json():
     data = request.get_json()
     order = ['name', 'type', 'content', 'children']
     ready_data = Organizer.reorder_keys(data['updatedJSON'], order)
+    print(data['action'])
     if data['action'] == 'add':
         if data['itemType'] == 'folder':
             user = User.query.filter_by(username=data['author']).first_or_404()

@@ -474,13 +474,24 @@ ul {
 }
 
 .addConfirm {
-    position: absolute;
-    width: 300px;
-    height: 200px;
-    background-color: #383838;
-    border: 5px solid #ddd;
-    top: 50%;
-    left: 50%;
-    text-align: center;
-    transform: translate(-50%, -50%);
-  }
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  background-color: #383838;
+  border: 5px solid #ddd;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.moveConfirm {
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  background-color: #383838;
+  border: 5px solid #ddd;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
