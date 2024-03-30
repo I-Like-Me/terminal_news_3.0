@@ -215,6 +215,20 @@ function showInputField(type, event) {
       file.style.pointerEvents = 'none';
       file.style.opacity = '0.4';
     });
+
+    // If the item being moved is a folder, disable the folders in its hierarchy
+    if (selectedElement.classList.contains('folder')) {
+      const folderPath = getItemPath(selectedElement);
+      const allFolders = fileTreeElement.querySelectorAll('.folder');
+      allFolders.forEach(folder => {
+        const folderPathToCheck = getItemPath(folder);
+        if (folderPathToCheck.startsWith(folderPath)) {
+          folder.style.pointerEvents = 'none';
+          folder.style.opacity = '0.4';
+        }
+      });
+    }
+
     const confirmButton = document.querySelector('.moveConfirm button');
     confirmButton.disabled = true;
     selectedElement.classList.add('highlight');
