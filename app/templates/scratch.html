@@ -1,6 +1,4 @@
-{% extends "base.html" %}
 
-{% block content %}
 
 <div id="container">
   <div id="leftPanel">
@@ -21,6 +19,7 @@
     <div id="file_buttons" class="row" style="display: none;">
         <div class="column">
             <button id="saveBtn">Save</button>
+            <button onclick="showInputField('move', event)">Move File</button>
             <button id="deleteBtn" style="background-color: red;" onclick="showInputField('delete_file', event)">Delete File</button>
         </div>
     </div>
@@ -109,6 +108,25 @@ function folderButtonsVis() {
 }
 
 fileTreeElement.addEventListener('click', (event) => {
+  if (moveMode) {
+    event.stopPropagation();
+    const newDestinationFolder = event.target.closest('.folder');
+    if (newDestinationFolder) {
+      // If there was a previously selected destination folder, remove the highlight
+      if (destinationFolder) {
+        destinationFolder.classList.remove('highlight');
+      }
+      // Add the highlight to the newly selected destination folder
+      newDestinationFolder.classList.add('highlight');
+      // Update the destinationFolder variable
+      destinationFolder = newDestinationFolder;
+      const confirmButton = document.querySelector('.moveConfirm button');
+      confirmButton.disabled = false;
+      const message = document.querySelector('.moveConfirm p');
+      message.textContent = 'Are you sure you want to move this item?';
+    }
+    return;
+  }
   const target = event.target;
   const fileTypeElement = target.closest('.file');
   const folderTypeElement = target.closest('.folder');
@@ -143,6 +161,7 @@ fileTreeElement.addEventListener('click', (event) => {
   } else if (folderTypeElement) {
     if (moveMode) {
       destinationFolder = folderTypeElement;
+      destinationFolder.classList.add('highlight');
       const confirmButton = document.querySelector('.moveConfirm button');
       confirmButton.disabled = false;
       return;
@@ -165,7 +184,6 @@ function showInputField(type, event) {
   newItemType = type;
   const rightPanel = document.getElementById('rightPanel');
   
-  // Remove any existing confirm windows
   const existingConfirmWindow = rightPanel.querySelector('.addConfirm, .deleteConfirm, .moveConfirm');
   if (existingConfirmWindow) {
     existingConfirmWindow.remove();
@@ -197,6 +215,9 @@ function showInputField(type, event) {
       file.style.pointerEvents = 'none';
       file.style.opacity = '0.4';
     });
+    const confirmButton = document.querySelector('.moveConfirm button');
+    confirmButton.disabled = true;
+    selectedElement.classList.add('highlight');
   }
 }
 
@@ -216,23 +237,31 @@ async function moveItem() {
   const destinationPath = getItemPath(destinationFolder);
   let sourceNode = findNodeInTree(fileTreeData, sourcePath.split(' > '));
   let destinationNode = findNodeInTree(fileTreeData, destinationPath.split(' > '));
-
+  console.log(sourcePath);
+  console.log(destinationPath);
+  console.log(sourceNode);
+  console.log(destinationNode);
   if (!sourceNode || !destinationNode) {
     alert('Error in moving item. Please try again.');
     return;
   }
 
-  // Remove source node from its parent
   let sourceParentNode = findParentNodeInTree(fileTreeData, sourcePath.split(' > '));
   if (sourceParentNode) {
     sourceParentNode.children = sourceParentNode.children.filter(node => node !== sourceNode);
   }
 
-  // Add source node to destination node
   destinationNode.children.push(sourceNode);
 
   await updateJsonFile();
   document.querySelector('.moveConfirm').remove();
+  const confirmButton = document.querySelector('.moveConfirm button');
+  selectedElement.classList.remove('highlight');
+  destinationFolder.classList.remove('highlight');
+  confirmButton.disabled = false;
+  confirmButton.textContent = 'Confirm';
+  const message = document.querySelector('.moveConfirm p');
+  message.textContent = 'Confirm your selection';
 }
 
 function findNodeInTree(node, pathArray) {
@@ -330,11 +359,78 @@ async function updateJsonFile() {
   openPathToItem(itemPath);
 }
 
+function addItemToTree(item) {
+  actionType = 'add';
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
+  selectedItem.appendChild(listItem);
+  itemPath = getItemPath(selectedElement);
+  const pathArray = itemPath.split(' > ');
+  let currentNode = fileTreeData;
+  for (let i = 0; i < pathArray.length; i++) {
+    const child = currentNode.children.find(node => node.name === pathArray[i]);
+    if (child) {
+      currentNode = child;
+    }
+  }
+  currentNode.children.push(item); 
+}
+
 function getParentItem(item) {
   const listItem = document.createElement('li');
   listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
   selectedItem.appendChild(listItem);
   itemPath = getItemPath(selectedElement);
+}
+
+async function deleteItem() {
+  itemPath = getItemPath(selectedElement);
+  actionType = 'delete';
+  pathArray = itemPath.split(' > ');
+  parentItemName = pathArray[pathArray.length - 2];
+  parentPath = pathArray.slice(0, pathArray.length - 1).join(' > ');
+  let currentNode = fileTreeData;
+  for (let i = 0; i < pathArray.length; i++) {
+    const child = currentNode.children.find(node => node.name === pathArray[i]);
+    if (child) {
+      currentNode = child;
+    }
+  }
+
+  function checkChildren(node) {
+    if (node.type === 'file') {
+      removeFileList.push(node.content);
+    } else if (node.children) {
+      node.children.forEach(checkChildren);
+    }
+  }
+  checkChildren(currentNode);
+  deleteItemFromTree(itemPath);
+  document.querySelector('.deleteConfirm').remove();
+
+  const response = await updateJsonFile();
+
+  if (response.ok) {
+    const updatedData = await response.json();
+    fileTreeData = updatedData;
+  }
+}
+
+function deleteItemFromTree(path) {
+  const pathArray = path.split(' > ');
+  let currentNode = fileTreeData;
+  let parent = null;
+
+  for (let i = 0; i < pathArray.length; i++) {
+    const childIndex = currentNode.children.findIndex(node => node.name === pathArray[i]);
+    if (childIndex !== -1) {
+      parent = currentNode;
+      currentNode = currentNode.children[childIndex];
+      if (i === pathArray.length - 1) {
+        parent.children.splice(childIndex, 1);
+      }
+    }
+  }
 }
 
 function openPathToItem(path) {
@@ -380,3 +476,33 @@ function getItemPath(element) {
   return path;
 }
 
+function displayTextInRightPanel(content, file_id) {
+  const editorContainer = document.getElementById('editorContainer');
+  editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
+  var icons = Quill.import('ui/icons');
+
+  var quill = new Quill('#editor', {
+    theme: 'snow'
+  });
+
+  quill.clipboard.dangerouslyPasteHTML(content);
+  
+  const saveBtn = document.getElementById('saveBtn');
+
+  saveBtn.addEventListener('click', function() {
+    const editorContent = quill.root.innerHTML;
+
+    fetch('/save_content', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        content: editorContent,
+        f_id: file_id
+      })
+    });
+  });
+}
+
+</script>

@@ -210,13 +210,20 @@ function folderButtonsVis() {
 fileTreeElement.addEventListener('click', (event) => {
   if (moveMode) {
     event.stopPropagation();
-    destinationFolder = event.target.closest('.folder');
-    if (destinationFolder) {
-      destinationFolder.classList.add('highlight');  // Highlight the destination folder
+    const newDestinationFolder = event.target.closest('.folder');
+    if (newDestinationFolder) {
+      // If there was a previously selected destination folder, remove the highlight
+      if (destinationFolder) {
+        destinationFolder.classList.remove('highlight');
+      }
+      // Add the highlight to the newly selected destination folder
+      newDestinationFolder.classList.add('highlight');
+      // Update the destinationFolder variable
+      destinationFolder = newDestinationFolder;
       const confirmButton = document.querySelector('.moveConfirm button');
-      confirmButton.disabled = false;  // Enable the button
+      confirmButton.disabled = false;
       const message = document.querySelector('.moveConfirm p');
-      message.textContent = 'Are you sure you want to move this item?';  // Change the message
+      message.textContent = 'Are you sure you want to move this item?';
     }
     return;
   }
