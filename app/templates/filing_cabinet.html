@@ -415,6 +415,17 @@ function cancelMove() {
   document.querySelector('.moveConfirm').remove();
 }
 
+document.addEventListener('click', function(event) {
+  // Check if the move action is running
+  if (moveMode) {
+    // Check if the click was outside the popup window
+    if (!document.querySelector('.moveConfirm').contains(event.target)) {
+      // Call the cancelMove function
+      cancelMove();
+    }
+  }
+});
+
 function findNodeInTree(node, pathArray) {
   if (pathArray.length === 0) {
     return node;

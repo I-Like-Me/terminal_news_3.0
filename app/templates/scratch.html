@@ -1,5 +1,4 @@
 
-
 <div id="container">
   <div id="leftPanel">
     <button id="toggleBtn" onclick="toggleFileTreeSearch()">Search</button>
@@ -112,10 +111,13 @@ fileTreeElement.addEventListener('click', (event) => {
     event.stopPropagation();
     const newDestinationFolder = event.target.closest('.folder');
     if (newDestinationFolder) {
+      // If there was a previously selected destination folder, remove the highlight
       if (destinationFolder) {
         destinationFolder.classList.remove('highlight');
       }
+      // Add the highlight to the newly selected destination folder
       newDestinationFolder.classList.add('highlight');
+      // Update the destinationFolder variable
       destinationFolder = newDestinationFolder;
       const confirmButton = document.querySelector('.moveConfirm button');
       confirmButton.disabled = false;
@@ -158,7 +160,7 @@ fileTreeElement.addEventListener('click', (event) => {
   } else if (folderTypeElement) {
     if (moveMode) {
       destinationFolder = folderTypeElement;
-      destinationFolder.classList.add('highlight');
+      destinationFolder.classList.add('highlight');  // Highlight the destination folder
       const confirmButton = document.querySelector('.moveConfirm button');
       confirmButton.disabled = false;
       return;
@@ -264,23 +266,61 @@ async function moveItem() {
     return;
   }
 
+  // Remove source node from its parent
   let sourceParentNode = findParentNodeInTree(fileTreeData, sourcePath.split(' > '));
   if (sourceParentNode) {
     sourceParentNode.children = sourceParentNode.children.filter(node => node !== sourceNode);
   }
 
+  // Add source node to destination node
   destinationNode.children.push(sourceNode);
 
   await updateJsonFile();
   document.querySelector('.moveConfirm').remove();
   const confirmButton = document.querySelector('.moveConfirm button');
-  selectedElement.classList.remove('highlight');
-  destinationFolder.classList.remove('highlight');
-  confirmButton.disabled = false;
-  confirmButton.textContent = 'Confirm';
+  selectedElement.classList.remove('highlight');  // Remove the highlight from the original selection
+  destinationFolder.classList.remove('highlight');  // Remove the highlight from the destination folder
+  confirmButton.disabled = false;  // Enable the button
+  confirmButton.textContent = 'Confirm';  // Change the button text
   const message = document.querySelector('.moveConfirm p');
-  message.textContent = 'Confirm your selection';
+  message.textContent = 'Confirm your selection';  // Change the message
 }
+
+function cancelMove() {
+  moveMode = false;
+  const allFiles = fileTreeElement.querySelectorAll('.file');
+  allFiles.forEach(file => {
+    file.style.pointerEvents = 'auto';
+    file.style.opacity = '1';
+  });
+
+  if (previousState.allFolders) {
+    previousState.allFolders.forEach(folder => {
+      folder.style.pointerEvents = 'auto';
+      folder.style.opacity = '1';
+    });
+  }
+
+  if (destinationFolder) {
+    destinationFolder.classList.remove('highlight');
+    destinationFolder = null;
+  }
+
+  if (selectedElement) {
+    selectedElement.classList.remove('highlight');
+    selectedElement = null;
+  }
+
+  document.querySelector('.moveConfirm').remove();
+}
+
+document.addEventListener('click', function(event) {
+  if (moveMode) {
+    if (!document.querySelector('.moveConfirm').contains(event.target)) {
+      cancelMove();
+    }
+  }
+});
 
 function findNodeInTree(node, pathArray) {
   if (pathArray.length === 0) {
@@ -292,22 +332,6 @@ function findNodeInTree(node, pathArray) {
     return findNodeInTree(nextNode, pathArray);
   }
   return null;
-}
-
-function cancelMove() {
-  moveMode = previousState.moveMode;
-  selectedElement = previousState.selectedElement;
-  previousState.allFiles.forEach(file => {
-    file.style.pointerEvents = 'auto';
-    file.style.opacity = '1';
-  });
-  if (previousState.allFolders) {
-    previousState.allFolders.forEach(folder => {
-      folder.style.pointerEvents = 'auto';
-      folder.style.opacity = '1';
-    });
-  }
-  document.querySelector('.moveConfirm').remove();
 }
 
 function findParentNodeInTree(node, pathArray) {
@@ -508,35 +532,6 @@ function getItemPath(element) {
     parentElement = parentElement.parentElement.parentElement.previousElementSibling;
   }
   return path;
-}
-
-function displayTextInRightPanel(content, file_id) {
-  const editorContainer = document.getElementById('editorContainer');
-  editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
-  var icons = Quill.import('ui/icons');
-
-  var quill = new Quill('#editor', {
-    theme: 'snow'
-  });
-
-  quill.clipboard.dangerouslyPasteHTML(content);
-  
-  const saveBtn = document.getElementById('saveBtn');
-
-  saveBtn.addEventListener('click', function() {
-    const editorContent = quill.root.innerHTML;
-
-    fetch('/save_content', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ 
-        content: editorContent,
-        f_id: file_id
-      })
-    });
-  });
 }
 
 </script>
