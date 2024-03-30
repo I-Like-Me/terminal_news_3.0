@@ -112,13 +112,10 @@ fileTreeElement.addEventListener('click', (event) => {
     event.stopPropagation();
     const newDestinationFolder = event.target.closest('.folder');
     if (newDestinationFolder) {
-      // If there was a previously selected destination folder, remove the highlight
       if (destinationFolder) {
         destinationFolder.classList.remove('highlight');
       }
-      // Add the highlight to the newly selected destination folder
       newDestinationFolder.classList.add('highlight');
-      // Update the destinationFolder variable
       destinationFolder = newDestinationFolder;
       const confirmButton = document.querySelector('.moveConfirm button');
       confirmButton.disabled = false;
@@ -179,6 +176,7 @@ fileTreeElement.addEventListener('click', (event) => {
 
 let moveMode = false;
 let destinationFolder;
+let previousState = {};
 
 function showInputField(type, event) {
   newItemType = type;
@@ -195,7 +193,7 @@ function showInputField(type, event) {
     <p>${type === 'move' ? 'Click a destination folder from the tree' : 'Are you sure you want to ' + (type.includes('delete') ? 'delete' : 'add') + ' this item?'}</p>
     ${type === 'folder' || type === 'file' ? '<input type="text" id="newItemText" placeholder="Enter item name here.">' : ''}
     <button onclick="${type.includes('delete') ? 'deleteItem()' : type === 'move' ? 'moveItem()' : 'confirmNewItem(event)'}">${type === 'move' ? 'Move' : 'Confirm'}</button>
-    <button onclick="this.parentElement.remove()">Cancel</button>
+    <button onclick="cancelMove()">Cancel</button>
   `;
   rightPanel.appendChild(confirmWindow);
   document.addEventListener('click', function onClickOutside(event) {
@@ -216,7 +214,6 @@ function showInputField(type, event) {
       file.style.opacity = '0.4';
     });
 
-    // If the item being moved is a folder, disable the folders in its hierarchy
     if (selectedElement.classList.contains('folder')) {
       const folderPath = getItemPath(selectedElement);
       const allFolders = fileTreeElement.querySelectorAll('.folder');
@@ -232,6 +229,13 @@ function showInputField(type, event) {
     const confirmButton = document.querySelector('.moveConfirm button');
     confirmButton.disabled = true;
     selectedElement.classList.add('highlight');
+
+    previousState = {
+      moveMode,
+      allFiles,
+      selectedElement,
+      allFolders: selectedElement.classList.contains('folder') ? fileTreeElement.querySelectorAll('.folder') : null
+    };
   }
 }
 
@@ -288,6 +292,22 @@ function findNodeInTree(node, pathArray) {
     return findNodeInTree(nextNode, pathArray);
   }
   return null;
+}
+
+function cancelMove() {
+  moveMode = previousState.moveMode;
+  selectedElement = previousState.selectedElement;
+  previousState.allFiles.forEach(file => {
+    file.style.pointerEvents = 'auto';
+    file.style.opacity = '1';
+  });
+  if (previousState.allFolders) {
+    previousState.allFolders.forEach(folder => {
+      folder.style.pointerEvents = 'auto';
+      folder.style.opacity = '1';
+    });
+  }
+  document.querySelector('.moveConfirm').remove();
 }
 
 function findParentNodeInTree(node, pathArray) {
