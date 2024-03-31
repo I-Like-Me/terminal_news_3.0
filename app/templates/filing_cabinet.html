@@ -358,10 +358,6 @@ async function moveItem() {
   const destinationPath = getItemPath(destinationFolder);
   let sourceNode = findNodeInTree(fileTreeData, sourcePath.split(' > '));
   let destinationNode = findNodeInTree(fileTreeData, destinationPath.split(' > '));
-  console.log(sourcePath);
-  console.log(destinationPath);
-  console.log(sourceNode);
-  console.log(destinationNode);
   if (!sourceNode || !destinationNode) {
     alert('Error in moving item. Please try again.');
     return;
@@ -427,25 +423,33 @@ document.addEventListener('click', function(event) {
 });
 
 function findNodeInTree(node, pathArray) {
+  console.log(node);
+  console.log(pathArray);
   if (pathArray.length === 0) {
     return node;
   }
   const nextNodeName = pathArray.shift();
   const nextNode = node.children.find(child => child.name === nextNodeName);
+  console.log(nextNodeName);
+  console.log(nextNode);
   if (nextNode) {
     return findNodeInTree(nextNode, pathArray);
   }
   return null;
 }
 
-function findParentNodeInTree(node, pathArray) {
-  if (pathArray.length === 1) {
-    return node;
+function findParentNodeInTree(node, pathArray, parentNode = null) {
+  console.log(node);
+  console.log(pathArray);
+  if (pathArray.length === 0) {
+    return parentNode;
   }
   const nextNodeName = pathArray.shift();
   const nextNode = node.children.find(child => child.name === nextNodeName);
+  console.log(nextNodeName);
+  console.log(nextNode);
   if (nextNode) {
-    return findParentNodeInTree(nextNode, pathArray);
+    return findParentNodeInTree(nextNode, pathArray, node);
   }
   return null;
 }
@@ -496,7 +500,8 @@ async function updateJsonFile() {
     parentLocation: parentPath, 
     action: actionType
   };
-
+  console.log(parentPath);
+  console.log(itemPath);
   const response = await fetch('/update_json', {
     method: 'POST',
     headers: {

@@ -257,33 +257,27 @@ async function moveItem() {
   const destinationPath = getItemPath(destinationFolder);
   let sourceNode = findNodeInTree(fileTreeData, sourcePath.split(' > '));
   let destinationNode = findNodeInTree(fileTreeData, destinationPath.split(' > '));
-  console.log(sourcePath);
-  console.log(destinationPath);
-  console.log(sourceNode);
-  console.log(destinationNode);
   if (!sourceNode || !destinationNode) {
     alert('Error in moving item. Please try again.');
     return;
   }
 
-  // Remove source node from its parent
   let sourceParentNode = findParentNodeInTree(fileTreeData, sourcePath.split(' > '));
   if (sourceParentNode) {
     sourceParentNode.children = sourceParentNode.children.filter(node => node !== sourceNode);
   }
 
-  // Add source node to destination node
   destinationNode.children.push(sourceNode);
 
   await updateJsonFile();
   document.querySelector('.moveConfirm').remove();
   const confirmButton = document.querySelector('.moveConfirm button');
-  selectedElement.classList.remove('highlight');  // Remove the highlight from the original selection
-  destinationFolder.classList.remove('highlight');  // Remove the highlight from the destination folder
-  confirmButton.disabled = false;  // Enable the button
-  confirmButton.textContent = 'Confirm';  // Change the button text
+  selectedElement.classList.remove('highlight');
+  destinationFolder.classList.remove('highlight');
+  confirmButton.disabled = false;
+  confirmButton.textContent = 'Confirm';
   const message = document.querySelector('.moveConfirm p');
-  message.textContent = 'Confirm your selection';  // Change the message
+  message.textContent = 'Confirm your selection';
 }
 
 function cancelMove() {
@@ -323,27 +317,11 @@ document.addEventListener('click', function(event) {
 });
 
 function findNodeInTree(node, pathArray) {
-  if (pathArray.length === 0) {
-    return node;
-  }
-  const nextNodeName = pathArray.shift();
-  const nextNode = node.children.find(child => child.name === nextNodeName);
-  if (nextNode) {
-    return findNodeInTree(nextNode, pathArray);
-  }
-  return null;
+
 }
 
 function findParentNodeInTree(node, pathArray) {
-  if (pathArray.length === 1) {
-    return node;
-  }
-  const nextNodeName = pathArray.shift();
-  const nextNode = node.children.find(child => child.name === nextNodeName);
-  if (nextNode) {
-    return findParentNodeInTree(nextNode, pathArray);
-  }
-  return null;
+
 }
 
 function confirmNewItem(event) {

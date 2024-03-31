@@ -1233,8 +1233,10 @@ class Npcpool(db.Model):
 class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True)
-    path = db.Column(db.String(10000), index=True)
+    author = db.Column(db.String(64), index=True)
+    repr_path = db.Column(db.String(10000), index=True)
+    access_path = db.Column(db.String(10000), index=True)
     content = db.Column(db.Text)
 
     def __repr__(self):
-        return f'<File {self.name} at {self.path}>'
+        return f'<File {self.name} at {self.repr_path}>'
