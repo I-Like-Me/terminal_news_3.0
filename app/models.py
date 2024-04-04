@@ -571,12 +571,18 @@ class User(UserMixin, db.Model):
                     },
                 {"name": "READ_ME.txt", "type": "file", "content": "This is the Root folder. It can't be collapsed or renamed. You can add your own subfolders and files. You can delete this READ_ME file if you like."}
             ]}
-            root_rm_path = JsonTools.find_path(self.my_documents, self.my_documents['children'][1]['content'], path=())
-            games_rm_path = JsonTools.find_path(self.my_documents, self.my_documents['children'][0]['children'][0]['content'], path=())
+            root_rm_path, root_rm_repr_path = JsonTools.find_path(self.my_documents, self.my_documents['children'][1]['content'], (), path=())
+            games_rm_path, games_rm_repr_path = JsonTools.find_path(self.my_documents, self.my_documents['children'][0]['children'][0]['content'], (), path=())
+            print(root_rm_repr_path)
+            print(games_rm_repr_path)
+            root_rm_repr_path = JsonTools.find_repr_path(self.my_documents, self.my_documents['children'][1]['content'], path=())
+            games_rm_repr_path = JsonTools.find_repr_path(self.my_documents, self.my_documents['children'][0]['children'][0]['content'], path=())
+            r_rm_repr_path_str = JsonTools.path_to_repr_string(root_rm_path)
+            g_rm_repr_path_str = JsonTools.path_to_repr_string(games_rm_path)
             r_rm_path_str = JsonTools.path_to_string(root_rm_path)
             g_rm_path_str = JsonTools.path_to_string(games_rm_path)
-            root_rm_file = File(name=self.my_documents['children'][1]['name'], path=r_rm_path_str, content=self.my_documents['children'][1]['content'])
-            games_rm_file = File(name=self.my_documents['children'][0]['children'][0]['name'], path=g_rm_path_str, content=self.my_documents['children'][0]['children'][0]['content'])
+            root_rm_file = File(name=self.my_documents['children'][1]['name'], author=self.username, repr_path=None, access_path=r_rm_path_str, content=self.my_documents['children'][1]['content'])
+            games_rm_file = File(name=self.my_documents['children'][0]['children'][0]['name'], author=self.username, repr_path=None, access_path=g_rm_path_str, content=self.my_documents['children'][0]['children'][0]['content'])
             db.session.add_all([root_rm_file, games_rm_file])
             db.session.commit()
             JsonTools.replace_value_by_path(self.my_documents, root_rm_path, root_rm_file.id)
