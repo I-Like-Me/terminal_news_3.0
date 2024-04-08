@@ -196,7 +196,7 @@ let itemPath;
 let parentPath;
 let parentItemName;
 let actionType;
-const removeFileList = [];
+const affectedFileList = [];
 
 function fileButtonsVis() {
     document.getElementById('file_buttons').style.display = 'block';
@@ -371,6 +371,8 @@ async function moveItem() {
 
   // Add source node to destination node
   destinationNode.children.push(sourceNode);
+  affectedFileList.length = 0;
+  checkChildren(sourceNode);
 
   await updateJsonFile();
   document.querySelector('.moveConfirm').remove();
@@ -496,10 +498,11 @@ async function updateJsonFile() {
     itemType: newItemType,
     changeLocation: itemPath,
     parentName: parentItemName,
-    fileList: removeFileList,
+    fileList: affectedFileList,
     parentLocation: parentPath, 
     action: actionType
   };
+  console.log(parentItemName)
   console.log(parentPath);
   console.log(itemPath);
   const response = await fetch('/update_json', {
@@ -526,6 +529,15 @@ async function updateJsonFile() {
   openPathToItem(itemPath);
 }
 
+// Existing function to check children
+function checkChildren(node) {
+  if (node.type === 'file') {
+    affectedFileList.push(node.content);
+  } else if (node.children) {
+    node.children.forEach(checkChildren);
+  }
+}
+
 function addItemToTree(item) {
   actionType = 'add';
   const listItem = document.createElement('li');
@@ -533,6 +545,8 @@ function addItemToTree(item) {
   selectedItem.appendChild(listItem);
   itemPath = getItemPath(selectedElement);
   const pathArray = itemPath.split(' > ');
+  parentItemName = pathArray[pathArray.length - 1]; // Added this line
+  parentPath = pathArray.slice(0, pathArray.length - 1).join(' > '); // Added this line
   let currentNode = fileTreeData;
   for (let i = 0; i < pathArray.length; i++) {
     const child = currentNode.children.find(node => node.name === pathArray[i]);
@@ -540,7 +554,9 @@ function addItemToTree(item) {
       currentNode = child;
     }
   }
-  currentNode.children.push(item); 
+  currentNode.children.push(item);
+  affectedFileList.length = 0;
+  checkChildren(currentNode); 
 }
 
 function getParentItem(item) {
@@ -563,14 +579,7 @@ async function deleteItem() {
       currentNode = child;
     }
   }
-  // Recursively check all children of the node being deleted
-  function checkChildren(node) {
-    if (node.type === 'file') {
-      removeFileList.push(node.content);
-    } else if (node.children) {
-      node.children.forEach(checkChildren);
-    }
-  }
+  affectedFileList.length = 0;
   checkChildren(currentNode);
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();

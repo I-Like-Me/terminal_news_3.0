@@ -140,24 +140,31 @@ def update_json():
     data = request.get_json()
     order = ['name', 'type', 'content', 'children']
     ready_data = Organizer.reorder_keys(data['updatedJSON'], order)
+    user = User.query.filter_by(username=data['author']).first_or_404()
+    print(data['author'])
+    print(data['itemName'])
+    print(data['itemType'])
+    print(data['changeLocation'])
+    print(data['parentName'])
+    print(data['fileList'])
+    print(data['parentLocation']) 
     print(data['action'])
     if data['action'] == 'add':
+        pass
         if data['itemType'] == 'folder':
-            user = User.query.filter_by(username=data['author']).first_or_404()
             user.my_documents = ready_data
             db.session.commit()
         if data['itemType'] == 'file':
             pathTuple = JsonTools.find_path(ready_data, 'Type Here', path=())
             pathString = JsonTools.path_to_string(pathTuple)
-            new_file = File(name=data['itemName'], path=pathString, content='Type Here')
+            new_file = File(name=data['itemName'], author=data['author'], repr_path=data['changeLocation'], access_path=pathString, content='Type Here')
             db.session.add(new_file)
             db.session.commit()
-            user = User.query.filter_by(username=data['author']).first_or_404()
             JsonTools.update_nested_dict(ready_data, pathTuple, new_file.id)
             user.my_documents = ready_data
             db.session.commit()
     if data['action'] == 'delete':
-        user = User.query.filter_by(username=data['author']).first_or_404()
+        pass
         user.my_documents = ready_data
         for item in data['fileList']:
             file_to_delete = File.query.get(item)
