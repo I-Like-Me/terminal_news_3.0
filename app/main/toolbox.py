@@ -148,8 +148,23 @@ class JsonTools:
         elif json_obj == value:
             return path
 
+    def build_repr_from_path(json_obj, path):
+        repr_path = []
+        for key in path:
+            if isinstance(key, int):
+                json_obj = json_obj[key]
+                repr_path.append(' > ')
+            else:
+                repr_path.append(json_obj.get('name'))
+                json_obj = json_obj.get(key)
+        return repr_path
+
     def path_to_string(path):
         return json.dumps(path)
+    
+    def repr_path_to_string(path):
+        repr_str = ''.join(path) 
+        return repr_str
 
     def string_to_path(path_string):
         return json.loads(path_string)

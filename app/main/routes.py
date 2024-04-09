@@ -157,7 +157,20 @@ def update_json():
         if data['itemType'] == 'file':
             pathTuple = JsonTools.find_path(ready_data, 'Type Here', path=())
             pathString = JsonTools.path_to_string(pathTuple)
-            new_file = File(name=data['itemName'], author=data['author'], repr_path=data['changeLocation'], access_path=pathString, content='Type Here')
+            reprPath = JsonTools.build_repr_from_path(ready_data, pathTuple)
+            reprString = JsonTools.repr_path_to_string(reprPath)
+            data['fileList'].pop(-1)
+            if len(data['fileList']) > 0:
+                for f_id in data['fileList']:
+                    cur_file = Collectors.get_file(f_id)
+                    filePath = JsonTools.find_path(ready_data, f_id, path=())
+                    filePathString = JsonTools.path_to_string(filePath)
+                    reprFilePath = JsonTools.build_repr_from_path(ready_data, filePath)
+                    reprFileString = JsonTools.repr_path_to_string(reprFilePath)
+                    cur_file.access_path = filePathString
+                    cur_file.repr_path = reprFileString
+                    db.session.commit()
+            new_file = File(name=data['itemName'], author=data['author'], repr_path=reprString, access_path=pathString, content='Type Here')
             db.session.add(new_file)
             db.session.commit()
             JsonTools.update_nested_dict(ready_data, pathTuple, new_file.id)
