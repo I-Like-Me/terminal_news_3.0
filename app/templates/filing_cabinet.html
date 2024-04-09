@@ -196,6 +196,7 @@ let itemPath;
 let parentPath;
 let parentItemName;
 let actionType;
+let highlightedItem = null;
 const affectedFileList = [];
 
 function fileButtonsVis() {
@@ -282,6 +283,7 @@ let destinationFolder;
 let previousState = {};
 
 function showInputField(type, event) {
+  highlightedItem = document.querySelector('.highlight');
   newItemType = type;
   const rightPanel = document.getElementById('rightPanel');
   
@@ -302,9 +304,23 @@ function showInputField(type, event) {
   document.addEventListener('click', function onClickOutside(event) {
     if (!confirmWindow.contains(event.target)) {
       confirmWindow.remove();
+      if (highlightedItem) {
+        highlightedItem.classList.add('highlight');
+      }
       document.removeEventListener('click', onClickOutside);
     }
+  
+    if (confirmWindow) {
+      confirmWindow.remove();
+      if (highlightedItem) {
+        highlightedItem.classList.add('highlight');
+      }
+      document.removeEventListener('click', onClickOutside);
+    }
+
+    
   });
+
   if (event) {
     event.stopPropagation();
   }
@@ -409,8 +425,8 @@ function cancelMove() {
     selectedElement.classList.remove('highlight');
     selectedElement = null;
   }
-
   document.querySelector('.moveConfirm').remove();
+  // Remove the pop-up window
 }
 
 document.addEventListener('click', function(event) {

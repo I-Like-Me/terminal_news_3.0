@@ -150,8 +150,17 @@ def update_json():
     print(data['parentLocation']) 
     print(data['action'])
     if data['action'] == 'add':
-        pass
         if data['itemType'] == 'folder':
+            if len(data['fileList']) > 0:
+                for f_id in data['fileList']:
+                    cur_file = Collectors.get_file(f_id)
+                    filePath = JsonTools.find_path(ready_data, f_id, path=())
+                    filePathString = JsonTools.path_to_string(filePath)
+                    reprFilePath = JsonTools.build_repr_from_path(ready_data, filePath)
+                    reprFileString = JsonTools.repr_path_to_string(reprFilePath)
+                    cur_file.access_path = filePathString
+                    cur_file.repr_path = reprFileString
+                    db.session.commit()            
             user.my_documents = ready_data
             db.session.commit()
         if data['itemType'] == 'file':
@@ -177,7 +186,6 @@ def update_json():
             user.my_documents = ready_data
             db.session.commit()
     if data['action'] == 'delete':
-        pass
         user.my_documents = ready_data
         for item in data['fileList']:
             file_to_delete = File.query.get(item)
