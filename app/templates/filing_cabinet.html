@@ -202,9 +202,15 @@ function fileButtonsVis() {
     document.getElementById('file_buttons').style.display = 'block';
     document.getElementById('folder_buttons').style.display = 'none';
 }
+
 function folderButtonsVis() {
     document.getElementById('file_buttons').style.display = 'none';
     document.getElementById('folder_buttons').style.display = 'block';
+}
+
+function allButtonsOff() {
+    document.getElementById('file_buttons').style.display = 'none';
+    document.getElementById('folder_buttons').style.display = 'none';
 }
 
 fileTreeElement.addEventListener('click', (event) => {
@@ -282,6 +288,7 @@ let destinationFolder;
 let previousState = {};
 
 function showInputField(type, event) {
+  console.log(moveMode);
   newItemType = type;
   const rightPanel = document.getElementById('rightPanel');
   
@@ -296,11 +303,14 @@ function showInputField(type, event) {
     <p>${type === 'move' ? 'Click a destination folder from the tree' : 'Are you sure you want to ' + (type.includes('delete') ? 'delete' : 'add') + ' this item?'}</p>
     ${type === 'folder' || type === 'file' ? '<input type="text" id="newItemText" placeholder="Enter item name here.">' : ''}
     <button onclick="${type.includes('delete') ? 'deleteItem()' : type === 'move' ? 'moveItem()' : 'confirmNewItem(event)'}">${type === 'move' ? 'Move' : 'Confirm'}</button>
-    <button onclick="cancelMove()">Cancel</button>
+    <button onclick="cancelAction()">Cancel</button>
   `;
   rightPanel.appendChild(confirmWindow);
   document.addEventListener('click', function onClickOutside(event) {
     if (!confirmWindow.contains(event.target)) {
+      if (!fileTreeElement.contains(event.target)) {
+        cancelAction();
+      }
       confirmWindow.remove();
       document.removeEventListener('click', onClickOutside);
     }
@@ -385,8 +395,9 @@ async function moveItem() {
   message.textContent = 'Confirm your selection';  // Change the message
 }
 
-function cancelMove() {
-  moveMode = false;
+function cancelAction() {
+  console.log(moveMode);
+  // Reset UI state
   const allFiles = fileTreeElement.querySelectorAll('.file');
   allFiles.forEach(file => {
     file.style.pointerEvents = 'auto';
@@ -410,7 +421,15 @@ function cancelMove() {
     selectedElement = null;
   }
 
-  document.querySelector('.moveConfirm').remove();
+  // Remove the confirm window
+  const confirmWindow = document.querySelector('.addConfirm, .deleteConfirm, .moveConfirm');
+  if (confirmWindow) {
+    moveMode = false;
+    confirmWindow.remove();
+  console.log(moveMode);
+  }
+
+  allButtonsOff();
 }
 
 document.addEventListener('click', function(event) {
@@ -419,7 +438,8 @@ document.addEventListener('click', function(event) {
     // Check if the click was outside the popup window
     if (!document.querySelector('.moveConfirm').contains(event.target)) {
       // Call the cancelMove function
-      cancelMove();
+      
+      cancelAction();
     }
   }
 });

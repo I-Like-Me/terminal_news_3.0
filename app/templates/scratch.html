@@ -1,4 +1,3 @@
-Can the code below be modified so 'checkChildren()' is used by the Add action, Remove action, and Move action? This way the 'affectedFileList' holds the 'content' of any file type that is a sibling to the item being affected and recursively check all children of the node being affected. if the item being affected is a file type its 'content' should be added to 'affectedFileList' above should take place starting with its parent.
 
 <div id="container">
   <div id="leftPanel">
@@ -102,9 +101,15 @@ function fileButtonsVis() {
     document.getElementById('file_buttons').style.display = 'block';
     document.getElementById('folder_buttons').style.display = 'none';
 }
+
 function folderButtonsVis() {
     document.getElementById('file_buttons').style.display = 'none';
     document.getElementById('folder_buttons').style.display = 'block';
+}
+
+function allButtonsOff() {
+    document.getElementById('file_buttons').style.display = 'none';
+    document.getElementById('folder_buttons').style.display = 'none';
 }
 
 fileTreeElement.addEventListener('click', (event) => {
@@ -112,10 +117,13 @@ fileTreeElement.addEventListener('click', (event) => {
     event.stopPropagation();
     const newDestinationFolder = event.target.closest('.folder');
     if (newDestinationFolder) {
+
       if (destinationFolder) {
         destinationFolder.classList.remove('highlight');
       }
+
       newDestinationFolder.classList.add('highlight');
+
       destinationFolder = newDestinationFolder;
       const confirmButton = document.querySelector('.moveConfirm button');
       confirmButton.disabled = false;
@@ -179,6 +187,7 @@ let destinationFolder;
 let previousState = {};
 
 function showInputField(type, event) {
+  console.log(moveMode);
   newItemType = type;
   const rightPanel = document.getElementById('rightPanel');
   
@@ -193,7 +202,7 @@ function showInputField(type, event) {
     <p>${type === 'move' ? 'Click a destination folder from the tree' : 'Are you sure you want to ' + (type.includes('delete') ? 'delete' : 'add') + ' this item?'}</p>
     ${type === 'folder' || type === 'file' ? '<input type="text" id="newItemText" placeholder="Enter item name here.">' : ''}
     <button onclick="${type.includes('delete') ? 'deleteItem()' : type === 'move' ? 'moveItem()' : 'confirmNewItem(event)'}">${type === 'move' ? 'Move' : 'Confirm'}</button>
-    <button onclick="cancelMove()">Cancel</button>
+    <button onclick="cancelAction()">Cancel</button>
   `;
   rightPanel.appendChild(confirmWindow);
   document.addEventListener('click', function onClickOutside(event) {
@@ -260,12 +269,16 @@ async function moveItem() {
     return;
   }
 
+
   let sourceParentNode = findParentNodeInTree(fileTreeData, sourcePath.split(' > '));
   if (sourceParentNode) {
     sourceParentNode.children = sourceParentNode.children.filter(node => node !== sourceNode);
   }
 
+
   destinationNode.children.push(sourceNode);
+  affectedFileList.length = 0;
+  checkChildren(sourceNode);
 
   await updateJsonFile();
   document.querySelector('.moveConfirm').remove();
@@ -278,8 +291,9 @@ async function moveItem() {
   message.textContent = 'Confirm your selection';
 }
 
-function cancelMove() {
-  moveMode = false;
+function cancelAction() {
+  console.log(moveMode);
+
   const allFiles = fileTreeElement.querySelectorAll('.file');
   allFiles.forEach(file => {
     file.style.pointerEvents = 'auto';
@@ -302,49 +316,28 @@ function cancelMove() {
     selectedElement.classList.remove('highlight');
     selectedElement = null;
   }
-  
-  document.querySelector('.moveConfirm').remove();
+
+  // Remove the confirm window
+  const confirmWindow = document.querySelector('.addConfirm, .deleteConfirm, .moveConfirm');
+  if (confirmWindow) {
+    moveMode = false;
+    confirmWindow.remove();
+  console.log(moveMode);
+  }
+
+  allButtonsOff();
 }
 
 document.addEventListener('click', function(event) {
+
   if (moveMode) {
+
     if (!document.querySelector('.moveConfirm').contains(event.target)) {
-      cancelMove();
+      
+      cancelAction();
     }
   }
 });
-
-function findNodeInTree(node, pathArray) {
-  console.log(node);
-  console.log(pathArray);
-  if (pathArray.length === 0) {
-    return node;
-  }
-  const nextNodeName = pathArray.shift();
-  const nextNode = node.children.find(child => child.name === nextNodeName);
-  console.log(nextNodeName);
-  console.log(nextNode);
-  if (nextNode) {
-    return findNodeInTree(nextNode, pathArray);
-  }
-  return null;
-}
-
-function findParentNodeInTree(node, pathArray, parentNode = null) {
-  console.log(node);
-  console.log(pathArray);
-  if (pathArray.length === 0) {
-    return parentNode;
-  }
-  const nextNodeName = pathArray.shift();
-  const nextNode = node.children.find(child => child.name === nextNodeName);
-  console.log(nextNodeName);
-  console.log(nextNode);
-  if (nextNode) {
-    return findParentNodeInTree(nextNode, pathArray, node);
-  }
-  return null;
-}
 
 function confirmNewItem(event) {
   event.stopPropagation();
@@ -392,7 +385,7 @@ async function updateJsonFile() {
     parentLocation: parentPath, 
     action: actionType
   };
-
+  console.log(parentItemName)
   console.log(parentPath);
   console.log(itemPath);
   const response = await fetch('/update_json', {
@@ -419,6 +412,15 @@ async function updateJsonFile() {
   openPathToItem(itemPath);
 }
 
+
+function checkChildren(node) {
+  if (node.type === 'file') {
+    affectedFileList.push(node.content);
+  } else if (node.children) {
+    node.children.forEach(checkChildren);
+  }
+}
+
 function addItemToTree(item) {
   actionType = 'add';
   const listItem = document.createElement('li');
@@ -426,6 +428,8 @@ function addItemToTree(item) {
   selectedItem.appendChild(listItem);
   itemPath = getItemPath(selectedElement);
   const pathArray = itemPath.split(' > ');
+  parentItemName = pathArray[pathArray.length - 1]; 
+  parentPath = pathArray.slice(0, pathArray.length - 1).join(' > '); 
   let currentNode = fileTreeData;
   for (let i = 0; i < pathArray.length; i++) {
     const child = currentNode.children.find(node => node.name === pathArray[i]);
@@ -433,7 +437,9 @@ function addItemToTree(item) {
       currentNode = child;
     }
   }
-  currentNode.children.push(item); 
+  currentNode.children.push(item);
+  affectedFileList.length = 0;
+  checkChildren(currentNode); 
 }
 
 function getParentItem(item) {
@@ -448,7 +454,7 @@ async function deleteItem() {
   actionType = 'delete';
   pathArray = itemPath.split(' > ');
   parentItemName = pathArray[pathArray.length - 2];
-  parentPath = pathArray.slice(0, pathArray.length - 1).join(' > ');
+  parentPath = pathArray.slice(0, pathArray.length - 1).join(' > '); 
   let currentNode = fileTreeData;
   for (let i = 0; i < pathArray.length; i++) {
     const child = currentNode.children.find(node => node.name === pathArray[i]);
@@ -456,13 +462,7 @@ async function deleteItem() {
       currentNode = child;
     }
   }
-  function checkChildren(node) {
-    if (node.type === 'file') {
-      affectedFileList.push(node.content);
-    } else if (node.children) {
-      node.children.forEach(checkChildren);
-    }
-  }
+  affectedFileList.length = 0;
   checkChildren(currentNode);
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
@@ -471,7 +471,7 @@ async function deleteItem() {
 
   if (response.ok) {
     const updatedData = await response.json();
-    fileTreeData = updatedData;
+    fileTreeData = updatedData;  
   }
 }
 
@@ -534,5 +534,3 @@ function getItemPath(element) {
   }
   return path;
 }
-
-
