@@ -141,14 +141,14 @@ def update_json():
     order = ['name', 'type', 'content', 'children']
     ready_data = Organizer.reorder_keys(data['updatedJSON'], order)
     user = User.query.filter_by(username=data['author']).first_or_404()
-    print(data['author'])
-    print(data['itemName'])
-    print(data['itemType'])
-    print(data['changeLocation'])
-    print(data['parentName'])
-    print(data['fileList'])
-    print(data['parentLocation']) 
-    print(data['action'])
+    print(f"The Author is {data['author']}")
+    print(f"The item being affected is {data['itemName']}")
+    print(f"The item type being affected is {data['itemType']}")
+    print(f"The repr path to the item being affected is {data['changeLocation']}")
+    print(f"The parent of the item being affected if {data['parentName']}")
+    print(f"The files that need to be checked are {data['fileList']}")
+    print(f"The location of the affected item's parent is {data['parentLocation']}") 
+    print(f"The action being taken is {data['action']}")
     if data['action'] == 'add':
         if data['itemType'] == 'folder':
             if len(data['fileList']) > 0:

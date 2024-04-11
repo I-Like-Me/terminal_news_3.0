@@ -272,7 +272,7 @@ zoom: 1;
 
 #container {
     display: flex;
-    height: 100vh;
+    height: 80vh;
     overflow: hidden;
     border: 5px solid #ddd; /* Add border to the container */
     padding: 0; /* Remove padding from the container */

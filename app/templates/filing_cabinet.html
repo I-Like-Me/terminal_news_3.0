@@ -83,9 +83,6 @@ function createFileTree(node, parentElement, isFirstLayer = true, newItemName = 
 
   if (node.name === newItemName) {
     listItem.querySelector(`div[data-name="${newItemName}"]`).classList.add('highlight');
-    console.log('New Item');
-    console.log(fileTreeData);
-
   }
   parentElement.appendChild(listItem);
 }
@@ -288,7 +285,6 @@ let destinationFolder;
 let previousState = {};
 
 function showInputField(type, event) {
-  console.log(moveMode);
   newItemType = type;
   const rightPanel = document.getElementById('rightPanel');
   
@@ -396,7 +392,6 @@ async function moveItem() {
 }
 
 function cancelAction() {
-  console.log(moveMode);
   // Reset UI state
   const allFiles = fileTreeElement.querySelectorAll('.file');
   allFiles.forEach(file => {
@@ -426,7 +421,6 @@ function cancelAction() {
   if (confirmWindow) {
     moveMode = false;
     confirmWindow.remove();
-  console.log(moveMode);
   }
 
   allButtonsOff();
@@ -445,15 +439,11 @@ document.addEventListener('click', function(event) {
 });
 
 function findNodeInTree(node, pathArray) {
-  console.log(node);
-  console.log(pathArray);
   if (pathArray.length === 0) {
     return node;
   }
   const nextNodeName = pathArray.shift();
   const nextNode = node.children.find(child => child.name === nextNodeName);
-  console.log(nextNodeName);
-  console.log(nextNode);
   if (nextNode) {
     return findNodeInTree(nextNode, pathArray);
   }
@@ -461,15 +451,11 @@ function findNodeInTree(node, pathArray) {
 }
 
 function findParentNodeInTree(node, pathArray, parentNode = null) {
-  console.log(node);
-  console.log(pathArray);
   if (pathArray.length === 0) {
     return parentNode;
   }
   const nextNodeName = pathArray.shift();
   const nextNode = node.children.find(child => child.name === nextNodeName);
-  console.log(nextNodeName);
-  console.log(nextNode);
   if (nextNode) {
     return findParentNodeInTree(nextNode, pathArray, node);
   }
@@ -522,9 +508,7 @@ async function updateJsonFile() {
     parentLocation: parentPath, 
     action: actionType
   };
-  console.log(parentItemName)
-  console.log(parentPath);
-  console.log(itemPath);
+
   const response = await fetch('/update_json', {
     method: 'POST',
     headers: {
