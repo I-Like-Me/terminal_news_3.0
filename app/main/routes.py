@@ -142,11 +142,14 @@ def update_json():
     ready_data = Organizer.reorder_keys(data['updatedJSON'], order)
     user = User.query.filter_by(username=data['author']).first_or_404()
     print(f"The Author is {data['author']}")
+    print(f"The name of the selected item is {data['selItemName']}")
+    print(f"The type of the selected item is {data['selItemType']}")
     print(f"The item being affected is {data['itemName']}")
     print(f"The item type being affected is {data['itemType']}")
     print(f"The repr path to the item being affected is {data['changeLocation']}")
     print(f"The parent of the item being affected if {data['parentName']}")
     print(f"The files that need to be checked are {data['fileList']}")
+    print(f"The files to delete are {data['deleteList']}")
     print(f"The location of the affected item's parent is {data['parentLocation']}") 
     print(f"The action being taken is {data['action']}")
     if data['action'] == 'add':
@@ -186,12 +189,22 @@ def update_json():
             user.my_documents = ready_data
             db.session.commit()
     if data['action'] == 'delete':
-        user.my_documents = ready_data
-        for item in data['fileList']:
-            file_to_delete = File.query.get(item)
-            if file_to_delete is not None:
-                db.session.delete(file_to_delete)
-        db.session.commit()
+        final_affected_list = []
+        for f_id in data['fileList']:
+            if f_id not in data['deleteList']:
+                final_affected_list.append(f_id)
+        print(final_affected_list)
+        print(len(final_affected_list))
+        print(data['deleteList'])
+        print(len(data['deleteList']))
+        print(data['fileList'])
+        print(len(data['fileList']))
+        # user.my_documents = ready_data
+        # for item in data['fileList']:
+        #     file_to_delete = File.query.get(item)
+        #     if file_to_delete is not None:
+        #         db.session.delete(file_to_delete)
+        # db.session.commit()
     return jsonify(user.my_documents)
 
 

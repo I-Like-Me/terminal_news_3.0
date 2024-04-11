@@ -186,6 +186,8 @@ function handleSearchResultClick(path) {
 }
 
 let selectedItem;
+let selectedItemName;
+let selectedItemType;
 let newItemName;
 let newItemType;
 let selectedElement; 
@@ -194,6 +196,7 @@ let parentPath;
 let parentItemName;
 let actionType;
 const affectedFileList = [];
+const deleteFileList = [];
 
 function fileButtonsVis() {
     document.getElementById('file_buttons').style.display = 'block';
@@ -247,6 +250,12 @@ fileTreeElement.addEventListener('click', (event) => {
     const fileData = findFileData(fileTreeData, filePath, '');
     fileTypeElement.classList.add('highlight');
     selectedElement = fileTypeElement;
+    if (selectedElement) {
+      selectedItemName = selectedElement.getAttribute('data-name');
+    }
+    if (selectedElement) {
+      selectedItemType = selectedElement.classList.contains('file') ? 'file' : 'folder';
+    }
     if (fileData && fileData.content) {
       fetch('/process_file_content', {
         method: 'POST',
@@ -378,7 +387,9 @@ async function moveItem() {
   // Add source node to destination node
   destinationNode.children.push(sourceNode);
   affectedFileList.length = 0;
+  deleteFileList.length = 0
   checkChildren(sourceNode);
+  checkSelectedChildren(sourceNode)
 
   await updateJsonFile();
   document.querySelector('.moveConfirm').remove();
@@ -500,11 +511,14 @@ async function updateJsonFile() {
   let dataToSend = {
     author: cur_user,
     updatedJSON: fileTreeData,
+    selItemName: selectedItemName,
+    selItemType: selectedItemType,
     itemName: newItemName,
     itemType: newItemType,
     changeLocation: itemPath,
     parentName: parentItemName,
     fileList: affectedFileList,
+    deleteList: deleteFileList,
     parentLocation: parentPath, 
     action: actionType
   };
@@ -542,6 +556,15 @@ function checkChildren(node) {
   }
 }
 
+function checkSelectedChildren(node) {
+  if (node.type === 'file') {
+    deleteFileList.push(node.content);
+  } else if (node.children) {
+    node.children.forEach(checkSelectedChildren);
+  }
+}
+
+
 function addItemToTree(item) {
   actionType = 'add';
   const listItem = document.createElement('li');
@@ -560,7 +583,9 @@ function addItemToTree(item) {
   }
   currentNode.children.push(item);
   affectedFileList.length = 0;
-  checkChildren(currentNode); 
+  deleteFileList.length = 0;
+  checkChildren(currentNode);
+  checkSelectedChildren(currentNode);
 }
 
 function getParentItem(item) {
@@ -571,6 +596,8 @@ function getParentItem(item) {
 }
 
 async function deleteItem() {
+  newItemName = 'None';
+  newItemType = 'None'
   itemPath = getItemPath(selectedElement);
   actionType = 'delete';
   pathArray = itemPath.split(' > ');
@@ -584,7 +611,9 @@ async function deleteItem() {
     }
   }
   affectedFileList.length = 0;
+  deleteFileList.length = 0;
   checkChildren(currentNode);
+  checkSelectedChildren(currentNode);
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
 
