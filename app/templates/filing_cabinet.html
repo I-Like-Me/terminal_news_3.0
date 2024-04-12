@@ -250,12 +250,11 @@ fileTreeElement.addEventListener('click', (event) => {
     const fileData = findFileData(fileTreeData, filePath, '');
     fileTypeElement.classList.add('highlight');
     selectedElement = fileTypeElement;
+    console.log(selectedElement);
     if (selectedElement) {
       selectedItemName = selectedElement.getAttribute('data-name');
     }
-    if (selectedElement) {
-      selectedItemType = selectedElement.classList.contains('file') ? 'file' : 'folder';
-    }
+    selectedItemType = 'file';
     if (fileData && fileData.content) {
       fetch('/process_file_content', {
         method: 'POST',
@@ -280,6 +279,11 @@ fileTreeElement.addEventListener('click', (event) => {
     }
     folderTypeElement.classList.add('highlight');
     selectedElement = folderTypeElement;
+    console.log(selectedElement);
+    if (selectedElement) {
+      selectedItemName = selectedElement.getAttribute('data-name');
+    }
+    selectedItemType = 'folder';
     folderButtonsVis();
     selectedItem = selectedElement;
     const editorContainer = document.getElementById('editorContainer');
@@ -596,10 +600,10 @@ function getParentItem(item) {
 }
 
 async function deleteItem() {
+  actionType = 'delete';
   newItemName = 'None';
   newItemType = 'None'
   itemPath = getItemPath(selectedElement);
-  actionType = 'delete';
   pathArray = itemPath.split(' > ');
   parentItemName = pathArray[pathArray.length - 2]; // Get parent's name
   parentPath = pathArray.slice(0, pathArray.length - 1).join(' > '); // Get parent's path
@@ -613,7 +617,9 @@ async function deleteItem() {
   affectedFileList.length = 0;
   deleteFileList.length = 0;
   checkChildren(currentNode);
+  console.log(affectedFileList)
   checkSelectedChildren(currentNode);
+  console.log(affectedFileList)
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
 

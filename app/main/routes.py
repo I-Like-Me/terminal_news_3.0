@@ -147,7 +147,7 @@ def update_json():
     print(f"The item being affected is {data['itemName']}")
     print(f"The item type being affected is {data['itemType']}")
     print(f"The repr path to the item being affected is {data['changeLocation']}")
-    print(f"The parent of the item being affected if {data['parentName']}")
+    print(f"The parent of the item being affected is {data['parentName']}")
     print(f"The files that need to be checked are {data['fileList']}")
     print(f"The files to delete are {data['deleteList']}")
     print(f"The location of the affected item's parent is {data['parentLocation']}") 
