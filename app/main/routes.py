@@ -193,18 +193,23 @@ def update_json():
         for f_id in data['fileList']:
             if f_id not in data['deleteList']:
                 final_affected_list.append(f_id)
-        print(final_affected_list)
-        print(len(final_affected_list))
-        print(data['deleteList'])
-        print(len(data['deleteList']))
-        print(data['fileList'])
-        print(len(data['fileList']))
-        # user.my_documents = ready_data
-        # for item in data['fileList']:
-        #     file_to_delete = File.query.get(item)
-        #     if file_to_delete is not None:
-        #         db.session.delete(file_to_delete)
-        # db.session.commit()
+        user.my_documents = ready_data
+        if len(data['deleteList']) > 0:
+            for item in data['deleteList']:
+                file_to_delete = File.query.get(item)
+                if file_to_delete is not None:
+                    db.session.delete(file_to_delete)
+        db.session.commit()
+        if len(final_affected_list) > 0:
+            for f_id in final_affected_list:
+                cur_file = Collectors.get_file(f_id)
+                filePath = JsonTools.find_path(ready_data, f_id, path=())
+                filePathString = JsonTools.path_to_string(filePath)
+                reprFilePath = JsonTools.build_repr_from_path(ready_data, filePath)
+                reprFileString = JsonTools.repr_path_to_string(reprFilePath)
+                cur_file.access_path = filePathString
+                cur_file.repr_path = reprFileString
+                db.session.commit()
     return jsonify(user.my_documents)
 
 
