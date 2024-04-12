@@ -614,12 +614,17 @@ async function deleteItem() {
       currentNode = child;
     }
   }
+  let parentNode = fileTreeData;
+  for (let i = 0; i < parentPath.length; i++) {
+    const child = parentNode.children.find(node => node.name === parentPath[i]);
+    if (child) {
+      parentNode = child;
+    }
+  }
   affectedFileList.length = 0;
   deleteFileList.length = 0;
-  checkChildren(currentNode);
-  console.log(affectedFileList)
+  checkChildren(parentNode);
   checkSelectedChildren(currentNode);
-  console.log(affectedFileList)
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
 
