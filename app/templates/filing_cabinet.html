@@ -188,6 +188,7 @@ function handleSearchResultClick(path) {
 let selectedItem;
 let selectedItemName;
 let selectedItemType;
+let selectedItemContent;
 let newItemName;
 let newItemType;
 let selectedElement; 
@@ -250,11 +251,15 @@ fileTreeElement.addEventListener('click', (event) => {
     const fileData = findFileData(fileTreeData, filePath, '');
     fileTypeElement.classList.add('highlight');
     selectedElement = fileTypeElement;
-    console.log(selectedElement);
     if (selectedElement) {
-      selectedItemName = selectedElement.getAttribute('data-name');
+      selectedItemName = selectedElement.getAttribute('type');
     }
-    selectedItemType = 'file';
+    selectedItemName = fileName;
+    selectedItemType = fileData.type;
+    selectedItemContent = fileData.content
+    console.log(selectedItemName);
+    console.log(selectedItemType);
+    console.log(selectedItemContent);
     if (fileData && fileData.content) {
       fetch('/process_file_content', {
         method: 'POST',
@@ -277,13 +282,19 @@ fileTreeElement.addEventListener('click', (event) => {
       confirmButton.disabled = false;
       return;
     }
+    const folderName = folderTypeElement.getAttribute('data-name');
+    const folderPath = getItemPath(folderTypeElement);
     folderTypeElement.classList.add('highlight');
     selectedElement = folderTypeElement;
-    console.log(selectedElement);
     if (selectedElement) {
       selectedItemName = selectedElement.getAttribute('data-name');
     }
+    selectedItemName = folderName;
     selectedItemType = 'folder';
+    selectedItemContent = 'Not File'
+    console.log(selectedItemName);
+    console.log(selectedItemType);
+    console.log(selectedItemContent);
     folderButtonsVis();
     selectedItem = selectedElement;
     const editorContainer = document.getElementById('editorContainer');
@@ -517,6 +528,7 @@ async function updateJsonFile() {
     updatedJSON: fileTreeData,
     selItemName: selectedItemName,
     selItemType: selectedItemType,
+    selItemContent: selectedItemContent,
     itemName: newItemName,
     itemType: newItemType,
     changeLocation: itemPath,
