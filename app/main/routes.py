@@ -153,29 +153,34 @@ def update_json():
     print(f"The files to delete are {data['deleteList']}")
     print(f"The location of the affected item's parent is {data['parentLocation']}") 
     print(f"The action being taken is {data['action']}")
+    print()
+    holderDict = ready_data
+    print(holderDict)
+    JsonTools.sort_nested_list(holderDict['children'])
+    print(holderDict)
     # Make list of all parents involved
-    foldersInvolved = []
-    dataToSort = data['fileList']
-    if data['action'] == 'delete':
-        dataToSort.remove(data['selItemContent'])
-    for fetch_id in dataToSort:
-        print(fetch_id)
-        filePath = JsonTools.find_path(ready_data, fetch_id, path=())
-        pathList = list(filePath)
-        if len(pathList) > 0:
-            pathList.pop(-1)
-            pathList.pop(-1)
-            pathList.pop(-1)
-            if pathList not in foldersInvolved:
-                foldersInvolved.append(pathList)
-    for folPath in foldersInvolved:
-        if len(folPath) > 0:
-            folStuff = JsonTools.get_value_by_path(ready_data, folPath)
-            print(folStuff['children'])
-            print('__________________')
-            print(sorted(folStuff['children'], key=lambda x: x['name']))
-            print('____________________')
-    print(foldersInvolved)
+    # foldersInvolved = []
+    # dataToSort = data['fileList']
+    # if data['action'] == 'delete':
+    #     dataToSort.remove(data['selItemContent'])
+    # for fetch_id in dataToSort:
+    #     print(fetch_id)
+    #     filePath = JsonTools.find_path(ready_data, fetch_id, path=())
+    #     pathList = list(filePath)
+    #     if len(pathList) > 0:
+    #         pathList.pop(-1)
+    #         pathList.pop(-1)
+    #         pathList.pop(-1)
+    #         if pathList not in foldersInvolved:
+    #             foldersInvolved.append(pathList)
+    # for folPath in foldersInvolved:
+    #     if len(folPath) > 0:
+    #         folStuff = JsonTools.get_value_by_path(ready_data, folPath)
+    #         print(folStuff['children'])
+    #         print('__________________')
+    #         print(sorted(folStuff['children'], key=lambda x: x['name']))
+    #         print('____________________')
+    # print(foldersInvolved)
     # for each folders children in the parents list, separate files and folders to separate lists
     # first sort the folder list to alphabetical order
     # then soft the file list to alphabetical order

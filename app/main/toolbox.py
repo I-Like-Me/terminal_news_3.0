@@ -187,3 +187,9 @@ class JsonTools:
             d[path[-1]] = value
         else:
             d[path[-1]] = value
+
+    def sort_nested_list(data):
+        data.sort(key=lambda x: (x['type'] != 'folder', x['name']))
+        for item in data:
+            if item['type'] == 'folder':
+                JsonTools.sort_nested_list(item['children'])
