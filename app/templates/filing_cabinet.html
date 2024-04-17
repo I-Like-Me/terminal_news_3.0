@@ -197,8 +197,8 @@ let parentPath;
 let parentItemName;
 let actionType;
 const affectedFileList = [];
-const deleteFileList = [];
-const allFileList = [];
+const changeFileList = [];
+let allFileList = [];
 
 function fileButtonsVis() {
     document.getElementById('file_buttons').style.display = 'block';
@@ -250,6 +250,7 @@ fileTreeElement.addEventListener('click', (event) => {
     const fileName = fileTypeElement.getAttribute('data-name');
     const filePath = getItemPath(fileTypeElement);
     const fileData = findFileData(fileTreeData, filePath, '');
+    console.log(fileData);
     fileTypeElement.classList.add('highlight');
     selectedElement = fileTypeElement;
     if (selectedElement) {
@@ -403,7 +404,7 @@ async function moveItem() {
   // Add source node to destination node
   destinationNode.children.push(sourceNode);
   affectedFileList.length = 0;
-  deleteFileList.length = 0
+  changeFileList.length = 0
   checkChildren(sourceNode);
   checkSelectedChildren(sourceNode)
   getAllFiles(fileTreeData);
@@ -490,7 +491,7 @@ function findParentNodeInTree(node, pathArray, parentNode = null) {
   return null;
 }
 
-function confirmNewItem(event) {
+async function confirmNewItem(event) {
   event.stopPropagation();
   let newItem;
   newItemName = document.getElementById('newItemText').value;
@@ -508,7 +509,12 @@ function confirmNewItem(event) {
     return;
   }
   addItemToTree(newItem);
-  updateJsonFile();
+  const response = await updateJsonFile();
+
+  if (response.ok) {
+    const updatedData = await response.json();
+    fileTreeData = updatedData;  // Update the client-side data
+  }
   document.querySelector('.addConfirm').remove();
 }
 
@@ -536,7 +542,7 @@ async function updateJsonFile() {
     changeLocation: itemPath,
     parentName: parentItemName,
     fileList: affectedFileList,
-    deleteList: deleteFileList,
+    changeList: changeFileList,
     allFiles: allFileList,
     parentLocation: parentPath, 
     action: actionType
@@ -557,6 +563,7 @@ async function updateJsonFile() {
   const data = await response.json();
   
   fileTreeData = data;
+  console.log(fileTreeData);
   fileTreeElement.innerHTML = '';
   createFileTree(fileTreeData, fileTreeElement, true, newItemName);
   const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
@@ -585,7 +592,7 @@ function checkChildren(node) {
 
 function checkSelectedChildren(node) {
   if (node.type === 'file') {
-    deleteFileList.push(node.content);
+    changeFileList.push(node.content);
   } else if (node.children) {
     node.children.forEach(checkSelectedChildren);
   }
@@ -610,10 +617,12 @@ function addItemToTree(item) {
   }
   currentNode.children.push(item);
   affectedFileList.length = 0;
-  deleteFileList.length = 0;
+  changeFileList.length = 0;
   checkChildren(currentNode);
   checkSelectedChildren(currentNode);
   getAllFiles(fileTreeData);
+  console.log('add');
+  console.log(allFileList);
 }
 
 function getParentItem(item) {
@@ -627,6 +636,7 @@ async function deleteItem() {
   actionType = 'delete';
   newItemName = 'None';
   newItemType = 'None'
+  
   itemPath = getItemPath(selectedElement);
   pathArray = itemPath.split(' > ');
   parentItemName = pathArray[pathArray.length - 2]; // Get parent's name
@@ -646,10 +656,15 @@ async function deleteItem() {
     }
   }
   affectedFileList.length = 0;
-  deleteFileList.length = 0;
+  changeFileList.length = 0;
   checkChildren(parentNode);
   checkSelectedChildren(currentNode);
+  console.log(fileTreeData);
+  console.log(allFileList);
+  allFileList = [];
   getAllFiles(fileTreeData);
+  console.log('delete');
+  console.log(allFileList);
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
 
