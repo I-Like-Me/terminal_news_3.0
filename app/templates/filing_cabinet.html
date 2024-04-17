@@ -569,8 +569,11 @@ async function updateJsonFile() {
   const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
   if (newItemElement) {
     newItemElement.click();
+    openPathToItem(itemPath);
   }
-  openPathToItem(itemPath);
+  if (actionType === 'delete') {
+    cancelAction();
+  }
 }
 
 function getAllFiles(node) {
