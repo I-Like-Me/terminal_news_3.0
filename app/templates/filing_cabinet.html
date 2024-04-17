@@ -453,6 +453,8 @@ function cancelAction() {
   }
 
   allButtonsOff();
+  const editorContainer = document.getElementById('editorContainer');
+  editorContainer.innerHTML = '';
 }
 
 document.addEventListener('click', function(event) {
@@ -676,7 +678,7 @@ async function deleteItem() {
   if (response.ok) {
     const updatedData = await response.json();
     fileTreeData = updatedData;  // Update the client-side data
-  }
+  }  
 }
 
 function deleteItemFromTree(path) {
