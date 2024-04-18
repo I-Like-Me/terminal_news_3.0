@@ -220,9 +220,11 @@ def update_json():
                 cur_file.repr_path = reprFileString
                 db.session.commit()
     if data['action'] == 'move':
-        print(JsonTools.get_nested_dict_path(ready_data, 'Evan > Games > Rebels > Chewy'))
-        print(JsonTools.get_nested_dict_path(ready_data, data['moveDestinationPath']))
-        JsonTools.sort_nested_list(ready_data['children'])
+        sourcePath =  JsonTools.get_nested_dict_path(ready_data, data['moveSourcePath'])
+        destPath = JsonTools.get_nested_dict_path(ready_data, data['moveDestinationPath'])
+        JsonTools.add_to_nested_dict(ready_data, sourcePath, destPath)
+        #JsonTools.sort_nested_list(ready_data['children'])
+        print(ready_data)
     return jsonify(user.my_documents)
 
 

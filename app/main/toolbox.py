@@ -204,3 +204,16 @@ class JsonTools:
                     d = child
                     break
         return result
+
+    def add_to_nested_dict(nested_dict, source_path, dest_path):
+        # Get the item at the source path
+        item = JsonTools.get_value_by_path(nested_dict, source_path)
+        
+        # Remove the item from its current location
+        parent_path = source_path[:-2]  # Get the parent path
+        parent = JsonTools.get_value_by_path(nested_dict, parent_path)  # Get the parent
+        parent['children'].remove(item)  # Remove the item from the parent's children
+        
+        # Add the item to the destination path
+        dest = JsonTools.get_value_by_path(nested_dict, dest_path)  # Get the destination
+        dest['children'].append(item)  # Add the item to the destination's children
