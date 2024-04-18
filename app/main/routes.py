@@ -141,19 +141,21 @@ def update_json():
     order = ['name', 'type', 'content', 'children']
     ready_data = Organizer.reorder_keys(data['updatedJSON'], order)
     user = User.query.filter_by(username=data['author']).first_or_404()
-    # print(f"The Author is {data['author']}")
-    # print(f"The name of the selected item is {data['selItemName']}")
-    # print(f"The type of the selected item is {data['selItemType']}")
-    # print(f"The type of the selected item is {data['selItemContent']}")
-    # print(f"The item being affected is {data['itemName']}")
-    # print(f"The item type being affected is {data['itemType']}")
-    # print(f"The repr path to the item being affected is {data['changeLocation']}")
-    # print(f"The parent of the item being affected is {data['parentName']}")
-    # print(f"The files that need to be checked are {data['fileList']}")
-    # print(f"The files to delete are {data['changeList']}")
-    # print(f"The location of the affected item's parent is {data['parentLocation']}") 
-    # print(f"The action being taken is {data['action']}")
-    # print(f"The list of files include {data['allFiles']}")
+    print(f"The Author is {data['author']}")
+    print(f"The name of the selected item is {data['selItemName']}")
+    print(f"The type of the selected item is {data['selItemType']}")
+    print(f"The type of the selected item is {data['selItemContent']}")
+    print(f"The item being affected is {data['itemName']}")
+    print(f"The item type being affected is {data['itemType']}")
+    print(f"The repr path to the item being affected is {data['changeLocation']}")
+    print(f"The parent of the item being affected is {data['parentName']}")
+    print(f"The files that need to be checked are {data['fileList']}")
+    print(f"The files to delete are {data['changeList']}")
+    print(f"The location of the affected item's parent is {data['parentLocation']}") 
+    print(f"The action being taken is {data['action']}")
+    print(f"The list of files include {data['allFiles']}")
+    print(data['moveSourcePath'])
+    print(data['moveDestinationPath'])
     JsonTools.sort_nested_list(ready_data['children'])
     if data['action'] == 'add':
         if data['itemType'] == 'folder':
@@ -216,6 +218,9 @@ def update_json():
                 cur_file.access_path = filePathString
                 cur_file.repr_path = reprFileString
                 db.session.commit()
+    if data['action'] == 'delete':
+        print(JsonTools.get_nested_dict(data['moveSourcePath']))
+        print(JsonTools.get_nested_dict(data['moveDestinationPath']))
     return jsonify(user.my_documents)
 
 

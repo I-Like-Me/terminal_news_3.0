@@ -87,6 +87,7 @@ function createFileTree(node, parentElement, isFirstLayer = true, newItemName = 
   parentElement.appendChild(listItem);
 }
 
+
 function toggleFileTreeSearch() {
   const fileTreeContainer = document.getElementById('fileTreeContainer');
   const searchContainer = document.getElementById('searchContainer');
@@ -102,11 +103,13 @@ function toggleFileTreeSearch() {
     toggleBtn.textContent = 'Search';
   }
 }
+
 function handleKeyUp(event) {
   if (event.keyCode === 13) {
     runSearch();
   }
 }
+
 function runSearch() {
   const searchInput = document.getElementById('searchInput').value.toLowerCase();
   const searchResults = document.getElementById('searchResults');
@@ -199,6 +202,12 @@ let actionType;
 const affectedFileList = [];
 const changeFileList = [];
 let allFileList = [];
+let moveMode = false;
+let destinationFolder;
+let previousState = {};
+let sourcePath;
+let destinationPath;
+
 
 function fileButtonsVis() {
     document.getElementById('file_buttons').style.display = 'block';
@@ -250,7 +259,6 @@ fileTreeElement.addEventListener('click', (event) => {
     const fileName = fileTypeElement.getAttribute('data-name');
     const filePath = getItemPath(fileTypeElement);
     const fileData = findFileData(fileTreeData, filePath, '');
-    console.log(fileData);
     fileTypeElement.classList.add('highlight');
     selectedElement = fileTypeElement;
     if (selectedElement) {
@@ -259,9 +267,6 @@ fileTreeElement.addEventListener('click', (event) => {
     selectedItemName = fileName;
     selectedItemType = fileData.type;
     selectedItemContent = fileData.content
-    console.log(selectedItemName);
-    console.log(selectedItemType);
-    console.log(selectedItemContent);
     if (fileData && fileData.content) {
       fetch('/process_file_content', {
         method: 'POST',
@@ -294,9 +299,6 @@ fileTreeElement.addEventListener('click', (event) => {
     selectedItemName = folderName;
     selectedItemType = 'folder';
     selectedItemContent = 'Not File'
-    console.log(selectedItemName);
-    console.log(selectedItemType);
-    console.log(selectedItemContent);
     folderButtonsVis();
     selectedItem = selectedElement;
     const editorContainer = document.getElementById('editorContainer');
@@ -305,10 +307,6 @@ fileTreeElement.addEventListener('click', (event) => {
     folderButtonsVis();
   }
 });
-
-let moveMode = false;
-let destinationFolder;
-let previousState = {};
 
 function showInputField(type, event) {
   newItemType = type;
@@ -385,28 +383,24 @@ async function moveItem() {
     file.style.pointerEvents = 'auto';
     file.style.opacity = '1';
   });
-
-  const sourcePath = getItemPath(selectedElement);
-  const destinationPath = getItemPath(destinationFolder);
-  let sourceNode = findNodeInTree(fileTreeData, sourcePath.split(' > '));
-  let destinationNode = findNodeInTree(fileTreeData, destinationPath.split(' > '));
-  if (!sourceNode || !destinationNode) {
-    alert('Error in moving item. Please try again.');
-    return;
-  }
-
-  // Remove source node from its parent
-  let sourceParentNode = findParentNodeInTree(fileTreeData, sourcePath.split(' > '));
-  if (sourceParentNode) {
-    sourceParentNode.children = sourceParentNode.children.filter(node => node !== sourceNode);
-  }
-
-  // Add source node to destination node
-  destinationNode.children.push(sourceNode);
+  sourcePath = getItemPath(selectedElement);
+  destinationPath = getItemPath(destinationFolder);
+  newItemName = 'None';
+  newItemType = 'None';
+  itemPath = 'None';
+  parentPath = 'None';
+  parentItemName = 'None';
+  actionType = 'move';
   affectedFileList.length = 0;
   changeFileList.length = 0
-  checkChildren(sourceNode);
-  checkSelectedChildren(sourceNode)
+  let currentNode = fileTreeData;
+  for (let i = 0; i < sourcePath.length; i++) {
+    const child = currentNode.children.find(node => node.name === sourcePath[i]);
+    if (child) {
+      currentNode = child;
+    }
+  }
+  allFileList = [];
   getAllFiles(fileTreeData);
 
   await updateJsonFile();
@@ -547,7 +541,9 @@ async function updateJsonFile() {
     changeList: changeFileList,
     allFiles: allFileList,
     parentLocation: parentPath, 
-    action: actionType
+    action: actionType,
+    moveSourcePath: sourcePath,
+    moveDestinationPath: destinationPath
   };
 
   const response = await fetch('/update_json', {
@@ -565,7 +561,6 @@ async function updateJsonFile() {
   const data = await response.json();
   
   fileTreeData = data;
-  console.log(fileTreeData);
   fileTreeElement.innerHTML = '';
   createFileTree(fileTreeData, fileTreeElement, true, newItemName);
   const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
@@ -606,6 +601,8 @@ function checkSelectedChildren(node) {
 
 function addItemToTree(item) {
   actionType = 'add';
+  sourcePath = '';
+  destinationPath = '';
   const listItem = document.createElement('li');
   listItem.innerHTML = `<div class="${item.type}" data-name="${item.name}">${item.name}</div>`;
   selectedItem.appendChild(listItem);
@@ -625,9 +622,8 @@ function addItemToTree(item) {
   changeFileList.length = 0;
   checkChildren(currentNode);
   checkSelectedChildren(currentNode);
+  allFileList = [];
   getAllFiles(fileTreeData);
-  console.log('add');
-  console.log(allFileList);
 }
 
 function getParentItem(item) {
@@ -641,7 +637,8 @@ async function deleteItem() {
   actionType = 'delete';
   newItemName = 'None';
   newItemType = 'None'
-  
+  sourcePath = '';
+  destinationPath = '';
   itemPath = getItemPath(selectedElement);
   pathArray = itemPath.split(' > ');
   parentItemName = pathArray[pathArray.length - 2]; // Get parent's name
@@ -664,12 +661,8 @@ async function deleteItem() {
   changeFileList.length = 0;
   checkChildren(parentNode);
   checkSelectedChildren(currentNode);
-  console.log(fileTreeData);
-  console.log(allFileList);
   allFileList = [];
   getAllFiles(fileTreeData);
-  console.log('delete');
-  console.log(allFileList);
   deleteItemFromTree(itemPath);
   document.querySelector('.deleteConfirm').remove();
 
