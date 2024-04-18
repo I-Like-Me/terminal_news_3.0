@@ -194,11 +194,13 @@ class JsonTools:
             if item['type'] == 'folder':
                 JsonTools.sort_nested_list(item['children'])
 
-    def get_nested_dict(dictionary, path):
-        keys = path.split(' > ')
-        temp_dict = dictionary
+    def get_nested_dict_path(d, str_path):
+        keys = str_path.split(' > ')
+        result = []
         for key in keys:
-            temp_dict = next((child for child in temp_dict['children'] if child['name'] == key), None)
-            if temp_dict is None:
-                return None
-        return temp_dict
+            for i, child in enumerate(d['children']):
+                if child['name'] == key:
+                    result.extend(['children', i])
+                    d = child
+                    break
+        return result

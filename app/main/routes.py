@@ -156,8 +156,8 @@ def update_json():
     print(f"The list of files include {data['allFiles']}")
     print(data['moveSourcePath'])
     print(data['moveDestinationPath'])
-    JsonTools.sort_nested_list(ready_data['children'])
     if data['action'] == 'add':
+        JsonTools.sort_nested_list(ready_data['children'])
         if data['itemType'] == 'folder':
             if len(data['allFiles']) > 0:
                 for f_id in data['allFiles']:
@@ -194,6 +194,7 @@ def update_json():
             user.my_documents = ready_data
             db.session.commit()
     if data['action'] == 'delete':
+        JsonTools.sort_nested_list(ready_data['children'])
         final_affected_list = []
         for f_id in data['allFiles']:
             if f_id not in data['changeList']:
@@ -218,9 +219,10 @@ def update_json():
                 cur_file.access_path = filePathString
                 cur_file.repr_path = reprFileString
                 db.session.commit()
-    if data['action'] == 'delete':
-        print(JsonTools.get_nested_dict(data['moveSourcePath']))
-        print(JsonTools.get_nested_dict(data['moveDestinationPath']))
+    if data['action'] == 'move':
+        print(JsonTools.get_nested_dict_path(ready_data, 'Evan > Games > Rebels > Chewy'))
+        print(JsonTools.get_nested_dict_path(ready_data, data['moveDestinationPath']))
+        JsonTools.sort_nested_list(ready_data['children'])
     return jsonify(user.my_documents)
 
 
