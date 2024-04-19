@@ -209,9 +209,7 @@ def update_json():
         db.session.commit()
         if len(final_affected_list) > 0:
             for f_id in final_affected_list:
-                print(f_id)
                 cur_file = Collectors.get_file(f_id)
-                print(cur_file)
                 filePath = JsonTools.find_path(ready_data, f_id, path=())
                 filePathString = JsonTools.path_to_string(filePath)
                 reprFilePath = JsonTools.build_repr_from_path(ready_data, filePath)
@@ -220,11 +218,20 @@ def update_json():
                 cur_file.repr_path = reprFileString
                 db.session.commit()
     if data['action'] == 'move':
-        sourcePath =  JsonTools.get_nested_dict_path(ready_data, data['moveSourcePath'])
-        destPath = JsonTools.get_nested_dict_path(ready_data, data['moveDestinationPath'])
-        JsonTools.add_to_nested_dict(ready_data, sourcePath, destPath)
+        JsonTools.add_to_nested_dict(ready_data, data['moveSourcePath'], data['moveDestinationPath'])
         JsonTools.sort_nested_list(ready_data['children'])
-        print(ready_data)
+        user.my_documents = ready_data
+        db.session.commit()
+        if len(data['allFiles']) > 0:
+            for f_id in data['allFiles']:
+                cur_file = Collectors.get_file(f_id)
+                filePath = JsonTools.find_path(ready_data, f_id, path=())
+                filePathString = JsonTools.path_to_string(filePath)
+                reprFilePath = JsonTools.build_repr_from_path(ready_data, filePath)
+                reprFileString = JsonTools.repr_path_to_string(reprFilePath)
+                cur_file.access_path = filePathString
+                cur_file.repr_path = reprFileString
+                db.session.commit()
     return jsonify(user.my_documents)
 
 
