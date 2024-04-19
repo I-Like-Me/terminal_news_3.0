@@ -215,5 +215,7 @@ class JsonTools:
         parent['children'].remove(item)  # Remove the item from the parent's children
         
         # Add the item to the destination path
-        dest = JsonTools.get_value_by_path(nested_dict, dest_path)  # Get the destination
+        dest = JsonTools.get_value_by_path(nested_dict, dest_path)
+        if 'children' not in dest:
+            dest['children'] = []  # Get the destination
         dest['children'].append(item)  # Add the item to the destination's children

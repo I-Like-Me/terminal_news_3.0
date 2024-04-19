@@ -223,7 +223,7 @@ def update_json():
         sourcePath =  JsonTools.get_nested_dict_path(ready_data, data['moveSourcePath'])
         destPath = JsonTools.get_nested_dict_path(ready_data, data['moveDestinationPath'])
         JsonTools.add_to_nested_dict(ready_data, sourcePath, destPath)
-        #JsonTools.sort_nested_list(ready_data['children'])
+        JsonTools.sort_nested_list(ready_data['children'])
         print(ready_data)
     return jsonify(user.my_documents)
 
