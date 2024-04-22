@@ -119,7 +119,6 @@ def filing(username):
 def process_file_content():
     content = request.json['content']
     file = Collectors.get_file(content)
-    print('pizza')
     return jsonify(processed_content=file.content)
 
 @bp.route('/get_cabinet/<username>', methods=['GET'])
@@ -140,7 +139,7 @@ def save_content():
 def get_categories():
     return ['Ability', 'Skill', 'Damage Type']
 
-@bp.route('/get_category<string:category>', methods=['GET'])
+@bp.route('/get_category/<string:category>', methods=['GET'])
 def get_category(category):
     if category == 'Ability':
         entries = Ability.query.all()
@@ -148,6 +147,7 @@ def get_category(category):
         entries = Skill.query.all()
     elif category == 'Damage Type':
         entries = Damagetype.query.all()
+    print(entries)
     return {entry.id: entry.name for entry in entries}
 
 @bp.route('/get_ability/<int:id>', methods=['GET'])
