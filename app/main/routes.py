@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from flask import render_template, flash, redirect, url_for, request, g, current_app, jsonify
 from flask_login import current_user, login_required
 from app import db
-from app.models import User, Character, File
+from app.models import User, Character, File, Ability, Skill, Damagetype
 from app.auth.forms import LoginForm
 from app.main.forms import PickNPCs, PickTopics, AssetSel
 from app.main.toolbox import Converters, Collectors, Builders, Organizer, JsonTools
@@ -119,6 +119,7 @@ def filing(username):
 def process_file_content():
     content = request.json['content']
     file = Collectors.get_file(content)
+    print('pizza')
     return jsonify(processed_content=file.content)
 
 @bp.route('/get_cabinet/<username>', methods=['GET'])
@@ -134,6 +135,35 @@ def save_content():
     desired_file.content = new_content
     db.session.commit()
     return 'Success!', 200
+
+@bp.route('/get_categories', methods=['GET'])
+def get_categories():
+    return ['Ability', 'Skill', 'Damage Type']
+
+@bp.route('/get_category<string:category>', methods=['GET'])
+def get_category(category):
+    if category == 'Ability':
+        entries = Ability.query.all()
+    elif category == 'Skill':
+        entries = Skill.query.all()
+    elif category == 'Damage Type':
+        entries = Damagetype.query.all()
+    return {entry.id: entry.name for entry in entries}
+
+@bp.route('/get_ability/<int:id>', methods=['GET'])
+def get_ability(id):
+    ability = Ability.query.get(id)
+    return {'name': ability.name}
+
+@bp.route('/get_skill/<int:id>', methods=['GET'])
+def get_skill(id):
+    skill = Skill.query.get(id)
+    return {'name': skill.name}
+
+@bp.route('/get_damage_type/<int:id>', methods=['GET'])
+def get_damage_type(id):
+    damagetype = Damagetype.query.get(id)
+    return {'name': damagetype.name}
 
 @bp.route('/update_json', methods=['POST'])
 def update_json():
