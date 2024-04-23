@@ -818,6 +818,7 @@ function displayTextInRightPanel(content, file_id) {
       .then(categories => {
         // Create and populate a dropdown with the categories
         let dropdown = document.createElement('select');
+        dropdown.id = 'categoryDropdown';
         categories.forEach(category => {
           let option = document.createElement('option');
           option.value = category;
@@ -834,37 +835,78 @@ function displayTextInRightPanel(content, file_id) {
         searchInput.type = 'text';
         searchInput.id = 'searchInput';
         searchInput.placeholder = 'Search...';
-        searchInput.setAttribute('list', 'entryDropdown');
+        searchInput.style.display = 'none'; // Initially hidden
 
-        // Append the search input field to your HTML
+        // Create a left arrow icon
+        let leftArrow = document.createElement('span');
+        leftArrow.textContent = '←';
+        leftArrow.style.display = 'none'; // Initially hidden
+
+        // Append the left arrow and the search input field to your HTML
+        toolbar.appendChild(leftArrow);
         toolbar.appendChild(searchInput);
 
-        // Create a datalist for the entries
-        let entryDatalist = document.createElement('datalist');
-        entryDatalist.id = 'entryDropdown';
+        // Create a div for the entries
+        let entryDiv = document.createElement('div');
+        entryDiv.id = 'entryDiv';
+        entryDiv.style.display = 'none'; // Initially hidden
 
-        // Append the datalist to your HTML
-        toolbar.appendChild(entryDatalist);
+        // Append the div to your HTML
+        toolbar.appendChild(entryDiv);
 
         // Add an event listener to the dropdown
         dropdown.addEventListener('change', function() {
           fetch('/get_category/' + dropdown.value)
             .then(response => response.json())
             .then(data => {
-              // Populate the datalist with the entries
+              // Populate the div with the entries
+              entryDiv.innerHTML = ''; // Clear previous entries
               Object.keys(data).forEach(entryId => {
-                let option = document.createElement('option');
-                option.value = data[entryId];
-                entryDatalist.appendChild(option);
+                let div = document.createElement('div');
+                div.textContent = data[entryId];
+                div.addEventListener('click', function() {
+                  let range = quill.getSelection();
+                  quill.insertText(range.index, div.textContent, {'link': '/entry/' + entryId});
+                });
+                entryDiv.appendChild(div);
               });
+
+              // Replace the dropdown with the search input field
+              dropdown.style.display = 'none';
+              leftArrow.style.display = '';
+              searchInput.style.display = '';
             });
+        });
+
+        // Add an event listener to the left arrow
+        leftArrow.addEventListener('click', function() {
+          // Replace the search input field with the dropdown
+          dropdown.style.display = '';
+          leftArrow.style.display = 'none';
+          searchInput.style.display = 'none';
+          entryDiv.style.display = 'none'; // Hide the div
         });
 
         // Add an event listener to the search field
         searchInput.addEventListener('input', function() {
-          let selectedOption = searchInput.value;
-          let range = quill.getSelection();
-          quill.insertText(range.index, selectedOption, {'link': '/entry/' + selectedOption});
+          let filter = searchInput.value.toUpperCase();
+          let divs = entryDiv.getElementsByTagName('div');
+          for (let i = 0; i < divs.length; i++) {
+            let txtValue = divs[i].textContent;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              divs[i].style.display = '';
+            } else {
+              divs[i].style.display = 'none';
+            }
+          }
+          entryDiv.style.display = 'block'; // Show the div when typing
+        });
+
+        // Hide the div when clicking outside
+        document.addEventListener('click', function(event) {
+          if (event.target !== searchInput && event.target.parentNode !== entryDiv) {
+            entryDiv.style.display = 'none';
+          }
         });
     });
   });
