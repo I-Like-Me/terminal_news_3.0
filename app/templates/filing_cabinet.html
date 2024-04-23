@@ -829,29 +829,42 @@ function displayTextInRightPanel(content, file_id) {
         let toolbar = document.querySelector('#toolbar');
         toolbar.appendChild(dropdown);
 
+        // Create a search input field
+        let searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.id = 'searchInput';
+        searchInput.placeholder = 'Search...';
+        searchInput.setAttribute('list', 'entryDropdown');
+
+        // Append the search input field to your HTML
+        toolbar.appendChild(searchInput);
+
+        // Create a datalist for the entries
+        let entryDatalist = document.createElement('datalist');
+        entryDatalist.id = 'entryDropdown';
+
+        // Append the datalist to your HTML
+        toolbar.appendChild(entryDatalist);
+
         // Add an event listener to the dropdown
         dropdown.addEventListener('change', function() {
           fetch('/get_category/' + dropdown.value)
             .then(response => response.json())
             .then(data => {
-              // Create and populate another dropdown with the entries
-              let entryDropdown = document.createElement('select');
+              // Populate the datalist with the entries
               Object.keys(data).forEach(entryId => {
                 let option = document.createElement('option');
-                option.value = entryId;
-                option.text = data[entryId];
-                entryDropdown.appendChild(option);
-              });
-
-              // Append the entry dropdown to your HTML
-              document.body.appendChild(entryDropdown);
-
-              // Add an event listener to the entry dropdown
-              entryDropdown.addEventListener('change', function() {
-                let range = quill.getSelection();
-                quill.insertText(range.index, entryDropdown.options[entryDropdown.selectedIndex].text, {'link': '/entry/' + entryDropdown.value});
+                option.value = data[entryId];
+                entryDatalist.appendChild(option);
               });
             });
+        });
+
+        // Add an event listener to the search field
+        searchInput.addEventListener('input', function() {
+          let selectedOption = searchInput.value;
+          let range = quill.getSelection();
+          quill.insertText(range.index, selectedOption, {'link': '/entry/' + selectedOption});
         });
     });
   });

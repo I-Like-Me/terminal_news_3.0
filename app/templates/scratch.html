@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+why am i getting the error Uncaught (in promise) ReferenceError: searchField is not defined and how do i fix it so the search bar apears and i can search the entries dropdown?
 
-{% block content %}
+
+HTML:
 
 <div id="container">
   <div id="leftPanel">
@@ -33,563 +34,69 @@
             <button style="background-color: red;" onclick="showInputField('delete_folder', event)">Delete Folder</button>
         </div>   
     </div>
-    <div id="editorFileName"></div>
+    <div id="toolbar">
+        <!-- Add a series of dropdowns for headers -->
+        <select class="ql-header">
+          <option value="" selected></option>
+          <option value="1">Header 1</option>
+          <option value="2">Header 2</option>
+          <option value="3">Header 3</option>
+        </select>
+      
+        <!-- Add styling buttons -->
+        <button class="ql-bold"></button>
+        <button class="ql-italic"></button>
+        <button class="ql-underline"></button>
+      
+        <!-- Add link button -->
+        <button id='link-button' class="ql-link"></button>
+      
+        <!-- Add list buttons -->
+        <button class="ql-list" value="ordered"></button>
+        <button class="ql-list" value="bullet"></button>
+      
+        <!-- Add clean button -->
+        <button class="ql-clean"></button>
+    </div>    
     <div id="editorContainer"></div> 
   </div>
 </div>
 
-<script>
-cur_user = '{{ user_name }}'
-let fileTreeData;
-const fileTreeElement = document.getElementById('fileTree');
-window.onload = function() {
-  var username = cur_user; 
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      fileTreeData = JSON.parse(this.responseText);
-      createFileTree(fileTreeData, fileTreeElement);
-    }
-  };
-  xhttp.open("GET", "/get_cabinet/" + username, true);
-  xhttp.send();
-}
-
-function createFileTree(node, parentElement, isFirstLayer = true, newItemName = null) {
-  const listItem = document.createElement('li');
-  listItem.innerHTML = `<div class="${node.type === 'folder' ? 'folder' : 'file'}" data-name="${node.name}"><span class="arrow">${node.type === 'folder' ? '<i class="bi bi-caret-right-fill"></i>' : ''}</span>${node.name}</div>`;
-
-  if (node.children) {
-    const childList = document.createElement('ul');
-    if (!isFirstLayer) {
-      childList.style.display = 'none';
-    }
-    node.children.forEach(childNode => createFileTree(childNode, childList, false, newItemName));
-    listItem.appendChild(childList);
-
-    if (node.type === 'folder') {
-      const arrowElement = listItem.querySelector('.arrow');
-      arrowElement.addEventListener('click', (event) => {
-        event.stopPropagation();
-        childList.style.display = childList.style.display === 'none' ? 'block' : 'none';
-        arrowElement.innerHTML = arrowElement.innerHTML === '<i class="bi bi-caret-right-fill"></i>' ? '<i class="bi bi-caret-down-fill"></i>' : '<i class="bi bi-caret-right-fill"></i>';
-      });
-
-      if (isFirstLayer || node.name === newItemName) {
-        childList.style.display = 'block';
-        arrowElement.innerHTML = '<i class="bi bi-caret-down-fill"></i>';
-      }
-    }
-  }
-
-  if (node.name === newItemName) {
-    listItem.querySelector(`div[data-name="${newItemName}"]`).classList.add('highlight');
-  }
-  parentElement.appendChild(listItem);
-}
-
-
-function toggleFileTreeSearch() {
-  const fileTreeContainer = document.getElementById('fileTreeContainer');
-  const searchContainer = document.getElementById('searchContainer');
-  const toggleBtn = document.getElementById('toggleBtn');
-
-  if (fileTreeContainer.style.display !== 'none') {
-    fileTreeContainer.style.display = 'none';
-    searchContainer.style.display = 'block';
-    toggleBtn.textContent = 'File Tree';
-  } else {
-    fileTreeContainer.style.display = 'block';
-    searchContainer.style.display = 'none';
-    toggleBtn.textContent = 'Search';
-  }
-}
-
-function handleKeyUp(event) {
-  if (event.keyCode === 13) {
-    runSearch();
-  }
-}
-
-function runSearch() {
-  const searchInput = document.getElementById('searchInput').value.toLowerCase();
-  const searchResults = document.getElementById('searchResults');
-  searchResults.innerHTML = '';
-
-  if (searchInput.length === 0) {
-    return;
-  }
-  function searchInTree(node, path) {
-    const matches = [];
-    const nodeName = node.name.toLowerCase();
-    if (nodeName.includes(searchInput)) {
-      matches.push({ path, confidence: 5 });
-    }
-    if (node.children) {
-      node.children.forEach((child, index) => {
-        const childPath = path ? `${path} > ${child.name}` : child.name;
-        matches.push(...searchInTree(child, childPath));
-      });
-    }
-    return matches;
-  }
-  const searchResultsData = searchInTree(fileTreeData, '');
-  const sortedResults = searchResultsData.sort((a, b) => b.confidence - a.confidence);
-  sortedResults.slice(0, 5).forEach(result => {
-    const listItem = document.createElement('li');
-    listItem.textContent = result.path;
-    listItem.addEventListener('click', () => handleSearchResultClick(result.path));
-    searchResults.appendChild(listItem);
-  });
-}
-
-function handleSearchResultClick(path) {
-  const fileTreeContainer = document.getElementById('fileTreeContainer');
-  const searchContainer = document.getElementById('searchContainer');
-  const toggleBtn = document.getElementById('toggleBtn');
-  const pathArray = path.split(' > ');
-  const lastNodeName = pathArray.pop(); 
-  let currentNode = fileTreeData;
-  let currentElement = fileTreeElement;
-  const allFolders = fileTreeElement.querySelectorAll('.folder');
-  allFolders.forEach(folder => {
-    
-    if (folder.parentElement.parentElement.id !== 'fileTree') {
-      folder.nextElementSibling.style.display = 'none';
-      folder.classList.remove('open');
-    }
-  });
-
-  pathArray.forEach(name => {
-    const child = currentNode.children.find(node => node.name === name);
-    if (child) {
-      currentNode = child;
-      const element = currentElement.querySelector(`[data-name="${currentNode.name}"]`);
-      if (element) {
-        if (currentNode.type === 'folder' && !element.classList.contains('open')) {
-          element.classList.add('open');
-          element.nextElementSibling.style.display = 'block';
-        }
-        currentElement = element.nextElementSibling;
-      }
-    }
-  });
-
-  const lastElement = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
-  if (lastElement) {
-    lastElement.classList.add('highlight');
-  }
-  const element = currentElement.querySelector(`[data-name="${lastNodeName}"]`);
-  if (element) {
-    const container = fileTreeContainer.querySelector('ul');
-    container.scrollTop = element.offsetTop - container.offsetTop;
-  }
-  fileTreeContainer.style.display = 'block';
-  searchContainer.style.display = 'none';
-  toggleBtn.textContent = 'Search';
-}
-
-let selectedItem;
-let selectedItemName;
-let selectedItemType;
-let selectedItemContent;
-let newItemName;
-let newItemType;
-let selectedElement; 
-let itemPath;
-let parentPath;
-let parentItemName;
-let actionType;
-const affectedFileList = [];
-const changeFileList = [];
-let allFileList = [];
-let moveMode = false;
-let destinationFolder;
-let previousState = {};
-let sourcePath;
-let destinationPath;
-
-
-function fileButtonsVis() {
-    document.getElementById('file_buttons').style.display = 'block';
-    document.getElementById('folder_buttons').style.display = 'none';
-}
-
-function folderButtonsVis() {
-    document.getElementById('file_buttons').style.display = 'none';
-    document.getElementById('folder_buttons').style.display = 'block';
-}
-
-function allButtonsOff() {
-    document.getElementById('file_buttons').style.display = 'none';
-    document.getElementById('folder_buttons').style.display = 'none';
-}
-
-fileTreeElement.addEventListener('click', (event) => {
-  if (moveMode) {
-    event.stopPropagation();
-    const newDestinationFolder = event.target.closest('.folder');
-    if (newDestinationFolder) {
-      // If there was a previously selected destination folder, remove the highlight
-      if (destinationFolder) {
-        destinationFolder.classList.remove('highlight');
-      }
-      // Add the highlight to the newly selected destination folder
-      newDestinationFolder.classList.add('highlight');
-      // Update the destinationFolder variable
-      destinationFolder = newDestinationFolder;
-      const confirmButton = document.querySelector('.moveConfirm button');
-      confirmButton.disabled = false;
-      const message = document.querySelector('.moveConfirm p');
-      message.textContent = 'Are you sure you want to move this item?';
-    }
-    return;
-  }
-  const target = event.target;
-  const fileTypeElement = target.closest('.file');
-  const folderTypeElement = target.closest('.folder');
-  const allItems = fileTreeElement.querySelectorAll('.file, .folder');
-  allItems.forEach(item => {
-    item.classList.remove('highlight');
-  });
-
-  if (fileTypeElement) {
-    if (moveMode) {
-      return;
-    }
-    const fileName = fileTypeElement.getAttribute('data-name');
-    const filePath = getItemPath(fileTypeElement);
-    const fileData = findFileData(fileTreeData, filePath, '');
-    fileTypeElement.classList.add('highlight');
-    selectedElement = fileTypeElement;
-    if (selectedElement) {
-      selectedItemName = selectedElement.getAttribute('type');
-    }
-    selectedItemName = fileName;
-    selectedItemType = fileData.type;
-    selectedItemContent = fileData.content
-    if (fileData && fileData.content) {
-      fetch('/process_file_content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ content: fileData.content })
-      })
-      .then(response => response.json())
-      .then(data => {
-        displayTextInRightPanel(data.processed_content, fileData.content);
-      });
-      fileButtonsVis();
-    }
-  } else if (folderTypeElement) {
-    if (moveMode) {
-      destinationFolder = folderTypeElement;
-      destinationFolder.classList.add('highlight');  // Highlight the destination folder
-      const confirmButton = document.querySelector('.moveConfirm button');
-      confirmButton.disabled = false;
-      return;
-    }
-    const folderName = folderTypeElement.getAttribute('data-name');
-    const folderPath = getItemPath(folderTypeElement);
-    folderTypeElement.classList.add('highlight');
-    selectedElement = folderTypeElement;
-    if (selectedElement) {
-      selectedItemName = selectedElement.getAttribute('data-name');
-    }
-    selectedItemName = folderName;
-    selectedItemType = 'folder';
-    selectedItemContent = 'Not File'
-    folderButtonsVis();
-    selectedItem = selectedElement;
-    const editorContainer = document.getElementById('editorContainer');
-    editorContainer.innerHTML = '';
-  } else {
-    folderButtonsVis();
-  }
-});
-
-function showInputField(type, event) {
-  newItemType = type;
-  const rightPanel = document.getElementById('rightPanel');
-  
-  const existingConfirmWindow = rightPanel.querySelector('.addConfirm, .deleteConfirm, .moveConfirm');
-  if (existingConfirmWindow) {
-    existingConfirmWindow.remove();
-  }
-
-  const confirmWindow = document.createElement('div');
-  confirmWindow.className = type === 'folder' || type === 'file' ? 'addConfirm' : type.includes('delete') ? 'deleteConfirm' : 'moveConfirm';
-  confirmWindow.innerHTML = `
-    <p>${type === 'move' ? 'Click a destination folder from the tree' : 'Are you sure you want to ' + (type.includes('delete') ? 'delete' : 'add') + ' this item?'}</p>
-    ${type === 'folder' || type === 'file' ? '<input type="text" id="newItemText" placeholder="Enter item name here.">' : ''}
-    <button onclick="${type.includes('delete') ? 'deleteItem()' : type === 'move' ? 'moveItem()' : 'confirmNewItem(event)'}">${type === 'move' ? 'Move' : 'Confirm'}</button>
-    <button onclick="cancelAction()">Cancel</button>
-  `;
-  rightPanel.appendChild(confirmWindow);
-  document.addEventListener('click', function onClickOutside(event) {
-    if (!confirmWindow.contains(event.target)) {
-      if (!fileTreeElement.contains(event.target)) {
-        cancelAction();
-      }
-      confirmWindow.remove();
-      document.removeEventListener('click', onClickOutside);
-    }
-  });
-  if (event) {
-    event.stopPropagation();
-  }
-
-  if (type === 'move') {
-    moveMode = true;
-    const allFiles = fileTreeElement.querySelectorAll('.file');
-    allFiles.forEach(file => {
-      file.style.pointerEvents = 'none';
-      file.style.opacity = '0.4';
-    });
-
-    if (selectedElement.classList.contains('folder')) {
-      const folderPath = getItemPath(selectedElement);
-      const allFolders = fileTreeElement.querySelectorAll('.folder');
-      allFolders.forEach(folder => {
-        const folderPathToCheck = getItemPath(folder);
-        if (folderPathToCheck.startsWith(folderPath)) {
-          folder.style.pointerEvents = 'none';
-          folder.style.opacity = '0.4';
-        }
-      });
-    }
-
-    const confirmButton = document.querySelector('.moveConfirm button');
-    confirmButton.disabled = true;
-    selectedElement.classList.add('highlight');
-
-    previousState = {
-      moveMode,
-      allFiles,
-      selectedElement,
-      allFolders: selectedElement.classList.contains('folder') ? fileTreeElement.querySelectorAll('.folder') : null
-    };
-  }
-}
-
-async function moveItem() {
-  if (!destinationFolder) {
-    alert('No destination folder selected. Please click a destination folder from the tree.');
-    return;
-  }
-  moveMode = false;
-  const allFiles = fileTreeElement.querySelectorAll('.file');
-  allFiles.forEach(file => {
-    file.style.pointerEvents = 'auto';
-    file.style.opacity = '1';
-  });
-  sourcePath = getItemPath(selectedElement);
-  destinationPath = getItemPath(destinationFolder);
-  newItemName = 'None';
-  newItemType = 'None';
-  itemPath = 'None';
-  parentPath = 'None';
-  parentItemName = 'None';
-  actionType = 'move';
-  affectedFileList.length = 0;
-  changeFileList.length = 0
-  let currentNode = fileTreeData;
-  for (let i = 0; i < sourcePath.length; i++) {
-    const child = currentNode.children.find(node => node.name === sourcePath[i]);
-    if (child) {
-      currentNode = child;
-    }
-  }
-  allFileList = [];
-  getAllFiles(fileTreeData);
-
-  await updateJsonFile();
-  document.querySelector('.moveConfirm').remove();
-  const confirmButton = document.querySelector('.moveConfirm button');
-  selectedElement.classList.remove('highlight');  // Remove the highlight from the original selection
-  destinationFolder.classList.remove('highlight');  // Remove the highlight from the destination folder
-  confirmButton.disabled = false;  // Enable the button
-  confirmButton.textContent = 'Confirm';  // Change the button text
-  const message = document.querySelector('.moveConfirm p');
-  message.textContent = 'Confirm your selection';  // Change the message
-}
-
-function cancelAction() {
-  // Reset UI state
-  const allFiles = fileTreeElement.querySelectorAll('.file');
-  allFiles.forEach(file => {
-    file.style.pointerEvents = 'auto';
-    file.style.opacity = '1';
-  });
-
-  if (previousState.allFolders) {
-    previousState.allFolders.forEach(folder => {
-      folder.style.pointerEvents = 'auto';
-      folder.style.opacity = '1';
-    });
-  }
-
-  if (destinationFolder) {
-    destinationFolder.classList.remove('highlight');
-    destinationFolder = null;
-  }
-
-  if (selectedElement) {
-    selectedElement.classList.remove('highlight');
-    selectedElement = null;
-  }
-
-  // Remove the confirm window
-  const confirmWindow = document.querySelector('.addConfirm, .deleteConfirm, .moveConfirm');
-  if (confirmWindow) {
-    moveMode = false;
-    confirmWindow.remove();
-  }
-
-  allButtonsOff();
-  const editorContainer = document.getElementById('editorContainer');
-  editorContainer.innerHTML = '';
-}
-
-document.addEventListener('click', function(event) {
-  // Check if the move action is running
-  if (moveMode) {
-    // Check if the click was outside the popup window
-    if (!document.querySelector('.moveConfirm').contains(event.target)) {
-      // Call the cancelMove function
-      
-      cancelAction();
-    }
-  }
-});
-
-function findNodeInTree(node, pathArray) {
-  if (pathArray.length === 0) {
-    return node;
-  }
-  const nextNodeName = pathArray.shift();
-  const nextNode = node.children.find(child => child.name === nextNodeName);
-  if (nextNode) {
-    return findNodeInTree(nextNode, pathArray);
-  }
-  return null;
-}
-
-function findParentNodeInTree(node, pathArray, parentNode = null) {
-  if (pathArray.length === 0) {
-    return parentNode;
-  }
-  const nextNodeName = pathArray.shift();
-  const nextNode = node.children.find(child => child.name === nextNodeName);
-  if (nextNode) {
-    return findParentNodeInTree(nextNode, pathArray, node);
-  }
-  return null;
-}
-
-async function confirmNewItem(event) {
-  event.stopPropagation();
-  let newItem;
-  newItemName = document.getElementById('newItemText').value;
-  if (newItemType === 'folder' && document.getElementById('newItemText').style.display !== 'none') {
-    newItem = { name: newItemName, type: newItemType, children: [] };
-  } else if (newItemType === 'file' && document.getElementById('newItemText').style.display !== 'none') {
-    newItem = { name: newItemName, type: newItemType, content: 'Type Here' };
-  }
-  if (!newItemName) {
-    alert('The name field is empty. Please enter a name.');
-    return;
-  }
-  if (doesNameExist(newItemName)) {
-    alert('A folder or file with this name already exists. Please enter a unique name.');
-    return;
-  }
-  addItemToTree(newItem);
-  const response = await updateJsonFile();
-
-  if (response.ok) {
-    const updatedData = await response.json();
-    fileTreeData = updatedData;  // Update the client-side data
-  }
-  document.querySelector('.addConfirm').remove();
-}
-
-function doesNameExist(name) {
-  if (selectedElement) {
-    const siblings = selectedElement.nextElementSibling.children;
-    for (let i = 0; i < siblings.length; i++) {
-      if (siblings[i].firstElementChild.getAttribute('data-name').toLowerCase() === name.toLowerCase()) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-async function updateJsonFile() {
-  let dataToSend = {
-    author: cur_user,
-    updatedJSON: fileTreeData,
-    selItemName: selectedItemName,
-    selItemType: selectedItemType,
-    selItemContent: selectedItemContent,
-    itemName: newItemName,
-    itemType: newItemType,
-    changeLocation: itemPath,
-    parentName: parentItemName,
-    fileList: affectedFileList,
-    changeList: changeFileList,
-    allFiles: allFileList,
-    parentLocation: parentPath, 
-    action: actionType,
-    moveSourcePath: sourcePath,
-    moveDestinationPath: destinationPath
-  };
-
-  const response = await fetch('/update_json', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(dataToSend)
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const data = await response.json();
-  
-  fileTreeData = data;
-  fileTreeElement.innerHTML = '';
-  createFileTree(fileTreeData, fileTreeElement, true, newItemName);
-  const newItemElement = fileTreeElement.querySelector(`div[data-name="${newItemName}"]`);
-  if (newItemElement) {
-    newItemElement.click();
-    openPathToItem(itemPath);
-  }
-  if (actionType === 'delete') {
-    cancelAction();
-  }
-}
-
-function getAllFiles(node) {
-  if (node.type === 'file') {
-    allFileList.push(node.content);
-  } else if (node.children) {
-    node.children.forEach(getAllFiles);
-  }
-}
-
+Javascript:
 function displayTextInRightPanel(content, file_id) {
   const editorContainer = document.getElementById('editorContainer');
   editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
   var icons = Quill.import('ui/icons');
 
+  icons['ql-header ql-picker'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon class="ql-stroke" points="7 11 9 13 11 11 7 11"></polygon><polygon class="ql-stroke" points="7 7 9 5 11 7 7 7"></polygon></svg>';
+  icons['bold'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ql-stroke" d="M5,4H9.5A2.5,2.5,0,0,1,12,6.5v0A2.5,2.5,0,0,1,9.5,9H5A0,0,0,0,1,5,9V4A0,0,0,0,1,5,4Z"></path><path class="ql-stroke" d="M5,9h5.5A2.5,2.5,0,0,1,13,11.5v0A2.5,2.5,0,0,1,10.5,14H5a0,0,0,0,1,0,0V9A0,0,0,0,1,5,9Z"></path></svg>';
+  icons['italic'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line class="ql-stroke" x1="7" x2="13" y1="4" y2="4"></line><line class="ql-stroke" x1="7" x2="13" y1="4" y2="4"></line><line class="ql-stroke" x1="5" x2="11" y1="14" y2="14"></line><line class="ql-stroke" x1="8" x2="10" y1="14" y2="4"></line></svg>';
+  icons['underline'] = '<svg viewBox="2 2 15 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ql-stroke" d="M5,3V9a4.012,4.012,0,0,0,4,4H9a4.012,4.012,0,0,0,4-4V3"></path><rect class="ql-fill" height="0.3" rx="0.5" ry="0.5" width="12" x="3" y="15.5"></rect></svg>';
+  icons['link'] = '<svg viewBox="2 2 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line class="ql-stroke" x1="7" x2="11" y1="7" y2="11"></line><path class="ql-even ql-stroke" d="M8.9,4.577a3.476,3.476,0,0,1,.36,4.679A3.476,3.476,0,0,1,4.577,8.9C3.185,7.5,2.035,6.4,4.217,4.217S7.5,3.185,8.9,4.577Z"></path><path class="ql-even ql-stroke" d="M13.423,9.1a3.476,3.476,0,0,0-4.679-.36,3.476,3.476,0,0,0,.36,4.679c1.392,1.392,2.5,2.542,4.679.36S14.815,10.5,13.423,9.1Z"></path></svg>';
+  icons['list']['ordered'] = '<svg viewBox="0 1 10 10" fill="none" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round"><line class="ql-stroke" x1="7" x2="15" y1="4" y2="4"></line><line class="ql-stroke" x1="7" x2="15" y1="9" y2="9"></line><line class="ql-stroke" x1="7" x2="15" y1="14" y2="14"></line><line class="ql-stroke ql-thin" x1="2.5" x2="4.5" y1="5.5" y2="5.5"></line><path class="ql-fill" d="M3.5,6A0.5,0.5,0,0,1,3,5.5V3.085l-0.276.138A0.5,0.5,0,0,1,2.053,3c-0.124-.247-0.023-0.324.224-0.447l1-.5A0.5,0.5,0,0,1,4,2.5v3A0.5,0.5,0,0,1,3.5,6Z"></path><path class="ql-stroke ql-thin" d="M4.5,10.5h-2c0-.234,1.85-1.076,1.85-2.234A0.959,0.959,0,0,0,2.5,8.156"></path><path class="ql-stroke ql-thin" d="M2.5,14.846a0.959,0.959,0,0,0,1.85-.109A0.7,0.7,0,0,0,3.75,14a0.688,0.688,0,0,0,.6-0.736,0.959,0.959,0,0,0-1.85-.109"></path></svg>';
+  icons['list']['bullet'] = '<svg viewBox="0 6 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line class="ql-stroke" x1="6" x2="15" y1="4" y2="4"></line><line class="ql-stroke" x1="6" x2="15" y1="9" y2="9"></line><line class="ql-stroke" x1="6" x2="15" y1="14" y2="14"></line><line class="ql-stroke" x1="3" x2="3" y1="4" y2="4"></line><line class="ql-stroke" x1="3" x2="3" y1="9" y2="9"></line><line class="ql-stroke" x1="3" x2="3" y1="14" y2="14"></line></svg>';
+  icons['clean'] = '<svg viewBox="1.4 1.4 15 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line class="ql-stroke" x1="5" x2="13" y1="3" y2="3"></line><line class="ql-stroke" x1="6" x2="9.35" y1="12" y2="3"></line><line class="ql-stroke" x1="11" x2="15" y1="11" y2="15"></line><line class="ql-stroke" x1="15" x2="11" y1="11" y2="15"></line><rect class="ql-fill" height="1" rx="0.5" ry="0.5" width="7" x="2" y="14"></rect></svg>';
+
   var quill = new Quill('#editor', {
+    modules: {
+      toolbar: '#toolbar'
+    },
     theme: 'snow'
   });
+
+
+  let quillContent = document.querySelector('.ql-editor');
+  quillContent.style.backgroundColor = '#383838';
+  quillContent.style.color = '#00dd00';
+  quillContent.style.borderColor = '#ffffff';
+  quillContent.style.fontSize = '2em';
+
+  let pickerElement = document.querySelector('.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg'); 
+  pickerElement.style.position = 'absolute';
+  pickerElement.style.marginTop = '-10.5px';
+  pickerElement.style.right = '85px';
+  pickerElement.style.top = '36%';
+  pickerElement.style.width = '30px';
 
   quill.clipboard.dangerouslyPasteHTML(content);
   
@@ -609,4 +116,77 @@ function displayTextInRightPanel(content, file_id) {
       })
     });
   });
+
+  document.querySelector('#link-button').addEventListener('click', function() {
+    fetch('/get_categories')
+      .then(response => response.json())
+      .then(categories => {
+        // Create and populate a dropdown with the categories
+        let dropdown = document.createElement('select');
+        categories.forEach(category => {
+          let option = document.createElement('option');
+          option.value = category;
+          option.text = category;
+          dropdown.appendChild(option);
+        });
+
+        // Append the dropdown to your HTML
+        let toolbar = document.querySelector('#toolbar');
+        toolbar.appendChild(dropdown);
+        console.log('Cat');
+
+        // Add an event listener to the dropdown
+        dropdown.addEventListener('change', function() {
+          fetch('/get_category/' + dropdown.value)
+            .then(response => response.json())
+            .then(data => {
+              // Create and populate another dropdown with the entries
+              let entryDropdown = document.createElement('select');
+              entryDropdown.id = 'entryDropdown';
+              Object.keys(data).forEach(entryId => {
+                let option = document.createElement('option');
+                option.value = entryId;
+                option.text = data[entryId];
+                entryDropdown.appendChild(option);
+              });
+
+              // Append the entry dropdown to your HTML
+              toolbar.appendChild(entryDropdown);
+              
+              // Add an event listener to the search field
+              searchField.addEventListener('keyup', function() {
+                let filter = searchField.value.toUpperCase();
+                let options = entryDropdown.options;
+                for (let i = 0; i < options.length; i++) {
+                  let txtValue = options[i].text;
+                  if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    options[i].style.display = '';
+                  } else {
+                    options[i].style.display = 'none';
+                  }
+                }
+              });
+
+              // Add an event listener to the entry dropdown
+              entryDropdown.addEventListener('change', function() {
+                let range = quill.getSelection();
+                quill.insertText(range.index, entryDropdown.options[entryDropdown.selectedIndex].text, {'link': '/entry/' + entryDropdown.value});
+              });
+            });
+        });
+    });
+  });
+
+  quill.on('text-change', function(delta, oldDelta, source) {
+    if (source == 'user') {
+      let ops = delta.ops;
+      ops.forEach(op => {
+        if (op.insert && op.insert.link) {
+          fetch(op.insert.link)
+            .then(response => response.json())
+            .then(data => alert(JSON.stringify(data)));
+        }
+      });
+    }
+  });  
 }

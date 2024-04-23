@@ -137,7 +137,7 @@ def save_content():
 
 @bp.route('/get_categories', methods=['GET'])
 def get_categories():
-    return ['Ability', 'Skill', 'Damage Type']
+    return ['------', 'Ability', 'Skill', 'Damage Type']
 
 @bp.route('/get_category/<string:category>', methods=['GET'])
 def get_category(category):
@@ -152,16 +152,22 @@ def get_category(category):
 
 @bp.route('/get_ability/<int:id>', methods=['GET'])
 def get_ability(id):
+    print(id)
+    print('ability')
     ability = Ability.query.get(id)
     return {'name': ability.name}
 
 @bp.route('/get_skill/<int:id>', methods=['GET'])
 def get_skill(id):
+    print(id)
+    print('skill')
     skill = Skill.query.get(id)
     return {'name': skill.name}
 
 @bp.route('/get_damage_type/<int:id>', methods=['GET'])
 def get_damage_type(id):
+    print(id)
+    print('damage type')
     damagetype = Damagetype.query.get(id)
     return {'name': damagetype.name}
 
