@@ -137,7 +137,8 @@ def save_content():
 
 @bp.route('/get_categories', methods=['GET'])
 def get_categories():
-    return ['------', 'Ability', 'Skill', 'Damage Type']
+    print('pizza')
+    return {1: '------', 2: 'Ability', 3: 'Skill', 4: 'Damage Type'}
 
 @bp.route('/get_category/<string:category>', methods=['GET'])
 def get_category(category):

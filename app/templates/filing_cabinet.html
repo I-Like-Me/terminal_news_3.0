@@ -47,15 +47,16 @@
         <button class="ql-italic"></button>
         <button class="ql-underline"></button>
       
-        <!-- Add link button -->
-        <button id='link-button' class="ql-link"></button>
-      
         <!-- Add list buttons -->
         <button class="ql-list" value="ordered"></button>
         <button class="ql-list" value="bullet"></button>
       
         <!-- Add clean button -->
         <button class="ql-clean"></button>
+
+        <!-- Add link button -->
+        <button id='link-button' class="ql-link"></button>
+        <select id='categoryDropdown' style='display: none;'></select>
     </div>    
     <div id="editorContainer"></div> 
   </div>
@@ -813,29 +814,63 @@ function displayTextInRightPanel(content, file_id) {
   });
 
   document.querySelector('#link-button').addEventListener('click', function() {
+    // Hide dropdown initially
+    let dropdown = document.getElementById('categoryDropdown');
+    dropdown.style.display = 'none';
+
+    let categorySearchInput = document.createElement('input');
+    categorySearchInput.type = 'text';
+    categorySearchInput.id = 'categorySearchInput';
+    categorySearchInput.placeholder = 'Search...';
+    categorySearchInput.style.display = '';
+
+    let toolbar = document.querySelector('#toolbar');
+    toolbar.appendChild(categorySearchInput);
+
+    // Create a div for the categories
+    let categoryDiv = document.createElement('div');
+    categoryDiv.id = 'categoryDiv';
+    categoryDiv.style.display = 'none'; // Initially hidden  
+
+    // Append the div to your HTML
+    toolbar.appendChild(categoryDiv);
+
     fetch('/get_categories')
       .then(response => response.json())
       .then(categories => {
-        // Create and populate a dropdown with the categories
-        let dropdown = document.createElement('select');
-        dropdown.id = 'categoryDropdown';
-        categories.forEach(category => {
-          let option = document.createElement('option');
-          option.value = category;
-          option.text = category;
-          dropdown.appendChild(option);
+        // Populate the div with the categories
+        categoryDiv.innerHTML = ''; // Clear previous categories
+        Object.keys(categories).forEach(categoryId => {
+            let div = document.createElement('div');
+            div.textContent = categories[categoryId];
+            div.addEventListener('click', function() {
+            });
+            categoryDiv.appendChild(div);
+          });
+          categorySearchInput.style.display = '';
         });
 
-        // Append the dropdown to your HTML
-        let toolbar = document.querySelector('#toolbar');
-        toolbar.appendChild(dropdown);
+        // Add an event listener to the search field
+        categorySearchInput.addEventListener('input', function() {
+          let filter = categorySearchInput.value.toUpperCase();
+          let divs = categoryDiv.getElementsByTagName('div');
+          for (let i = 0; i < divs.length; i++) {
+            let txtValue = divs[i].textContent;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              divs[i].style.display = '';
+            } else {
+              divs[i].style.display = 'none';
+            }
+          }
+          categoryDiv.style.display = ''; // Show the div when typing
+        });
 
         // Create a search input field
-        let searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.id = 'searchInput';
-        searchInput.placeholder = 'Search...';
-        searchInput.style.display = 'none'; // Initially hidden
+        let entrySearchInput = document.createElement('input');
+        entrySearchInput.type = 'text';
+        entrySearchInput.id = 'entrySearchInput';
+        entrySearchInput.placeholder = 'Search...';
+        entrySearchInput.style.display = 'none'; // Initially hidden
 
         // Create a left arrow icon
         let leftArrow = document.createElement('span');
@@ -844,7 +879,7 @@ function displayTextInRightPanel(content, file_id) {
 
         // Append the left arrow and the search input field to your HTML
         toolbar.appendChild(leftArrow);
-        toolbar.appendChild(searchInput);
+        toolbar.appendChild(entrySearchInput);
 
         // Create a div for the entries
         let entryDiv = document.createElement('div');
@@ -874,7 +909,7 @@ function displayTextInRightPanel(content, file_id) {
               // Replace the dropdown with the search input field
               dropdown.style.display = 'none';
               leftArrow.style.display = '';
-              searchInput.style.display = '';
+              entrySearchInput.style.display = '';
             });
         });
 
@@ -883,13 +918,13 @@ function displayTextInRightPanel(content, file_id) {
           // Replace the search input field with the dropdown
           dropdown.style.display = '';
           leftArrow.style.display = 'none';
-          searchInput.style.display = 'none';
+          entrySearchInput.style.display = 'none';
           entryDiv.style.display = 'none'; // Hide the div
         });
 
         // Add an event listener to the search field
-        searchInput.addEventListener('input', function() {
-          let filter = searchInput.value.toUpperCase();
+        entrySearchInput.addEventListener('input', function() {
+          let filter = entrySearchInput.value.toUpperCase();
           let divs = entryDiv.getElementsByTagName('div');
           for (let i = 0; i < divs.length; i++) {
             let txtValue = divs[i].textContent;
@@ -904,11 +939,10 @@ function displayTextInRightPanel(content, file_id) {
 
         // Hide the div when clicking outside
         document.addEventListener('click', function(event) {
-          if (event.target !== searchInput && event.target.parentNode !== entryDiv) {
+          if (event.target !== entrySearchInput && event.target.parentNode !== entryDiv) {
             entryDiv.style.display = 'none';
           }
         });
-    });
   });
 
   quill.on('text-change', function(delta, oldDelta, source) {

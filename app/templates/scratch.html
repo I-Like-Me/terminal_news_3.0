@@ -1,7 +1,7 @@
-why am i getting the error Uncaught (in promise) ReferenceError: searchField is not defined and how do i fix it so the search bar apears and i can search the entries dropdown?
-
+currently, after clicking the link icon in the toolbar, the category dropdown appears as ------ which is the first option of the drop down but not clickable. it should work like the entry dropdown with the search topic bar appearing first and the custom entry dropdown appearing below it. the image attached shows what appears next to the link icon when its been pressed. How do we modify the code to fix this?
 
 HTML:
+
 
 <div id="container">
   <div id="leftPanel">
@@ -47,22 +47,24 @@ HTML:
         <button class="ql-bold"></button>
         <button class="ql-italic"></button>
         <button class="ql-underline"></button>
-      
-        <!-- Add link button -->
-        <button id='link-button' class="ql-link"></button>
-      
+
         <!-- Add list buttons -->
         <button class="ql-list" value="ordered"></button>
         <button class="ql-list" value="bullet"></button>
       
         <!-- Add clean button -->
         <button class="ql-clean"></button>
+      
+        <!-- Add link button -->
+        <button id='link-button' class="ql-link"></button>
+        <select id='categoryDropdown' style='display: none;'></select>
     </div>    
     <div id="editorContainer"></div> 
   </div>
 </div>
 
-Javascript:
+javascript:
+
 function displayTextInRightPanel(content, file_id) {
   const editorContainer = document.getElementById('editorContainer');
   editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
@@ -121,8 +123,16 @@ function displayTextInRightPanel(content, file_id) {
     fetch('/get_categories')
       .then(response => response.json())
       .then(categories => {
-        // Create and populate a dropdown with the categories
-        let dropdown = document.createElement('select');
+        // Get the category dropdown
+        let dropdown = document.getElementById('categoryDropdown');
+        dropdown.style.display = 'block'; // Show the dropdown
+
+        // Clear previous categories
+        while (dropdown.firstChild) {
+          dropdown.removeChild(dropdown.firstChild);
+        }
+
+        // Populate the dropdown with the categories
         categories.forEach(category => {
           let option = document.createElement('option');
           option.value = category;
@@ -133,46 +143,84 @@ function displayTextInRightPanel(content, file_id) {
         // Append the dropdown to your HTML
         let toolbar = document.querySelector('#toolbar');
         toolbar.appendChild(dropdown);
-        console.log('Cat');
+
+        // Create a search input field
+        let searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.id = 'searchInput';
+        searchInput.placeholder = 'Search...';
+        searchInput.style.display = 'none'; // Initially hidden
+
+        // Create a left arrow icon
+        let leftArrow = document.createElement('span');
+        leftArrow.textContent = '←';
+        leftArrow.style.display = 'none'; // Initially hidden
+
+        // Append the left arrow and the search input field to your HTML
+        toolbar.appendChild(leftArrow);
+        toolbar.appendChild(searchInput);
+
+        // Create a div for the entries
+        let entryDiv = document.createElement('div');
+        entryDiv.id = 'entryDiv';
+        entryDiv.style.display = 'none'; // Initially hidden
+
+        // Append the div to your HTML
+        toolbar.appendChild(entryDiv);
 
         // Add an event listener to the dropdown
         dropdown.addEventListener('change', function() {
           fetch('/get_category/' + dropdown.value)
             .then(response => response.json())
             .then(data => {
-              // Create and populate another dropdown with the entries
-              let entryDropdown = document.createElement('select');
-              entryDropdown.id = 'entryDropdown';
+              // Populate the div with the entries
+              entryDiv.innerHTML = ''; // Clear previous entries
               Object.keys(data).forEach(entryId => {
-                let option = document.createElement('option');
-                option.value = entryId;
-                option.text = data[entryId];
-                entryDropdown.appendChild(option);
+                let div = document.createElement('div');
+                div.textContent = data[entryId];
+                div.addEventListener('click', function() {
+                  let range = quill.getSelection();
+                  quill.insertText(range.index, div.textContent, {'link': '/entry/' + entryId});
+                });
+                entryDiv.appendChild(div);
               });
 
-              // Append the entry dropdown to your HTML
-              toolbar.appendChild(entryDropdown);
-              
-              // Add an event listener to the search field
-              searchField.addEventListener('keyup', function() {
-                let filter = searchField.value.toUpperCase();
-                let options = entryDropdown.options;
-                for (let i = 0; i < options.length; i++) {
-                  let txtValue = options[i].text;
-                  if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    options[i].style.display = '';
-                  } else {
-                    options[i].style.display = 'none';
-                  }
-                }
-              });
-
-              // Add an event listener to the entry dropdown
-              entryDropdown.addEventListener('change', function() {
-                let range = quill.getSelection();
-                quill.insertText(range.index, entryDropdown.options[entryDropdown.selectedIndex].text, {'link': '/entry/' + entryDropdown.value});
-              });
+              // Replace the dropdown with the search input field
+              dropdown.style.display = 'none';
+              leftArrow.style.display = '';
+              searchInput.style.display = '';
             });
+        });
+
+        // Add an event listener to the left arrow
+        leftArrow.addEventListener('click', function() {
+          // Replace the search input field with the dropdown
+          dropdown.style.display = '';
+          leftArrow.style.display = 'none';
+          searchInput.style.display = 'none';
+          entryDiv.style.display = 'none'; // Hide the div
+        });
+
+        // Add an event listener to the search field
+        searchInput.addEventListener('input', function() {
+          let filter = searchInput.value.toUpperCase();
+          let divs = entryDiv.getElementsByTagName('div');
+          for (let i = 0; i < divs.length; i++) {
+            let txtValue = divs[i].textContent;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              divs[i].style.display = '';
+            } else {
+              divs[i].style.display = 'none';
+            }
+          }
+          entryDiv.style.display = 'block'; // Show the div when typing
+        });
+
+        // Hide the div when clicking outside
+        document.addEventListener('click', function(event) {
+          if (event.target !== searchInput && event.target.parentNode !== entryDiv) {
+            entryDiv.style.display = 'none';
+          }
         });
     });
   });
