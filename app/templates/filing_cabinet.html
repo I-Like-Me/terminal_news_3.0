@@ -56,7 +56,7 @@
 
         <!-- Add link button -->
         <button id='link-button' class="ql-link"></button>
-        <select id='categoryDropdown' style='display: none;'></select>
+        <!-- <select id='categoryDropdown' style='display: none;'></select> -->
     </div>    
     <div id="editorContainer"></div> 
   </div>
@@ -814,9 +814,6 @@ function displayTextInRightPanel(content, file_id) {
   });
 
   document.querySelector('#link-button').addEventListener('click', function() {
-    // Hide dropdown initially
-    let dropdown = document.getElementById('categoryDropdown');
-    dropdown.style.display = 'none';
 
     let categorySearchInput = document.createElement('input');
     categorySearchInput.type = 'text';
@@ -844,10 +841,15 @@ function displayTextInRightPanel(content, file_id) {
             let div = document.createElement('div');
             div.textContent = categories[categoryId];
             div.addEventListener('click', function() {
+                categorySearchInput.style.display = 'none';
+                categoryDiv.style.display = 'none';
+                leftArrow.style.display = '';
+                entrySearchInput.style.display = '';
             });
             categoryDiv.appendChild(div);
           });
           categorySearchInput.style.display = '';
+          categoryDiv.style.display = '';
         });
 
         // Add an event listener to the search field
@@ -862,7 +864,6 @@ function displayTextInRightPanel(content, file_id) {
               divs[i].style.display = 'none';
             }
           }
-          categoryDiv.style.display = ''; // Show the div when typing
         });
 
         // Create a search input field
@@ -890,8 +891,10 @@ function displayTextInRightPanel(content, file_id) {
         toolbar.appendChild(entryDiv);
 
         // Add an event listener to the dropdown
-        dropdown.addEventListener('change', function() {
-          fetch('/get_category/' + dropdown.value)
+        categorySearchInput.addEventListener('change', function() {
+        console.log(categorySearchInput);
+        console.log(categoryDiv);
+          fetch('/get_category/' + categorySearchInput.value)
             .then(response => response.json())
             .then(data => {
               // Populate the div with the entries
@@ -907,7 +910,8 @@ function displayTextInRightPanel(content, file_id) {
               });
 
               // Replace the dropdown with the search input field
-              dropdown.style.display = 'none';
+              categorySearchInput.style.display = 'none';
+              categoryDiv.style.display = 'none';
               leftArrow.style.display = '';
               entrySearchInput.style.display = '';
             });
@@ -916,7 +920,8 @@ function displayTextInRightPanel(content, file_id) {
         // Add an event listener to the left arrow
         leftArrow.addEventListener('click', function() {
           // Replace the search input field with the dropdown
-          dropdown.style.display = '';
+          categorySearchInput.style.display = '';
+          categoryDiv.style.display = '';
           leftArrow.style.display = 'none';
           entrySearchInput.style.display = 'none';
           entryDiv.style.display = 'none'; // Hide the div

@@ -137,11 +137,11 @@ def save_content():
 
 @bp.route('/get_categories', methods=['GET'])
 def get_categories():
-    print('pizza')
-    return {1: '------', 2: 'Ability', 3: 'Skill', 4: 'Damage Type'}
+    return {1: 'Ability', 2: 'Skill', 3: 'Damage Type'}
 
 @bp.route('/get_category/<string:category>', methods=['GET'])
 def get_category(category):
+    print(category)
     if category == 'Ability':
         entries = Ability.query.all()
     elif category == 'Skill':
