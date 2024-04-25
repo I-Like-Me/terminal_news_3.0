@@ -34,29 +34,30 @@
         </div>   
     </div>
     <div id="toolbar">
-        <!-- Add a series of dropdowns for headers -->
-        <select class="ql-header">
-          <option value="" selected></option>
-          <option value="1">Header 1</option>
-          <option value="2">Header 2</option>
-          <option value="3">Header 3</option>
-        </select>
-      
-        <!-- Add styling buttons -->
-        <button class="ql-bold"></button>
-        <button class="ql-italic"></button>
-        <button class="ql-underline"></button>
-      
-        <!-- Add list buttons -->
-        <button class="ql-list" value="ordered"></button>
-        <button class="ql-list" value="bullet"></button>
-      
-        <!-- Add clean button -->
-        <button class="ql-clean"></button>
+          <!-- Add a series of dropdowns for headers -->
+          <select class="ql-header">
+            <option value="" selected></option>
+            <option value="1">Header 1</option>
+            <option value="2">Header 2</option>
+            <option value="3">Header 3</option>
+          </select>
 
-        <!-- Add link button -->
-        <button id='link-button' class="ql-link"></button>
-        <!-- <select id='categoryDropdown' style='display: none;'></select> -->
+          <!-- Add styling buttons -->
+          <button class="ql-bold"></button>
+          <button class="ql-italic"></button>
+          <button class="ql-underline"></button>
+      
+          <!-- Add list buttons -->
+          <button class="ql-list" value="ordered"></button>
+          <button class="ql-list" value="bullet"></button>
+      
+          <!-- Add clean button -->
+          <button class="ql-clean"></button>
+          
+          <!-- Add link button -->
+          <button id='link-button' class="ql-link"></button>
+          <div id='linkDropdownDiv'></div>
+
     </div>    
     <div id="editorContainer"></div> 
   </div>
@@ -814,25 +815,25 @@ function displayTextInRightPanel(content, file_id) {
   });
 
   document.querySelector('#link-button').addEventListener('click', function() {
-    if (document.getElementById("categorySearchInput")) {
+    if (document.getElementById("linkDropdownDiv")) {
       console.log('red');
     } else {
       console.log('blue');
     }
-    
+
     let categorySearchInput = document.createElement('input');
     categorySearchInput.type = 'text';
     categorySearchInput.id = 'categorySearchInput';
     categorySearchInput.placeholder = 'Search...';
     categorySearchInput.style.display = 'None';
 
-    let toolbar = document.querySelector('#toolbar');
-    toolbar.appendChild(categorySearchInput);
+    let linkDropdownDiv = document.querySelector('#linkDropdownDiv');
+    linkDropdownDiv.appendChild(categorySearchInput);
 
     // Create a div for the categories
     let categoryDiv = document.createElement('div');
     categoryDiv.id = 'categoryDiv';
-    categoryDiv.style.display = 'none'; // Initially hidden  
+    categoryDiv.className = 'custom-dropdown'; 
 
     // Create a search input field
     let entrySearchInput = document.createElement('input');
@@ -847,19 +848,19 @@ function displayTextInRightPanel(content, file_id) {
     leftArrow.style.display = 'none'; // Initially hidden
 
     // Append the left arrow and the search input field to your HTML
-    toolbar.appendChild(leftArrow);
-    toolbar.appendChild(entrySearchInput);
+    linkDropdownDiv.appendChild(leftArrow);
+    linkDropdownDiv.appendChild(entrySearchInput);
 
     // Create a div for the entries
     let entryDiv = document.createElement('div');
     entryDiv.id = 'entryDiv';
-    entryDiv.style.display = 'none'; // Initially hidden
+    entryDiv.className = 'custom-dropdown';
     
     // Append the div to your HTML
-    toolbar.appendChild(entryDiv);
+    linkDropdownDiv.appendChild(entryDiv);
 
     // Append the div to your HTML
-    toolbar.appendChild(categoryDiv);
+    linkDropdownDiv.appendChild(categoryDiv);
 
     fetch('/get_categories')
       .then(response => response.json())

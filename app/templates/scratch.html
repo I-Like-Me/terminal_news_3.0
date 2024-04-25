@@ -1,4 +1,4 @@
-After clicking the link icon in the toolbar, the category dropdown appears and when a category is clicked it is replaced by the back arrow and the entry dropdown for the selected category. I would like to make a change to the linking interface and process. I want the categoryDiv to appear as column coming from the bottom of the of categorySearchInput separate and over tool bar and editor. 
+After clicking the link icon in the toolbar, the category dropdown appears and when a category is clicked it is replaced by the back arrow and the entry dropdown for the selected category. How do i edit the code below so categoryDiv and entryDiv visually looks just like ql-header drop down?
 
 HTML:
 
@@ -65,6 +65,7 @@ HTML:
 
 javascript:
 
+
 function displayTextInRightPanel(content, file_id) {
   const editorContainer = document.getElementById('editorContainer');
   editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
@@ -120,15 +121,20 @@ function displayTextInRightPanel(content, file_id) {
   });
 
   document.querySelector('#link-button').addEventListener('click', function() {
+    if (document.getElementById("linkDropdownDiv")) {
+      console.log('red');
+    } else {
+      console.log('blue');
+    }
 
     let categorySearchInput = document.createElement('input');
     categorySearchInput.type = 'text';
     categorySearchInput.id = 'categorySearchInput';
     categorySearchInput.placeholder = 'Search...';
-    categorySearchInput.style.display = '';
+    categorySearchInput.style.display = 'None';
 
-    let toolbar = document.querySelector('#toolbar');
-    toolbar.appendChild(categorySearchInput);
+    let linkDropdownDiv = document.querySelector('#linkDropdownDiv');
+    linkDropdownDiv.appendChild(categorySearchInput);
 
     // Create a div for the categories
     let categoryDiv = document.createElement('div');
@@ -148,19 +154,19 @@ function displayTextInRightPanel(content, file_id) {
     leftArrow.style.display = 'none'; // Initially hidden
 
     // Append the left arrow and the search input field to your HTML
-    toolbar.appendChild(leftArrow);
-    toolbar.appendChild(entrySearchInput);
+    linkDropdownDiv.appendChild(leftArrow);
+    linkDropdownDiv.appendChild(entrySearchInput);
 
     // Create a div for the entries
     let entryDiv = document.createElement('div');
     entryDiv.id = 'entryDiv';
     entryDiv.style.display = 'none'; // Initially hidden
+    
+    // Append the div to your HTML
+    linkDropdownDiv.appendChild(entryDiv);
 
     // Append the div to your HTML
-    toolbar.appendChild(entryDiv);
-
-    // Append the div to your HTML
-    toolbar.appendChild(categoryDiv);
+    linkDropdownDiv.appendChild(categoryDiv);
 
     fetch('/get_categories')
       .then(response => response.json())
