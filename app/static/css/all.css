@@ -359,6 +359,7 @@ ul {
 }
 
 .ql-snow .ql-picker {
+    font-family: 'VT323', Courier;
     font-size: 18px !important;
     height: 27px !important;
     margin-left: 15px !important;
@@ -379,6 +380,7 @@ ul {
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
     color: #00dd00 !important;
+    font-family: 'VT323', Courier;
 }
 
 .ql-snow.ql-toolbar button:hover .ql-fill,
@@ -410,6 +412,7 @@ ul {
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill {
   fill: #00dd00 !important;
+  font-family: 'VT323', Courier;
 }
 
 .ql-snow.ql-toolbar button:hover .ql-stroke,
@@ -441,10 +444,12 @@ ul {
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
   stroke: #00dd00 !important;
+  font-family: 'VT323', Courier;
 }
 
 .ql-editor {
   font-size: 2em;
+  font-family: 'VT323', Courier;
 }
 
 .highlight {
@@ -509,10 +514,7 @@ ul {
 .custom-dropdown div {
   color: black;
   padding: 12px 16px;
+  font-family: 'VT323', Courier;
   text-decoration: none;
 }
 
-#categoryDiv, #categorySearchInput {
-  margin-left: 0;
-  padding-left: 0;
-}
