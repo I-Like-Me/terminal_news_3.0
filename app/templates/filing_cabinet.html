@@ -33,7 +33,9 @@
             <button style="background-color: red;" onclick="showInputField('delete_folder', event)">Delete Folder</button>
         </div>   
     </div>
-    <div id="toolbar">
+    <div id="toolbar" style="display: none;">
+      <div class="row"> 
+        <div class="col">
           <!-- Add a series of dropdowns for headers -->
           <select class="ql-header">
             <option value="" selected></option>
@@ -56,8 +58,11 @@
           
           <!-- Add link button -->
           <button id='link-button' class="ql-link"></button>
+        </div>
+        <div class="col">
           <div id='linkDropdownDiv'></div>
-
+        </div>
+      </div>     
     </div>    
     <div id="editorContainer"></div> 
   </div>
@@ -304,6 +309,8 @@ fileTreeElement.addEventListener('click', (event) => {
       .then(response => response.json())
       .then(data => {
         displayTextInRightPanel(data.processed_content, fileData.content);
+        toolbar = document.getElementById('toolbar');
+        toolbar.style.display = 'block';
       });
       fileButtonsVis();
     }
@@ -834,6 +841,7 @@ function displayTextInRightPanel(content, file_id) {
     let categoryDiv = document.createElement('div');
     categoryDiv.id = 'categoryDiv';
     categoryDiv.className = 'custom-dropdown'; 
+    categoryDiv.style.display = 'none';
 
     // Create a search input field
     let entrySearchInput = document.createElement('input');
@@ -855,6 +863,8 @@ function displayTextInRightPanel(content, file_id) {
     let entryDiv = document.createElement('div');
     entryDiv.id = 'entryDiv';
     entryDiv.className = 'custom-dropdown';
+    entryDiv.style.display = 'none';
+
     
     // Append the div to your HTML
     linkDropdownDiv.appendChild(entryDiv);
