@@ -814,12 +814,17 @@ function displayTextInRightPanel(content, file_id) {
   });
 
   document.querySelector('#link-button').addEventListener('click', function() {
-
+    if (document.getElementById("categorySearchInput")) {
+      console.log('red');
+    } else {
+      console.log('blue');
+    }
+    
     let categorySearchInput = document.createElement('input');
     categorySearchInput.type = 'text';
     categorySearchInput.id = 'categorySearchInput';
     categorySearchInput.placeholder = 'Search...';
-    categorySearchInput.style.display = '';
+    categorySearchInput.style.display = 'None';
 
     let toolbar = document.querySelector('#toolbar');
     toolbar.appendChild(categorySearchInput);
@@ -849,7 +854,7 @@ function displayTextInRightPanel(content, file_id) {
     let entryDiv = document.createElement('div');
     entryDiv.id = 'entryDiv';
     entryDiv.style.display = 'none'; // Initially hidden
-
+    
     // Append the div to your HTML
     toolbar.appendChild(entryDiv);
 
