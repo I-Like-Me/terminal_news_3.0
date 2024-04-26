@@ -512,6 +512,8 @@ ul {
   z-index: 1;
   border-radius: 4px;
   padding: 12px 16px;
+  margin-top: 25px;
+  display: block;
 }
 
 .custom-dropdown div {
@@ -521,3 +523,15 @@ ul {
   text-decoration: none;
 }
 
+.custom-drop-filter {
+  height: 25px;
+  width: 160px;
+  position: absolute;
+  font-family: 'VT323', Courier;
+}
+
+.custom-drop-buttons {
+  position: absolute;
+  top: 80px;
+  right: 100px;
+}

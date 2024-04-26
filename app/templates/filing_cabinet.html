@@ -831,8 +831,8 @@ function displayTextInRightPanel(content, file_id) {
     let categorySearchInput = document.createElement('input');
     categorySearchInput.type = 'text';
     categorySearchInput.id = 'categorySearchInput';
-    categorySearchInput.placeholder = 'Search...';
-    categorySearchInput.style.fontFamily = 'VT323', 'Courier';
+    categorySearchInput.className = 'custom-drop-filter';
+    categorySearchInput.placeholder = 'Category...';
     categorySearchInput.style.display = 'None';
 
     let linkDropdownDiv = document.querySelector('#linkDropdownDiv');
@@ -848,18 +848,20 @@ function displayTextInRightPanel(content, file_id) {
     let entrySearchInput = document.createElement('input');
     entrySearchInput.type = 'text';
     entrySearchInput.id = 'entrySearchInput';
+    entrySearchInput.className = 'custom-drop-filter';
     entrySearchInput.placeholder = 'Search...';
-    entrySearchInput.style.fontFamily = 'VT323', 'Courier';
     entrySearchInput.style.display = 'none'; // Initially hidden
 
     // Create a left arrow icon
     let leftArrow = document.createElement('span');
+    leftArrow.className = 'custom-drop-buttons';
     leftArrow.textContent = '←';
     leftArrow.style.display = 'none'; // Initially hidden
 
     // Append the left arrow and the search input field to your HTML
-    linkDropdownDiv.appendChild(leftArrow);
     linkDropdownDiv.appendChild(entrySearchInput);
+    linkDropdownDiv.appendChild(leftArrow);
+    
 
     // Create a div for the entries
     let entryDiv = document.createElement('div');
