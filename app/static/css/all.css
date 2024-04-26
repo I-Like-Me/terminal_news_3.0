@@ -360,9 +360,8 @@ ul {
 
 .ql-snow .ql-picker {
     font-family: 'VT323', Courier;
-    font-size: 18px !important;
-    height: 27px !important;
-    margin-left: 15px !important;
+    font-size: 24px !important;
+    margin-left: 10px !important;
 }
 
 .ql-snow.ql-toolbar button:hover,
@@ -445,6 +444,10 @@ ul {
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
   stroke: #00dd00 !important;
   font-family: 'VT323', Courier;
+}
+
+.ql-snow .ql-picker.ql-header .ql-picker-label::before {
+  position: absolute;
 }
 
 .ql-editor {
