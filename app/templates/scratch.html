@@ -1,4 +1,4 @@
-After clicking the link icon in the toolbar, the category dropdown appears and when a category is clicked it is replaced by the back arrow and the entry dropdown for the selected category. How do i add buttons to the dropdowns so the user can scroll the drop downs up and down?
+After selecting a piece of text in the editor and clicking the link icon in the toolbar, the category dropdown appears and when a category is clicked it is replaced by the back arrow and the entry dropdown for the selected category. When i click on the entryDiv the text becomes unselected and nothing gets linked. How do i modify my code so the name of the item click on from the 'entryDiv' dropdown is stored in a variable called entryName, the name of the item clicked on from the 'categoryDiv' dropdown stored in a variable called categoryName, the 'entry.id' from the python code 'return {entry.id: entry.name for entry in entries}' is stored in a variable called entryID, and all three variables are sent in a json to the python route '@bp.route('/get_summary', methods=['GET'])' 
 
 CSS:
 
@@ -458,3 +458,47 @@ function displayTextInRightPanel(content, file_id) {
     }
   });  
 }
+
+Python:
+
+@bp.route('/get_categories', methods=['GET'])
+def get_categories():
+    return {1: 'Ability', 2: 'Skill', 3: 'Damage Type'}
+
+@bp.route('/get_category/<string:category>', methods=['GET'])
+def get_category(category):
+    print(category)
+    if category == 'Ability':
+        entries = Ability.query.all()
+    elif category == 'Skill':
+        entries = Skill.query.all()
+    elif category == 'Damage Type':
+        entries = Damagetype.query.all()
+    print(entries)
+    return {entry.id: entry.name for entry in entries}
+
+@bp.route('/get_ability/<int:id>', methods=['GET'])
+def get_ability(id):
+    print(id)
+    print('ability')
+    ability = Ability.query.get(id)
+    return {'name': ability.name}
+
+@bp.route('/get_skill/<int:id>', methods=['GET'])
+def get_skill(id):
+    print(id)
+    print('skill')
+    skill = Skill.query.get(id)
+    return {'name': skill.name}
+
+@bp.route('/get_damage_type/<int:id>', methods=['GET'])
+def get_damage_type(id):
+    print(id)
+    print('damage type')
+    damagetype = Damagetype.query.get(id)
+    return {'name': damagetype.name}
+
+@bp.route('/get_summary', methods=['GET'])
+def get_summary():
+    data = request.get_json()
+    print(data)

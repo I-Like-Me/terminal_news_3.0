@@ -141,36 +141,33 @@ def get_categories():
 
 @bp.route('/get_category/<string:category>', methods=['GET'])
 def get_category(category):
-    print(category)
     if category == 'Ability':
         entries = Ability.query.all()
     elif category == 'Skill':
         entries = Skill.query.all()
     elif category == 'Damage Type':
         entries = Damagetype.query.all()
-    print(entries)
     return {entry.id: entry.name for entry in entries}
 
 @bp.route('/get_ability/<int:id>', methods=['GET'])
 def get_ability(id):
-    print(id)
-    print('ability')
     ability = Ability.query.get(id)
     return {'name': ability.name}
 
 @bp.route('/get_skill/<int:id>', methods=['GET'])
 def get_skill(id):
-    print(id)
-    print('skill')
     skill = Skill.query.get(id)
     return {'name': skill.name}
 
 @bp.route('/get_damage_type/<int:id>', methods=['GET'])
 def get_damage_type(id):
-    print(id)
-    print('damage type')
     damagetype = Damagetype.query.get(id)
     return {'name': damagetype.name}
+
+@bp.route('/get_summary', methods=['GET'])
+def get_summary():
+    data = request.get_json()
+    print(data)
 
 @bp.route('/update_json', methods=['POST'])
 def update_json():

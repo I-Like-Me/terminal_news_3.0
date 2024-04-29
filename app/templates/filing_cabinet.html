@@ -886,6 +886,7 @@ function displayTextInRightPanel(content, file_id) {
           div.textContent = categories[categoryId];
           div.addEventListener('click', function() {
             console.log(div.innerHTML);
+            const categoryName = div.innerHTML;
             // Replace the dropdown with the search input field
             categorySearchInput.style.display = 'none';
             categoryDiv.style.display = 'none';
@@ -897,15 +898,18 @@ function displayTextInRightPanel(content, file_id) {
               .then(data => {
                 // Populate the div with the entries
                 entryDiv.innerHTML = ''; // Clear previous entries
+                idRef = {};
                 Object.keys(data).forEach(entryId => {
                   let div = document.createElement('div');
                   div.textContent = data[entryId];
+                  idRef[data[entryId]] = entryId;
                   div.addEventListener('click', function() {
                     let range = quill.getSelection();
-                    quill.insertText(range.index, div.textContent, {'link': '/entry/' + entryId});
+                    
                   });
                   entryDiv.appendChild(div);
                 });
+                console.log(idRef);
               });                
             });
             categoryDiv.appendChild(div);
@@ -952,7 +956,6 @@ function displayTextInRightPanel(content, file_id) {
           }
           entryDiv.style.display = ''; // Show the div when typing
         });
-
   });
 
   quill.on('text-change', function(delta, oldDelta, source) {
