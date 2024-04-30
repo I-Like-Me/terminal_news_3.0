@@ -1,4 +1,4 @@
-After selecting a piece of text in the editor and clicking the link icon in the toolbar, the category dropdown appears and when a category is clicked it is replaced by the back arrow and the entry dropdown for the selected category. When i click on the entryDiv the text becomes unselected and nothing gets linked. How do i modify my code so the name of the item click on from the 'entryDiv' dropdown is stored in a variable called entryName, the name of the item clicked on from the 'categoryDiv' dropdown stored in a variable called categoryName, the 'entry.id' from the python code 'return {entry.id: entry.name for entry in entries}' is stored in a variable called entryID, and all three variables are sent in a json to the python route '@bp.route('/get_summary', methods=['GET'])' 
+After selecting a piece of text in the editor and clicking the link icon in the toolbar, the category dropdown appears and when a category is clicked it is replaced by the back arrow and the entry dropdown for the selected category. When i click on an item in entryDiv, i get the error 'TypeError: The view function did not return a valid response. The return type must be a string, dict, list, tuple with headers or status, Response instance, or WSGI callable, but it was a set.' on flasks end. how do i modify the code below to fix this?
 
 CSS:
 
@@ -310,7 +310,6 @@ function displayTextInRightPanel(content, file_id) {
       })
     });
   });
-
   document.querySelector('#link-button').addEventListener('click', function() {
     if (document.getElementById("linkDropdownDiv")) {
       console.log('red');
@@ -365,7 +364,10 @@ function displayTextInRightPanel(content, file_id) {
 
     // Append the div to your HTML
     linkDropdownDiv.appendChild(categoryDiv);
-
+    let idRef = {};
+    let categoryName;
+    let entryName;
+    let entryID;
     fetch('/get_categories')
       .then(response => response.json())
       .then(categories => {
@@ -375,7 +377,7 @@ function displayTextInRightPanel(content, file_id) {
           let div = document.createElement('div');
           div.textContent = categories[categoryId];
           div.addEventListener('click', function() {
-            console.log(div.innerHTML);
+            categoryName = div.innerHTML;
             // Replace the dropdown with the search input field
             categorySearchInput.style.display = 'none';
             categoryDiv.style.display = 'none';
@@ -390,9 +392,23 @@ function displayTextInRightPanel(content, file_id) {
                 Object.keys(data).forEach(entryId => {
                   let div = document.createElement('div');
                   div.textContent = data[entryId];
+                  idRef[data[entryId]] = entryId;
                   div.addEventListener('click', function() {
-                    let range = quill.getSelection();
-                    quill.insertText(range.index, div.textContent, {'link': '/entry/' + entryId});
+                    entryName = div.innerHTML;
+                    
+                    entryID = idRef[entryName];
+  
+                    fetch('/get_summary', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                        entryNameK: entryName,
+                        categoryNameK: categoryName,
+                        entryIDK: entryID
+                      })
+                    });
                   });
                   entryDiv.appendChild(div);
                 });
@@ -442,7 +458,6 @@ function displayTextInRightPanel(content, file_id) {
           }
           entryDiv.style.display = ''; // Show the div when typing
         });
-
   });
 
   quill.on('text-change', function(delta, oldDelta, source) {
@@ -498,7 +513,8 @@ def get_damage_type(id):
     damagetype = Damagetype.query.get(id)
     return {'name': damagetype.name}
 
-@bp.route('/get_summary', methods=['GET'])
+@bp.route('/get_summary', methods=['POST'])
 def get_summary():
     data = request.get_json()
     print(data)
+    return {'pizza'}

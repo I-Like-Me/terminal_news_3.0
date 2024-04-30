@@ -164,10 +164,11 @@ def get_damage_type(id):
     damagetype = Damagetype.query.get(id)
     return {'name': damagetype.name}
 
-@bp.route('/get_summary', methods=['GET'])
+@bp.route('/get_summary', methods=['POST'])
 def get_summary():
     data = request.get_json()
     print(data)
+    return jsonify('pizza')
 
 @bp.route('/update_json', methods=['POST'])
 def update_json():
