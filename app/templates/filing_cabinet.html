@@ -875,7 +875,10 @@ function displayTextInRightPanel(content, file_id) {
 
     // Append the div to your HTML
     linkDropdownDiv.appendChild(categoryDiv);
-
+    let idRef = {};
+    let categoryName;
+    let entryName;
+    let entryID;
     fetch('/get_categories')
       .then(response => response.json())
       .then(categories => {
@@ -885,8 +888,7 @@ function displayTextInRightPanel(content, file_id) {
           let div = document.createElement('div');
           div.textContent = categories[categoryId];
           div.addEventListener('click', function() {
-            console.log(div.innerHTML);
-            const categoryName = div.innerHTML;
+            categoryName = div.innerHTML;
             // Replace the dropdown with the search input field
             categorySearchInput.style.display = 'none';
             categoryDiv.style.display = 'none';
@@ -898,18 +900,20 @@ function displayTextInRightPanel(content, file_id) {
               .then(data => {
                 // Populate the div with the entries
                 entryDiv.innerHTML = ''; // Clear previous entries
-                idRef = {};
                 Object.keys(data).forEach(entryId => {
                   let div = document.createElement('div');
                   div.textContent = data[entryId];
                   idRef[data[entryId]] = entryId;
                   div.addEventListener('click', function() {
-                    let range = quill.getSelection();
-                    
+                    entryName = div.innerHTML;
+                    entryID = idRef[entryName];
+                    console.log(idRef);
+                    console.log(categoryName);
+                    console.log(entryName);
+                    console.log(entryID);
                   });
                   entryDiv.appendChild(div);
                 });
-                console.log(idRef);
               });                
             });
             categoryDiv.appendChild(div);
