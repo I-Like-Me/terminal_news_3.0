@@ -537,3 +537,8 @@ ul {
   top: 80px;
   right: 210px;
 }
+
+#custom-link-button {
+  transform: scale(0.65)
+             translate(-8px, -14px);
+}
