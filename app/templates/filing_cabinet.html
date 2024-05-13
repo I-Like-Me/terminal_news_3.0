@@ -943,8 +943,12 @@ async function send_selection(quillText) {
     // Get the current selection
     let range = quillText.getSelection(true);
     
+    // Get the selected text
+    let selectedText = quillText.getText(range.index, range.length);
+    
     // Insert the clickable text
-    quillText.formatText(range.index, range.length, { 'link': '#' });
+    quillText.deleteText(range.index, range.length); // Delete the selected text
+    quillText.insertText(range.index, selectedText, { 'link': '#' }); // Insert the selected text as a link
     
     // Add a custom event listener to the inserted link
     let links = document.querySelectorAll('.ql-editor a');
@@ -952,7 +956,7 @@ async function send_selection(quillText) {
       links[i].addEventListener('click', function(e) {
         e.preventDefault();
         // Custom behavior goes here
-        alert('Link clicked!');
+        console.log(data); // Print the contents of the variable to the console
       });
     }
 }
