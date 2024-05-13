@@ -1,4 +1,4 @@
-How do we modify the code below clicking a second time  '<button id='custom-link-button'><i class="fa fa-link"></i></button>' closes the dropdowns and breaks the function 'document.querySelector('#custom-link-button').addEventListener('click', function() {'? So far it closes it once but cant reopen it after its been closed. How do we fix the code below so it works every time without reloading the page?
+Currently, selected text in the quill.js editor stays selected when you click 'document.querySelector('#custom-link-button').addEventListener('click', function() {' but not when clicking 'div.addEventListener('click', function() {' inside 'categoryDiv' or 'leftArrow.addEventListener('click', function() {'. How do i modify the code so the text stays selected till 'div.addEventListener('click', function() {' inside 'entryDiv' occurs?
 
 CSS:
 .custom-dropdown {
@@ -102,10 +102,175 @@ HTML:
 JAVASCRIPT:
 <script>
 
+
 let idRef = {};
 let categoryName;
 let entryName;
 let entryID;
+
+function startLinkTool() {
+    document.getElementById("linkDropdownDiv").style.display = "block";
+
+    let categorySearchInput = document.createElement('input');
+    categorySearchInput.type = 'text';
+    categorySearchInput.id = 'categorySearchInput';
+    categorySearchInput.className = 'custom-drop-filter';
+    categorySearchInput.placeholder = 'Category...';
+    categorySearchInput.style.display = 'None';
+
+    let linkDropdownDiv = document.querySelector('#linkDropdownDiv');
+    linkDropdownDiv.appendChild(categorySearchInput);
+
+    // Create a div for the categories
+    let categoryDiv = document.createElement('div');
+    categoryDiv.id = 'categoryDiv';
+    categoryDiv.className = 'custom-dropdown'; 
+    categoryDiv.style.display = 'none';
+
+    // Create a search input field
+    let entrySearchInput = document.createElement('input');
+    entrySearchInput.type = 'text';
+    entrySearchInput.id = 'entrySearchInput';
+    entrySearchInput.className = 'custom-drop-filter';
+    entrySearchInput.placeholder = 'Search...';
+    entrySearchInput.style.display = 'none'; // Initially hidden
+
+    // Create a left arrow icon
+    let leftArrow = document.createElement('span');
+    leftArrow.className = 'custom-drop-buttons';
+    leftArrow.textContent = '←';
+    leftArrow.style.display = 'none'; // Initially hidden
+
+    // Append the left arrow and the search input field to your HTML
+    linkDropdownDiv.appendChild(entrySearchInput);
+    linkDropdownDiv.appendChild(leftArrow);
+    
+
+    // Create a div for the entries
+    let entryDiv = document.createElement('div');
+    entryDiv.id = 'entryDiv';
+    entryDiv.className = 'custom-dropdown';
+    entryDiv.style.display = 'none';
+
+
+    // Append the div to your HTML
+    linkDropdownDiv.appendChild(entryDiv);
+
+    // Append the div to your HTML
+    linkDropdownDiv.appendChild(categoryDiv);
+    fetch('/get_categories')
+      .then(response => response.json())
+      .then(categories => {
+        // Populate the div with the categories
+        categoryDiv.innerHTML = ''; // Clear previous categories
+        Object.keys(categories).forEach(categoryId => {
+          let div = document.createElement('div');
+          div.textContent = categories[categoryId];
+          div.addEventListener('click', function() {
+            categoryName = div.innerHTML;
+            // Replace the dropdown with the search input field
+            categorySearchInput.style.display = 'none';
+            categoryDiv.style.display = 'none';
+            leftArrow.style.display = '';
+            entrySearchInput.style.display = '';
+            entryDiv.style.display = '';
+            fetch('/get_category/' + div.innerHTML)
+              .then(response => response.json())
+              .then(data => {
+                // Populate the div with the entries
+                entryDiv.innerHTML = ''; // Clear previous entries
+                Object.keys(data).forEach(entryId => {
+                  let div = document.createElement('div');
+                  div.textContent = data[entryId];
+                  idRef[data[entryId]] = entryId;
+                  div.addEventListener('click', function() {
+                    entryName = div.innerHTML;
+                    entryID = idRef[entryName];
+                    send_selection();
+                    endLinkTool()
+                  });
+                  entryDiv.appendChild(div);
+                });
+              });                
+            });
+            categoryDiv.appendChild(div);
+          });
+          
+          categorySearchInput.style.display = '';
+          categoryDiv.style.display = '';
+        });
+
+        // Add an event listener to the search field
+        categorySearchInput.addEventListener('input', function() {
+          let filter = categorySearchInput.value.toUpperCase();
+          let divs = categoryDiv.getElementsByTagName('div');
+          for (let i = 0; i < divs.length; i++) {
+            let txtValue = divs[i].textContent;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              divs[i].style.display = '';
+            } else {
+              divs[i].style.display = 'none';
+            }
+          }
+        });
+
+        // Add an event listener to the left arrow
+        leftArrow.addEventListener('click', function() {
+          // Replace the search input field with the dropdown
+          categorySearchInput.style.display = '';
+          categoryDiv.style.display = '';
+          leftArrow.style.display = 'none';
+          entrySearchInput.style.display = 'none';
+          entryDiv.style.display = 'none'; // Hide the div
+        });
+
+        // Add an event listener to the search field
+        entrySearchInput.addEventListener('input', function() {
+          let filter = entrySearchInput.value.toUpperCase();
+          let divs = entryDiv.getElementsByTagName('div');
+          for (let i = 0; i < divs.length; i++) {
+            let txtValue = divs[i].textContent;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              divs[i].style.display = '';
+            } else {
+              divs[i].style.display = 'none';
+            }
+          }
+          entryDiv.style.display = ''; // Show the div when typing
+        });  
+}
+
+function endLinkTool() {
+  document.getElementById("linkDropdownDiv").style.display = "none";
+  document.getElementById("categorySearchInput").style.display = 'none';
+  document.getElementById("categoryDiv").style.display = 'none';
+  document.getElementById("entrySearchInput").style.display = 'none';
+  document.getElementById("entryDiv").style.display = 'none';
+  document.getElementById('linkDropdownDiv').innerHTML = "";
+}
+
+async function send_selection() {
+    let dataToSend = {
+      entryNameK: entryName,
+      categoryNameK: categoryName,
+      entryIDK: entryID
+    };
+
+    const response = await fetch('/get_summary', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dataToSend)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+}
 
 function displayTextInRightPanel(content, file_id) {
   const editorContainer = document.getElementById('editorContainer');
@@ -161,150 +326,17 @@ function displayTextInRightPanel(content, file_id) {
     });
   });
 
-  let isDropdownOpen = false; // Add this line at the beginning of your script
-
   document.querySelector('#custom-link-button').addEventListener('click', function() {
-    if (isDropdownOpen) {
-      // If dropdown is open, close it and return
-      document.getElementById("linkDropdownDiv").style.display = "none";
-      isDropdownOpen = false;
-      return;
+    let range = quill.getSelection();
+    if (range && range.length != 0) {
+      if (document.getElementById("linkDropdownDiv").style.display === "none") {
+        startLinkTool();
+      } else {
+        endLinkTool();
+      };
     }
-
-    let categorySearchInput = document.createElement('input');
-    categorySearchInput.type = 'text';
-    categorySearchInput.id = 'categorySearchInput';
-    categorySearchInput.className = 'custom-drop-filter';
-    categorySearchInput.placeholder = 'Category...';
-    categorySearchInput.style.display = 'None';
-
-    let linkDropdownDiv = document.querySelector('#linkDropdownDiv');
-    linkDropdownDiv.appendChild(categorySearchInput);
-
-    let categoryDiv = document.createElement('div');
-    categoryDiv.id = 'categoryDiv';
-    categoryDiv.className = 'custom-dropdown'; 
-    categoryDiv.style.display = 'none';
-
-    let entrySearchInput = document.createElement('input');
-    entrySearchInput.type = 'text';
-    entrySearchInput.id = 'entrySearchInput';
-    entrySearchInput.className = 'custom-drop-filter';
-    entrySearchInput.placeholder = 'Search...';
-    entrySearchInput.style.display = 'none';
-
-    let leftArrow = document.createElement('span');
-    leftArrow.className = 'custom-drop-buttons';
-    leftArrow.textContent = '←';
-    leftArrow.style.display = 'none';
-
-    linkDropdownDiv.appendChild(entrySearchInput);
-    linkDropdownDiv.appendChild(leftArrow);
-    
-    let entryDiv = document.createElement('div');
-    entryDiv.id = 'entryDiv';
-    entryDiv.className = 'custom-dropdown';
-    entryDiv.style.display = 'none';
-
-    linkDropdownDiv.appendChild(entryDiv);
-
-    linkDropdownDiv.appendChild(categoryDiv);
-    fetch('/get_categories')
-      .then(response => response.json())
-      .then(categories => {
-        categoryDiv.innerHTML = ''; 
-        Object.keys(categories).forEach(categoryId => {
-          let div = document.createElement('div');
-          div.textContent = categories[categoryId];
-          div.addEventListener('click', function() {
-            categoryName = div.innerHTML;
-            categorySearchInput.style.display = 'none';
-            categoryDiv.style.display = 'none';
-            leftArrow.style.display = '';
-            entrySearchInput.style.display = '';
-            entryDiv.style.display = '';
-            fetch('/get_category/' + div.innerHTML)
-              .then(response => response.json())
-              .then(data => {
-                entryDiv.innerHTML = '';
-                Object.keys(data).forEach(entryId => {
-                  let div = document.createElement('div');
-                  div.textContent = data[entryId];
-                  idRef[data[entryId]] = entryId;
-                  div.addEventListener('click', function() {
-                    entryName = div.innerHTML;
-                    entryID = idRef[entryName];
-                    send_selection();
-                  });
-                  entryDiv.appendChild(div);
-                });
-              });                
-            });
-            categoryDiv.appendChild(div);
-          });
-          categorySearchInput.style.display = '';
-          categoryDiv.style.display = '';
-          isDropdownOpen = true;
-        });
-
-        categorySearchInput.addEventListener('input', function() {
-          let filter = categorySearchInput.value.toUpperCase();
-          let divs = categoryDiv.getElementsByTagName('div');
-          for (let i = 0; i < divs.length; i++) {
-            let txtValue = divs[i].textContent;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-              divs[i].style.display = '';
-            } else {
-              divs[i].style.display = 'none';
-            }
-          }
-        });
-
-        leftArrow.addEventListener('click', function() {
-          categorySearchInput.style.display = '';
-          categoryDiv.style.display = '';
-          leftArrow.style.display = 'none';
-          entrySearchInput.style.display = 'none';
-          entryDiv.style.display = 'none';
-        });
-
-        entrySearchInput.addEventListener('input', function() {
-          let filter = entrySearchInput.value.toUpperCase();
-          let divs = entryDiv.getElementsByTagName('div');
-          for (let i = 0; i < divs.length; i++) {
-            let txtValue = divs[i].textContent;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-              divs[i].style.display = '';
-            } else {
-              divs[i].style.display = 'none';
-            }
-          }
-          entryDiv.style.display = '';
-        });
   });
 
-  async function send_selection() {
-    let dataToSend = {
-      entryNameK: entryName,
-      categoryNameK: categoryName,
-      entryIDK: entryID
-    };
-
-    const response = await fetch('/get_summary', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(dataToSend)
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log(data);
-  }
 
   quill.on('text-change', function(delta, oldDelta, source) {
     if (source == 'user') {

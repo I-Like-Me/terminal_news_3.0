@@ -773,6 +773,10 @@ let entryName;
 let entryID;
 
 function startLinkTool() {
+    document.getElementById("linkDropdownDiv").addEventListener('mousedown', function(e) {
+      e.preventDefault();
+    });
+
     document.getElementById("linkDropdownDiv").style.display = "block";
 
     let categorySearchInput = document.createElement('input');
@@ -847,10 +851,13 @@ function startLinkTool() {
                   let div = document.createElement('div');
                   div.textContent = data[entryId];
                   idRef[data[entryId]] = entryId;
-                  div.addEventListener('click', function() {
+                  div.addEventListener('click', function(e) {
+                    e.preventDefault();
                     entryName = div.innerHTML;
                     entryID = idRef[entryName];
                     send_selection();
+                    endLinkTool()
+                    quill.setSelection(range.index, range.length);
                   });
                   entryDiv.appendChild(div);
                 });
@@ -990,14 +997,15 @@ function displayTextInRightPanel(content, file_id) {
   });
 
   document.querySelector('#custom-link-button').addEventListener('click', function() {
-    if (document.getElementById("linkDropdownDiv").style.display === "none") {
-      startLinkTool();
-    } else {
-      endLinkTool();
-    };
+    let range = quill.getSelection();
+    if (range && range.length != 0) {
+      if (document.getElementById("linkDropdownDiv").style.display === "none") {
+        startLinkTool();
+      } else {
+        endLinkTool();
+      };
+    }
   });
-
-
 
   quill.on('text-change', function(delta, oldDelta, source) {
     if (source == 'user') {
