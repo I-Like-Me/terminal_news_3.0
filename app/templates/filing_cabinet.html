@@ -772,7 +772,7 @@ let categoryName;
 let entryName;
 let entryID;
 
-function startLinkTool() {
+function startLinkTool(quillTextSelect) {
     document.getElementById("linkDropdownDiv").addEventListener('mousedown', function(e) {
       e.preventDefault();
     });
@@ -855,7 +855,7 @@ function startLinkTool() {
                     e.preventDefault();
                     entryName = div.innerHTML;
                     entryID = idRef[entryName];
-                    send_selection();
+                    send_selection(quillTextSelect);
                     endLinkTool();
                   });
                   entryDiv.appendChild(div);
@@ -918,7 +918,7 @@ function endLinkTool() {
   document.getElementById('linkDropdownDiv').innerHTML = "";
 }
 
-async function send_selection() {
+async function send_selection(quillText) {
     let dataToSend = {
       entryNameK: entryName,
       categoryNameK: categoryName,
@@ -939,6 +939,22 @@ async function send_selection() {
 
     const data = await response.json();
     console.log(data);
+
+    // Get the current selection
+    let range = quillText.getSelection(true);
+    
+    // Insert the clickable text
+    quillText.formatText(range.index, range.length, { 'link': '#' });
+    
+    // Add a custom event listener to the inserted link
+    let links = document.querySelectorAll('.ql-editor a');
+    for (let i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', function(e) {
+        e.preventDefault();
+        // Custom behavior goes here
+        alert('Link clicked!');
+      });
+    }
 }
 
 function displayTextInRightPanel(content, file_id) {
@@ -999,7 +1015,7 @@ function displayTextInRightPanel(content, file_id) {
     let range = quill.getSelection();
     if (range && range.length != 0) {
       if (document.getElementById("linkDropdownDiv").style.display === "none") {
-        startLinkTool();
+        startLinkTool(quill);
       } else {
         endLinkTool();
       };

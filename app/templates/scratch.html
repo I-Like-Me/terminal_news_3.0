@@ -1,4 +1,4 @@
-how do i modify the code so endLinkTool() runs when the selected text in the quill.js editor deselected?
+currently when startLinkTool() finishes, clickable text is being added to the quill.js editor named after the entryDiv that was selected. How do i modify the code below so instead of new clickable text being inserted, the selected text in the quill.js editor is turned in to clickable text, which prints the selected entryDiv to the console when the clickable text is clicked?
 
 CSS:
 .custom-dropdown {
@@ -108,8 +108,7 @@ let categoryName;
 let entryName;
 let entryID;
 
-function startLinkTool() {
-
+function startLinkTool(quillTextSelect) {
     document.getElementById("linkDropdownDiv").addEventListener('mousedown', function(e) {
       e.preventDefault();
     });
@@ -192,9 +191,8 @@ function startLinkTool() {
                     e.preventDefault();
                     entryName = div.innerHTML;
                     entryID = idRef[entryName];
-                    send_selection();
-                    endLinkTool()
-                    quill.setSelection(range.index, range.length);
+                    send_selection(quillTextSelect);
+                    endLinkTool();
                   });
                   entryDiv.appendChild(div);
                 });
@@ -256,7 +254,7 @@ function endLinkTool() {
   document.getElementById('linkDropdownDiv').innerHTML = "";
 }
 
-async function send_selection() {
+async function send_selection(quillText) {
     let dataToSend = {
       entryNameK: entryName,
       categoryNameK: categoryName,
@@ -277,6 +275,22 @@ async function send_selection() {
 
     const data = await response.json();
     console.log(data);
+
+    // Get the current selection
+    let range = quillText.getSelection(true);
+    
+    // Insert the clickable text
+    quillText.insertText(range.index, entryName, { 'link': '#' });
+    
+    // Add a custom event listener to the inserted link
+    let links = document.querySelectorAll('.ql-editor a');
+    for (let i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', function(e) {
+        e.preventDefault();
+        // Custom behavior goes here
+        alert('Link clicked!');
+      });
+    }
 }
 
 function displayTextInRightPanel(content, file_id) {
@@ -337,13 +351,12 @@ function displayTextInRightPanel(content, file_id) {
     let range = quill.getSelection();
     if (range && range.length != 0) {
       if (document.getElementById("linkDropdownDiv").style.display === "none") {
-        startLinkTool();
+        startLinkTool(quill);
       } else {
         endLinkTool();
       };
     }
   });
-
 
   quill.on('text-change', function(delta, oldDelta, source) {
     if (source == 'user') {
@@ -357,4 +370,10 @@ function displayTextInRightPanel(content, file_id) {
       });
     }
   });  
+
+  quill.on('selection-change', function(range, oldRange, source) {
+    if (range == null && source == 'user') {
+      endLinkTool();
+    }
+  });
 }
