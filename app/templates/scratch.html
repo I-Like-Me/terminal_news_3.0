@@ -1,4 +1,4 @@
-Currently, selected text in the quill.js editor stays selected when you click 'document.querySelector('#custom-link-button').addEventListener('click', function() {' but not when clicking 'div.addEventListener('click', function() {' inside 'categoryDiv' or 'leftArrow.addEventListener('click', function() {'. How do i modify the code so the text stays selected till 'div.addEventListener('click', function() {' inside 'entryDiv' occurs?
+how do i modify the code so endLinkTool() runs when the selected text in the quill.js editor deselected?
 
 CSS:
 .custom-dropdown {
@@ -109,6 +109,11 @@ let entryName;
 let entryID;
 
 function startLinkTool() {
+
+    document.getElementById("linkDropdownDiv").addEventListener('mousedown', function(e) {
+      e.preventDefault();
+    });
+
     document.getElementById("linkDropdownDiv").style.display = "block";
 
     let categorySearchInput = document.createElement('input');
@@ -183,11 +188,13 @@ function startLinkTool() {
                   let div = document.createElement('div');
                   div.textContent = data[entryId];
                   idRef[data[entryId]] = entryId;
-                  div.addEventListener('click', function() {
+                  div.addEventListener('click', function(e) {
+                    e.preventDefault();
                     entryName = div.innerHTML;
                     entryID = idRef[entryName];
                     send_selection();
                     endLinkTool()
+                    quill.setSelection(range.index, range.length);
                   });
                   entryDiv.appendChild(div);
                 });

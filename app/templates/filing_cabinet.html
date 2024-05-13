@@ -1019,6 +1019,12 @@ function displayTextInRightPanel(content, file_id) {
       });
     }
   });  
+
+  quill.on('selection-change', function(range, oldRange, source) {
+    if (range == null && source == 'user') {
+      endLinkTool();
+    }
+  });
 }
     const separator = document.getElementById('separator');
     const leftPanel = document.getElementById('leftPanel');
