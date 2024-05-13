@@ -856,8 +856,7 @@ function startLinkTool() {
                     entryName = div.innerHTML;
                     entryID = idRef[entryName];
                     send_selection();
-                    endLinkTool()
-                    quill.setSelection(range.index, range.length);
+                    endLinkTool();
                   });
                   entryDiv.appendChild(div);
                 });
