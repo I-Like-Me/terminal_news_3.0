@@ -167,8 +167,8 @@ def get_damage_type(id):
 @bp.route('/get_summary', methods=['POST'])
 def get_summary():
     data = request.get_json()
-    print(data)
-    return jsonify(data)
+    print(data['entryNameK'])
+    return jsonify(data['entryNameK'])
 
 @bp.route('/update_json', methods=['POST'])
 def update_json():

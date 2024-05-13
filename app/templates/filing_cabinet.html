@@ -939,7 +939,7 @@ async function send_selection(quillText) {
 
     const data = await response.json();
     console.log(data);
-
+    
     // Get the current selection
     let range = quillText.getSelection(true);
     
@@ -952,13 +952,13 @@ async function send_selection(quillText) {
     
     // Add a custom event listener to the inserted link
     let links = document.querySelectorAll('.ql-editor a');
-    for (let i = 0; i < links.length; i++) {
-      links[i].addEventListener('click', function(e) {
-        e.preventDefault();
-        // Custom behavior goes here
-        console.log(data); // Print the contents of the variable to the console
-      });
-    }
+    let newLink = links[links.length - 1]; // Get the last link (newly created)
+    newLink.dataset.linkData = JSON.stringify(data); // Store the data in a data attribute
+    newLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Custom behavior goes here
+      console.log(this.dataset.linkData); // Print the contents of the data attribute to the console
+    });
 }
 
 function displayTextInRightPanel(content, file_id) {
