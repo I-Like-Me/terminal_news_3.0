@@ -911,10 +911,14 @@ function startLinkTool(quillTextSelect) {
 
 function endLinkTool() {
   document.getElementById("linkDropdownDiv").style.display = "none";
-  document.getElementById("categorySearchInput").style.display = 'none';
-  document.getElementById("categoryDiv").style.display = 'none';
-  document.getElementById("entrySearchInput").style.display = 'none';
-  document.getElementById("entryDiv").style.display = 'none';
+  if (document.getElementById("categoryDiv") != null) {
+    document.getElementById("categorySearchInput").style.display = 'none';
+    document.getElementById("categoryDiv").style.display = 'none';
+  }
+  if (document.getElementById("entryDiv") != null) {
+    document.getElementById("entrySearchInput").style.display = 'none';
+    document.getElementById("entryDiv").style.display = 'none';
+  }
   document.getElementById('linkDropdownDiv').innerHTML = "";
 }
 
@@ -939,7 +943,7 @@ async function send_selection(quillText) {
 
     const data = await response.json();
     console.log(data);
-    
+
     // Get the current selection
     let range = quillText.getSelection(true);
     
