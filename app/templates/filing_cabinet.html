@@ -20,6 +20,10 @@
   <div id="rightPanel">
     <div id="file_buttons" class="row" style="display: none;">
         <div class="column">
+            <div id="overlappingPanel">
+              <span id="closeBtn">X</span>
+              <!-- Your panel content goes here -->
+            </div>
             <button id="saveBtn">Save</button>
             <button onclick="showInputField('move', event)">Move File</button>
             <button id="deleteBtn" style="background-color: red;" onclick="showInputField('delete_file', event)">Delete File</button>
@@ -956,12 +960,15 @@ async function send_selection(quillText) {
 }
 
 
-
 function displayTextInRightPanel(content, file_id) {
   const editorContainer = document.getElementById('editorContainer');
   editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
   var icons = Quill.import('ui/icons');
   var Inline = Quill.import('blots/inline');
+
+  document.getElementById('closeBtn').addEventListener('click', function() {
+    document.getElementById('overlappingPanel').style.display = 'none';
+  });
 
   class ClickableBlot extends Inline {
     static create(value) {
@@ -970,6 +977,7 @@ function displayTextInRightPanel(content, file_id) {
       node.addEventListener('click', function(e) {
         e.preventDefault();
         console.log(this.dataset.linkData);
+        document.getElementById('overlappingPanel').style.display = 'block';
       });
       return node;
     }

@@ -542,3 +542,23 @@ ul {
   transform: scale(0.65)
              translate(-8px, -14px);
 }
+
+/* Add this to your CSS */
+#overlappingPanel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%; /* Adjust as needed */
+  height: 100%;
+  background-color: #f9f9f9;
+  z-index: 2;
+  display: none;
+  overflow-y: auto;
+}
+
+#closeBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+}
