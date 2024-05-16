@@ -1,5 +1,34 @@
-currently when startLinkTool() finishes, the selected text is becoming clickable text and prints a variable called 'data' to the console. how do I modify the code below so the selected text in the quill.js editor is turned in to clickable text and stores a specfic string in that specific clickable text so when ever that specific clickable text is clicked from that point forward, it will print the associated string to the console? This way, different peices of clickable text will have different strings printed to the console when their associated clickable text is clicked.
+Show me how to integrate Code 1 by modifying Code 2.
 
+*Code 1 Start*
+let Inline = Quill.import('blots/inline');
+
+class ClickableBlot extends Inline {
+  static create(value) {
+    let node = super.create(value);
+    node.dataset.linkData = JSON.stringify(value);
+    node.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log(this.dataset.linkData);
+    });
+    return node;
+  }
+
+  static formats(node) {
+    return node.dataset.linkData;
+  }
+}
+
+ClickableBlot.blotName = 'clickable';
+ClickableBlot.tagName = 'span';
+
+Quill.register({
+  'formats/clickable': ClickableBlot
+});
+
+*Code 1 End*
+
+*Code 2 Start*
 CSS:
 .custom-dropdown {
   position: absolute;
@@ -246,10 +275,14 @@ function startLinkTool(quillTextSelect) {
 
 function endLinkTool() {
   document.getElementById("linkDropdownDiv").style.display = "none";
-  document.getElementById("categorySearchInput").style.display = 'none';
-  document.getElementById("categoryDiv").style.display = 'none';
-  document.getElementById("entrySearchInput").style.display = 'none';
-  document.getElementById("entryDiv").style.display = 'none';
+  if (document.getElementById("categoryDiv") != null) {
+    document.getElementById("categorySearchInput").style.display = 'none';
+    document.getElementById("categoryDiv").style.display = 'none';
+  }
+  if (document.getElementById("entryDiv") != null) {
+    document.getElementById("entrySearchInput").style.display = 'none';
+    document.getElementById("entryDiv").style.display = 'none';
+  }
   document.getElementById('linkDropdownDiv').innerHTML = "";
 }
 
@@ -278,22 +311,26 @@ async function send_selection(quillText) {
     // Get the current selection
     let range = quillText.getSelection(true);
     
-    // Get the selected text
-    let selectedText = quillText.getText(range.index, range.length);
-    
-    // Insert the clickable text
-    quillText.deleteText(range.index, range.length); // Delete the selected text
-    quillText.insertText(range.index, selectedText, { 'link': '#' }); // Insert the selected text as a link
-    
-    // Add a custom event listener to the inserted link
-    let links = document.querySelectorAll('.ql-editor a');
-    for (let i = 0; i < links.length; i++) {
-      links[i].addEventListener('click', function(e) {
-        e.preventDefault();
-        // Custom behavior goes here
-        console.log(data); // Print the contents of the variable to the console
-      });
-    }
+    // Change the color of the selected text
+    quillText.formatText(range.index, range.length, 'color', 'red'); // Change 'red' to the color you want
+
+    // Format the selected text as a link
+    quillText.formatText(range.index, range.length, 'link', '#'); // The '#' is a placeholder URL
+
+    // Delay the execution of the rest of the code
+    setTimeout(function() {
+        // Add a custom event listener to the inserted link
+        let links = document.querySelectorAll('.ql-editor a');
+        if (links.length > 0) {
+            let newLink = links[links.length - 1]; // Get the last link (newly created)
+            newLink.dataset.linkData = JSON.stringify(data); // Store the data in a data attribute
+            newLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Custom behavior goes here
+                console.log(this.dataset.linkData); // Print the contents of the data attribute to the console
+            });
+        }
+    }, 0);
 }
 
 function displayTextInRightPanel(content, file_id) {
@@ -361,22 +398,11 @@ function displayTextInRightPanel(content, file_id) {
     }
   });
 
-  quill.on('text-change', function(delta, oldDelta, source) {
-    if (source == 'user') {
-      let ops = delta.ops;
-      ops.forEach(op => {
-        if (op.insert && op.insert.link) {
-          fetch(op.insert.link)
-            .then(response => response.json())
-            .then(data => alert(JSON.stringify(data)));
-        }
-      });
-    }
-  });  
-
   quill.on('selection-change', function(range, oldRange, source) {
     if (range == null && source == 'user') {
       endLinkTool();
     }
   });
 }
+
+*Code 2 End*

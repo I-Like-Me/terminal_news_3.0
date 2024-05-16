@@ -947,28 +947,43 @@ async function send_selection(quillText) {
     // Get the current selection
     let range = quillText.getSelection(true);
     
-    // Get the selected text
-    let selectedText = quillText.getText(range.index, range.length);
-    
-    // Insert the clickable text
-    quillText.deleteText(range.index, range.length); // Delete the selected text
-    quillText.insertText(range.index, selectedText, { 'link': '#' }); // Insert the selected text as a link
-    
-    // Add a custom event listener to the inserted link
-    let links = document.querySelectorAll('.ql-editor a');
-    let newLink = links[links.length - 1]; // Get the last link (newly created)
-    newLink.dataset.linkData = JSON.stringify(data); // Store the data in a data attribute
-    newLink.addEventListener('click', function(e) {
-      e.preventDefault();
-      // Custom behavior goes here
-      console.log(this.dataset.linkData); // Print the contents of the data attribute to the console
-    });
+    // Change the color of the selected text
+    quillText.formatText(range.index, range.length, 'color', 'red'); // Change 'red' to the color you want
+
+    // Format the selected text as a clickable
+    quillText.formatText(range.index, range.length, 'clickable', data);
 }
+
+
 
 function displayTextInRightPanel(content, file_id) {
   const editorContainer = document.getElementById('editorContainer');
   editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
   var icons = Quill.import('ui/icons');
+  let Inline = Quill.import('blots/inline');
+
+  class ClickableBlot extends Inline {
+    static create(value) {
+      let node = super.create(value);
+      node.dataset.linkData = JSON.stringify(value);
+      node.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log(this.dataset.linkData);
+      });
+      return node;
+    }
+
+    static formats(node) {
+      return node.dataset.linkData;
+    }
+  }
+
+  ClickableBlot.blotName = 'clickable';
+  ClickableBlot.tagName = 'span';
+
+  Quill.register({
+    'formats/clickable': ClickableBlot
+  });
 
   icons['ql-header ql-picker'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon class="ql-stroke" points="7 11 9 13 11 11 7 11"></polygon><polygon class="ql-stroke" points="7 7 9 5 11 7 7 7"></polygon></svg>';
   icons['bold'] = '<svg viewBox="3 3 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ql-stroke" d="M5,4H9.5A2.5,2.5,0,0,1,12,6.5v0A2.5,2.5,0,0,1,9.5,9H5A0,0,0,0,1,5,9V4A0,0,0,0,1,5,4Z"></path><path class="ql-stroke" d="M5,9h5.5A2.5,2.5,0,0,1,13,11.5v0A2.5,2.5,0,0,1,10.5,14H5a0,0,0,0,1,0,0V9A0,0,0,0,1,5,9Z"></path></svg>';
@@ -1029,19 +1044,6 @@ function displayTextInRightPanel(content, file_id) {
       };
     }
   });
-
-  quill.on('text-change', function(delta, oldDelta, source) {
-    if (source == 'user') {
-      let ops = delta.ops;
-      ops.forEach(op => {
-        if (op.insert && op.insert.link) {
-          fetch(op.insert.link)
-            .then(response => response.json())
-            .then(data => alert(JSON.stringify(data)));
-        }
-      });
-    }
-  });  
 
   quill.on('selection-change', function(range, oldRange, source) {
     if (range == null && source == 'user') {
