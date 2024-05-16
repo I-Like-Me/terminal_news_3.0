@@ -308,6 +308,7 @@ fileTreeElement.addEventListener('click', (event) => {
       })
       .then(response => response.json())
       .then(data => {
+        console.log(data);
         displayTextInRightPanel(data.processed_content, fileData.content);
         toolbar = document.getElementById('toolbar');
         toolbar.style.display = 'block';
@@ -942,7 +943,7 @@ async function send_selection(quillText) {
     }
 
     const data = await response.json();
-    console.log(data);
+    let parsedData = JSON.parse(data);
 
     // Get the current selection
     let range = quillText.getSelection(true);
@@ -951,7 +952,7 @@ async function send_selection(quillText) {
     quillText.formatText(range.index, range.length, 'color', 'yellow'); // Change 'yellow' to the color you want
 
     // Format the selected text as a clickable
-    quillText.formatText(range.index, range.length, 'clickable', data);
+    quillText.formatText(range.index, range.length, 'clickable', parsedData);
 }
 
 
@@ -960,7 +961,7 @@ function displayTextInRightPanel(content, file_id) {
   const editorContainer = document.getElementById('editorContainer');
   editorContainer.innerHTML = '<div id="right_stuff"><div id="editor"></div></div>';
   var icons = Quill.import('ui/icons');
-  let Inline = Quill.import('blots/inline');
+  var Inline = Quill.import('blots/inline');
 
   class ClickableBlot extends Inline {
     static create(value) {
@@ -1021,7 +1022,8 @@ function displayTextInRightPanel(content, file_id) {
 
   saveBtn.addEventListener('click', function() {
     const editorContent = quill.root.innerHTML;
-
+    
+    console.log(editorContent);
     fetch('/save_content', {
       method: 'POST',
       headers: {
@@ -1030,6 +1032,7 @@ function displayTextInRightPanel(content, file_id) {
       body: JSON.stringify({ 
         content: editorContent,
         f_id: file_id
+
       })
     });
   });

@@ -118,7 +118,9 @@ def filing(username):
 @bp.route('/process_file_content', methods=['POST'])
 def process_file_content():
     content = request.json['content']
+    print(content)
     file = Collectors.get_file(content)
+    print(file)
     return jsonify(processed_content=file.content)
 
 @bp.route('/get_cabinet/<username>', methods=['GET'])
@@ -129,6 +131,7 @@ def get_cabinet(username):
 @bp.route('/save_content', methods=['POST'])
 def save_content():
     data = request.get_json()
+    print(data)
     new_content = data['content']
     desired_file = Collectors.get_file(data['f_id'])
     desired_file.content = new_content
@@ -234,7 +237,7 @@ def update_json():
         for f_id in data['allFiles']:
             if f_id not in data['changeList']:
                 final_affected_list.append(f_id)
-        print(final_affected_list)
+        
         user.my_documents = ready_data
         if len(data['changeList']) > 0:
             for item in data['changeList']:
