@@ -948,7 +948,7 @@ async function send_selection(quillText) {
     let range = quillText.getSelection(true);
     
     // Change the color of the selected text
-    quillText.formatText(range.index, range.length, 'color', 'red'); // Change 'red' to the color you want
+    quillText.formatText(range.index, range.length, 'color', 'yellow'); // Change 'yellow' to the color you want
 
     // Format the selected text as a clickable
     quillText.formatText(range.index, range.length, 'clickable', data);
