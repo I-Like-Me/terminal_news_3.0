@@ -551,9 +551,14 @@ ul {
   width: 50%; /* Adjust as needed */
   height: 100%;
   background-color: #f9f9f9;
-  z-index: 2;
+  z-index: 1;
   display: none;
   overflow-y: auto;
+  /* Inherit the style of the rest of the application */
+  color: black;
+  padding: 6px 8px;
+  font-family: 'VT323', Courier;
+  text-decoration: none;
 }
 
 #closeBtn {
@@ -561,4 +566,8 @@ ul {
   top: 10px;
   left: 10px;
   cursor: pointer;
+  /* Inherit the style of the rest of the application */
+  padding: 6px 8px;
+  font-family: 'VT323', Courier;
+  text-decoration: none;
 }
