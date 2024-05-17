@@ -742,10 +742,12 @@ class Character(db.Model):
     #         self.parties.append(party)
     #         user = self.player
     #         user.my_documents ?continue here?
-
+ 
 class Cls_5e(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     classed_character_association = db.relationship("CharCls", back_populates="cls")
     classed_characters = association_proxy('classed_character_association', 'classed_character')
     arch_choices = db.relationship("Architype", secondary=cls_arch_table, back_populates="arched_cls")
@@ -774,7 +776,8 @@ class Cls_5e(db.Model):
 class Ladder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     char_ladder = db.relationship("Character", secondary=char_ladder_table, back_populates="ladder")
     ladder_features = db.relationship("Feature", secondary=ladder_feature_table, back_populates="featured_ladder")
     ladder_gain_5 = db.Column(db.String(2000))
@@ -792,7 +795,8 @@ class Ladder(db.Model):
 class Race(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     value = db.Column(db.Integer)
     race_stat_increases = db.Column(db.String(2000))
     size = db.Column(db.String(64))
@@ -812,7 +816,8 @@ class Race(db.Model):
 class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     char_cur_loc = db.relationship("Lifeinfo", secondary=life_info_cur_loc_table, back_populates="cur_loc")
     char_birth_loc = db.relationship("Lifeinfo", secondary=life_info_birth_loc_table, back_populates="birth_loc")
 
@@ -823,7 +828,8 @@ class Location(db.Model):
 class Background(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     extra_languages_num = db.Column(db.Integer)
     skill_pros = db.relationship("Skill", secondary=bg_pro_skill_table, back_populates="skl_trained_bg")
     tool_pros = db.relationship("Gear", secondary=bg_pro_tool_table, back_populates="tool_trained_bg")
@@ -842,7 +848,8 @@ class Background(db.Model):
 class Alignment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     aligned_char = db.relationship("Character", secondary=char_alignment_table, back_populates="alignment")
 
     def __repr__(self):
@@ -852,7 +859,8 @@ class Alignment(db.Model):
 class Faction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     char_fac = db.relationship("Character", secondary=char_faction_table, back_populates="factions")
     fac_ranks = db.relationship("Rank", secondary=fac_rank_table, back_populates="ranked_facs")
 
@@ -863,7 +871,8 @@ class Faction(db.Model):
 class Rank(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     ranked_facs = db.relationship("Faction", secondary=fac_rank_table, back_populates="fac_ranks")
     ranked_char = db.relationship("Character", secondary=char_rank_table, back_populates="ranks")
 
@@ -874,7 +883,8 @@ class Rank(db.Model):
 class Architype(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     arch_features = db.relationship("Feature", secondary=arch_feature_table, back_populates="featured_arch")
     arched_cls = db.relationship("Cls_5e", secondary=cls_arch_table, back_populates="arch_choices")
     picked_arch = db.relationship("Clsinfo", secondary=cls_info_arch_table, back_populates="archs")
@@ -887,7 +897,8 @@ class Feature(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     level_access = db.Column(db.Integer)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     tool_pros = db.relationship("Gear", secondary=feature_pro_tool_table, back_populates="tool_trained_feature")
     weap_pros = db.relationship("Weapon", secondary=feature_pro_weap_table, back_populates="weap_trained_feature")
     skill_pros = db.relationship("Skill", secondary=feature_pro_skill_table, back_populates="skl_trained_feature")
@@ -909,6 +920,8 @@ class Feature(db.Model):
 class Ability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     cls_sav_throw = db.relationship("Cls_5e", secondary=cls_sav_ability_table, back_populates="sav_throws")
     armor_mod = db.relationship("Armor", secondary=ability_armor_mod_table, back_populates="ac_mod_type")
     skills = db.relationship("Skill", secondary=ability_skill_table, back_populates="ability")
@@ -920,6 +933,8 @@ class Ability(db.Model):
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     skl_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_skill_table, back_populates="skill_pros")
     skl_trained_bg = db.relationship("Background", secondary=bg_pro_skill_table, back_populates="skill_pros")
     skl_trained_feature = db.relationship("Feature", secondary=feature_pro_skill_table, back_populates="skill_pros")
@@ -933,7 +948,8 @@ class Skill(db.Model):
 class Feat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     char_feat = db.relationship("Character", secondary=char_feat_table, back_populates="feats")
 
     def __repr__(self):
@@ -1015,7 +1031,8 @@ class AbilityScores(db.Model):
 class Weapon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     damage_dice = db.relationship("Dice", secondary=weap_dice_table, back_populates="damage_roller")
     num_of_dice = db.Column(db.Integer)
     dmg_type = db.relationship("Damagetype", secondary=weap_dmg_type_table, back_populates="weap_source")
@@ -1038,7 +1055,8 @@ class Weapon(db.Model):
 class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     weap_prop = db.relationship("Weapon", secondary=weapon_property_table, back_populates="properties")
     armor_prop = db.relationship("Armor", secondary=armor_property_table, back_populates="properties")
     vehicle_prop = db.relationship("Vehicle", secondary=vehicle_property_table, back_populates="properties")
@@ -1052,7 +1070,8 @@ class Property(db.Model):
 class Ammo_power(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     dmg_type = db.relationship("Damagetype", secondary=ammo_power_dmg_type_table, back_populates="ammo_source")
     weap_load = db.relationship("Weapon", secondary=ammo_power_weap_table, back_populates="ammo")
     armor_load = db.relationship("Armor", secondary=ammo_power_armor_table, back_populates="power")
@@ -1067,6 +1086,8 @@ class Ammo_power(db.Model):
 class Armor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     armor_size = db.Column(db.String(64))
     ac = db.Column(db.Integer)
     ac_mod_type = db.relationship("Ability", secondary=ability_armor_mod_table, back_populates="armor_mod")
@@ -1091,7 +1112,8 @@ class Armor(db.Model):
 class Gear(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     power = db.relationship("Ammo_power", secondary=ammo_power_gear_table, back_populates="gear_load")
     tool_trained_char = db.relationship("Character", secondary=char_pro_tool_table, back_populates="tool_pros")
     tool_trained_cls = db.relationship("Cls_5e", secondary=cls_pro_tool_table, back_populates="tool_pros")
@@ -1106,7 +1128,8 @@ class Gear(db.Model):
 class Vehicle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     type = db.Column(db.String(120))
     speed = db.Column(db.Integer)
     capacity = db.Column(db.Integer)
@@ -1125,7 +1148,8 @@ class Vehicle(db.Model):
 class Mech(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     power = db.relationship("Ammo_power", secondary=ammo_power_mech_table, back_populates="mech_load")
     properties = db.relationship("Property", secondary=mech_property_table, back_populates="mech_prop")
     mech_trained_char = db.relationship("Character", secondary=char_pro_mech_table, back_populates="mech_pros")
@@ -1141,7 +1165,8 @@ class Mech(db.Model):
 class Cybernetic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     body_part = db.Column(db.String(64))
     properties = db.relationship("Property", secondary=cyber_property_table, back_populates="cyber_prop")
     owner = db.relationship("Character", secondary=char_cyber_table, back_populates="cybernetics")
@@ -1153,7 +1178,8 @@ class Cybernetic(db.Model):
 class Spell(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    description = db.Column(db.String(2000))
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     cantrip = db.Column(db.Boolean, default=False)
     level = db.Column(db.Integer, default=1)
     cls_books = db.relationship("Cls_5e", secondary=cls_spell_table, back_populates="spellbook") 
@@ -1166,6 +1192,8 @@ class Spell(db.Model):
 class Damagetype(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     weap_source = db.relationship("Weapon", secondary=weap_dmg_type_table, back_populates="dmg_type")
     race_resist = db.relationship("Race", secondary=race_dmg_resist_table, back_populates="dmg_resist")
     race_immune = db.relationship("Race", secondary=race_dmg_immune_table, back_populates="dmg_immune")
@@ -1188,6 +1216,8 @@ class Damagetype(db.Model):
 class Dice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     value = db.Column(db.Integer)
     damage_roller = db.relationship("Weapon", secondary=weap_dice_table, back_populates="damage_dice")
     cls_hit_dice = db.relationship("Cls_5e", secondary=cls_hit_dice_table, back_populates="hit_dice_type")
@@ -1199,6 +1229,8 @@ class Dice(db.Model):
 class Language(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.String(5000))
+    summary = db.Column(db.String(2000))
     race_lang = db.relationship("Race", secondary=race_lang_table, back_populates="languages")
     lang_speaker = db.relationship("Character", secondary=char_lang_table, back_populates="languages")
 

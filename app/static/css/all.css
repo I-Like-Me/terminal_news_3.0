@@ -561,6 +561,23 @@ ul {
   text-decoration: none;
 }
 
+#olPanelContent {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%; /* Adjust as needed */
+  height: 100%;
+  background-color: #000000;
+  z-index: 1;
+  display: none;
+  overflow-y: auto;
+  /* Inherit the style of the rest of the application */
+  color: #00dd00;
+  padding: 6px 8px;
+  font-family: 'VT323', Courier;
+  text-decoration: none;
+}
+
 #closeBtn {
   position: absolute;
   top: 10px;
@@ -570,4 +587,16 @@ ul {
   padding: 6px 8px;
   font-family: 'VT323', Courier;
   text-decoration: none;
+}
+
+#olPanelTitle {
+  position: absolute;
+  top: 100px;
+  left: 70px;
+}
+
+#olPanelDescription {
+  position: absolute;
+  top: 170px;
+  left: 70px;
 }
