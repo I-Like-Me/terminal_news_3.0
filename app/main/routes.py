@@ -112,15 +112,12 @@ def create_char(asset):
 @login_required
 def filing(username):
     user = User.query.filter_by(username=username).first_or_404()
-    print(user.my_documents)
     return render_template('filing_cabinet.html', user_name=user.username)
 
 @bp.route('/process_file_content', methods=['POST'])
 def process_file_content():
     content = request.json['content']
-    print(content)
     file = Collectors.get_file(content)
-    print(file)
     return jsonify(processed_content=file.content)
 
 @bp.route('/get_cabinet/<username>', methods=['GET'])
@@ -131,7 +128,6 @@ def get_cabinet(username):
 @bp.route('/save_content', methods=['POST'])
 def save_content():
     data = request.get_json()
-    print(data)
     new_content = data['content']
     desired_file = Collectors.get_file(data['f_id'])
     desired_file.content = new_content
@@ -170,17 +166,16 @@ def get_damage_type(id):
 @bp.route('/link_id', methods=['POST'])
 def link_id():
     data = request.get_json()
-    print(data['entryIDK'])
     return jsonify(data['entryIDK'])
 
 @bp.route('/get_summary/<strList>', methods=['GET'])
 def get_summary(strList):
-    cleanStrList = strList[1:-1]
-    realList = cleanStrList.split(',')
-    print(Converters.display_to_exact(realList[0]))
-    print(realList[1])
+    print(strList)
+    # cleanStrList = strList[1:-1]
+    realList = strList.split(',')
     sumItem = Converters.str_to_class(Converters.display_to_exact(realList[0])).query.get(realList[1])
     print(sumItem)
+    return {'title': sumItem.name, 'summary': sumItem.summary}
     
     
 
