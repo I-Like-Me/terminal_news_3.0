@@ -987,6 +987,7 @@ function displayTextInRightPanel(content, file_id) {
           .then(response => response.json())
           .then(data => {
             console.log(data);
+            document.getElementById("olPanelTitle").innerHTML = data.title;
             document.getElementById('overlappingPanel').style.display = 'block';
           });
       });
