@@ -167,11 +167,22 @@ def get_damage_type(id):
     damagetype = Damagetype.query.get(id)
     return {'name': damagetype.name}
 
-@bp.route('/get_summary', methods=['POST'])
-def get_summary():
+@bp.route('/link_id', methods=['POST'])
+def link_id():
     data = request.get_json()
     print(data['entryIDK'])
     return jsonify(data['entryIDK'])
+
+@bp.route('/get_summary/<strList>', methods=['GET'])
+def get_summary(strList):
+    cleanStrList = strList[1:-1]
+    realList = cleanStrList.split(',')
+    print(Converters.display_to_exact(realList[0]))
+    print(realList[1])
+    sumItem = Converters.str_to_class(Converters.display_to_exact(realList[0])).query.get(realList[1])
+    print(sumItem)
+    
+    
 
 @bp.route('/update_json', methods=['POST'])
 def update_json():

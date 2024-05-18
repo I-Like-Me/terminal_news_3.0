@@ -935,7 +935,7 @@ async function send_selection(quillText) {
       entryIDK: entryID
     };
 
-    const response = await fetch('/get_summary', {
+    const response = await fetch('/link_id', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -949,6 +949,8 @@ async function send_selection(quillText) {
 
     const data = await response.json();
     let parsedData = JSON.parse(data);
+    let dataArray = [categoryName,entryID];
+    let dataString = dataArray.toString();
 
     // Get the current selection
     let range = quillText.getSelection(true);
@@ -957,7 +959,7 @@ async function send_selection(quillText) {
     quillText.formatText(range.index, range.length, 'color', 'yellow'); // Change 'yellow' to the color you want
 
     // Format the selected text as a clickable
-    quillText.formatText(range.index, range.length, 'clickable', parsedData);
+    quillText.formatText(range.index, range.length, 'clickable', dataString);
 }
 
 
@@ -977,8 +979,12 @@ function displayTextInRightPanel(content, file_id) {
       node.dataset.linkData = JSON.stringify(value);
       node.addEventListener('click', function(e) {
         e.preventDefault();
-        console.log(this.dataset.linkData);
-        document.getElementById('overlappingPanel').style.display = 'block';
+        fetch('/get_summary/' + this.dataset.linkData)
+          .then(response => response.json())
+          .then(data => {
+            console.log(this.dataset.linkData);
+            document.getElementById('overlappingPanel').style.display = 'block';
+          });
       });
       return node;
     }

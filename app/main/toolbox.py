@@ -9,6 +9,14 @@ class Converters:
     def str_to_class(str):
         return getattr(sys.modules[__name__], str)
     
+    def display_to_exact(dis):
+        tableNames = {
+            "Ability": "Ability",
+            "Skill": "Skill",
+            "Damage Type": "Damagetype"
+        }
+        return tableNames[dis]
+    
 class Collectors:
     def get_bin(asset_type):
         bins = {
