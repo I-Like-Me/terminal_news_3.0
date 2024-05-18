@@ -986,7 +986,7 @@ function displayTextInRightPanel(content, file_id) {
         fetch('/get_summary/' + this.dataset.linkData)
           .then(response => response.json())
           .then(data => {
-            console.log(this.dataset.linkData);
+            console.log(data);
             document.getElementById('overlappingPanel').style.display = 'block';
           });
       });
