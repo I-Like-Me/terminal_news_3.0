@@ -21,7 +21,7 @@
     <div id="file_buttons" class="row" style="display: none;">
         <div class="column">
             <div id="overlappingPanel">
-              <span id="closeBtn"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a>X</a></li></ul></span>
+              <div id="topBar"><span id="closeBtn"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a>X</a></li></ul></span></div>
               <div id="olPanelTitle">Title</div>
               <div id="olPanelDescription">Description</div>
             </div>
@@ -988,6 +988,7 @@ function displayTextInRightPanel(content, file_id) {
           .then(data => {
             console.log(data);
             document.getElementById("olPanelTitle").innerHTML = data.title;
+            document.getElementById("olPanelDescription").innerHTML = data.summary;
             document.getElementById('overlappingPanel').style.display = 'block';
           });
       });
